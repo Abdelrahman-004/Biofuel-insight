@@ -498,6 +498,10 @@ export async function analyzeProject(inputs: {
   - Stress Test 3: Production drops 10%
   - DataPoints: Generate at least 5 data points for the "Investment Sensitivity Visualizer" (label, payback, irr) showing a range of market scenarios from -20% to +20% shifts.
 
+  EXPERT COUNSEL (Crucial):
+  - Provide 3 to 5 highly specific, actionable recommendations in the "ExpertCounsel" array.
+  - If the FinalFeasibilityScore is low (e.g., under 50%, like Algae projects), these recommendations MUST explicitly tell the investor how to pivot or what specific technologies/subsidies/co-products are needed to raise the score to a viable level.
+
   Override investor optimism with realistic engineering numbers.`;
 
   try {

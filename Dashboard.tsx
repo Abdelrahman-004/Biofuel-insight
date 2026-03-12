@@ -507,6 +507,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         </div>
       </div>
 
+      {/* Expert Counsel & Recommendations */}
+      {data.ExpertCounsel && data.ExpertCounsel.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl border border-indigo-800 shadow-xl overflow-hidden"
+        >
+          <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+            <h3 className="text-white font-bold text-lg flex items-center">
+              <i className="fas fa-lightbulb text-amber-400 mr-3 text-xl"></i>
+              Expert Counsel & Actionable Recommendations
+            </h3>
+            <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-500/30">
+              Strategic Advisory
+            </span>
+          </div>
+          <div className="p-6 md:p-8">
+            <p className="text-indigo-200 text-sm mb-6 leading-relaxed">
+              Based on the current feasibility score of <strong className="text-white">{data.FinalFeasibilityScore}%</strong>, our AI investment committee recommends the following strategic actions to improve project viability, reduce risk, and increase your potential ROI:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.ExpertCounsel.map((counsel, index) => (
+                <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-start group hover:bg-white/10 transition-colors">
+                  <div className="bg-indigo-500/20 text-indigo-300 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shrink-0 mr-4 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                    {index + 1}
+                  </div>
+                  <p className="text-slate-300 text-sm leading-relaxed pt-1">
+                    {counsel}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Economic Chart */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
