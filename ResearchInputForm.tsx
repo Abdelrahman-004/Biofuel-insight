@@ -7,7 +7,7 @@ interface ResearchInputFormProps {
   initialInputs?: any;
 }
 
-const BIOFUEL_TYPES = ['Bioethanol', 'Biodiesel', 'Biogas', 'Biobutanol'];
+const BIOFUEL_TYPES = ['Bioethanol', 'Biodiesel', 'Biogas', 'Biobutanol', 'Decarbonization'];
 const PATHWAYS = ['Biochemical', 'Thermochemical', 'Hybrid'];
 
 const STORAGE_KEY = 'biofuel_insight_research_form_draft';
@@ -18,8 +18,8 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
     feedstockType: 'Agricultural Waste (Date Palm)',
     conversionPathway: PATHWAYS[0],
     labYield: '0.45 Liters/kg',
-    efficiency: 85,
-    trl: 3,
+    efficiency: '85',
+    trl: '3',
     scale: '10,000 Tons/Year'
   });
 
@@ -48,7 +48,11 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAnalyze(inputs);
+    onAnalyze({
+      ...inputs,
+      efficiency: Number(inputs.efficiency),
+      trl: Number(inputs.trl)
+    });
   };
 
   const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition placeholder:text-slate-500";
@@ -114,7 +118,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
             <input 
               type="number" 
               value={inputs.efficiency}
-              onChange={(e) => setInputs({...inputs, efficiency: Number(e.target.value)})}
+              onChange={(e) => setInputs({...inputs, efficiency: e.target.value})}
               className={inputClasses}
             />
           </div>
@@ -124,7 +128,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
               type="number" 
               min="1" max="9"
               value={inputs.trl}
-              onChange={(e) => setInputs({...inputs, trl: Number(e.target.value)})}
+              onChange={(e) => setInputs({...inputs, trl: e.target.value})}
               className={inputClasses}
             />
           </div>

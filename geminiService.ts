@@ -62,7 +62,14 @@ RENEWABLE ENERGY:
 Output MUST be valid JSON following the provided schema.`;
 
 const getApiKey = () => {
-  return process.env.GEMINI_API_KEY || "";
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    if (import.meta.env.VITE_GEMINI_API_KEY) return import.meta.env.VITE_GEMINI_API_KEY;
+    if (import.meta.env.GEMINI_API_KEY) return import.meta.env.GEMINI_API_KEY;
+  }
+  try {
+    if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+  } catch (e) {}
+  return "";
 };
 
 const MOCK_DATA = {
@@ -387,6 +394,10 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay =
   throw lastError;
 }
 
+const getLanguageInstruction = () => {
+  return "";
+};
+
 export async function optimizeProject(projectName: string, description: string): Promise<OptimizerResult> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -405,7 +416,7 @@ The system includes:
 5. Net-Zero Advisor AI: Estimate carbon intensity (kg CO2-eq per MJ) and provide a roadmap to net-zero.
 
 Tone: Clear, Practical, Scientific, Investor-friendly, Realistic.
-Output MUST be valid JSON following the provided schema.`;
+Output MUST be valid JSON following the provided schema.${getLanguageInstruction()}`;
 
   const prompt = `Optimize the following biofuel project for profit and low-carbon impact:
   Project Name: ${projectName}
@@ -502,7 +513,7 @@ export async function analyzeProject(inputs: {
   - Provide 3 to 5 highly specific, actionable recommendations in the "ExpertCounsel" array.
   - If the FinalFeasibilityScore is low (e.g., under 50%, like Algae projects), these recommendations MUST explicitly tell the investor how to pivot or what specific technologies/subsidies/co-products are needed to raise the score to a viable level.
 
-  Override investor optimism with realistic engineering numbers.`;
+  Override investor optimism with realistic engineering numbers.${getLanguageInstruction()}`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
@@ -614,7 +625,7 @@ export async function analyzeProject(inputs: {
                   required: ["Minimum", "Maximum", "MajorCosts"]
                 }
               },
-              required: ["Assessment", "Justification", "PaybackPeriodYears", "RealisticRequiredCAPEX", "InvestmentVerdict"]
+              required: ["Assessment", "Justification", "PaybackPeriodYears", "RealisticRequiredCAPEX", "FundingGapUSD", "FundingGapPercentage", "InstalledCostPerUnit", "AnnualRevenue", "AnnualOPEX", "GrossProfit", "CapitalAdequacyRatio", "InvestmentVerdict", "EstimatedInvestmentUSD"]
             },
             SensitivityAnalysis: {
               type: Type.OBJECT,
@@ -690,16 +701,41 @@ export async function analyzeProject(inputs: {
                 ModelLimitations: { type: Type.ARRAY, items: { type: Type.STRING } },
                 DataGaps: { type: Type.ARRAY, items: { type: Type.STRING } }
               },
-              required: ["KeyAssumptions", "BenchmarkSources"]
+              required: ["KeyAssumptions", "BenchmarkSources", "ModelLimitations", "DataGaps"]
             },
             AuditorAssessment: {
               type: Type.OBJECT,
               properties: {
                 ValidationSummary: { type: Type.ARRAY, items: { type: Type.STRING } },
+                MetricClassifications: {
+                  type: Type.OBJECT,
+                  properties: {
+                    ProductionScale: { type: Type.STRING, enum: ['Realistic', 'Optimistic', 'Pessimistic'] },
+                    CapitalIntensity: { type: Type.STRING, enum: ['Realistic', 'Optimistic', 'Pessimistic'] },
+                    ROIEstimate: { type: Type.STRING, enum: ['Realistic', 'Optimistic', 'Pessimistic'] }
+                  },
+                  required: ["ProductionScale", "CapitalIntensity", "ROIEstimate"]
+                },
+                OptimizedProduction: {
+                  type: Type.OBJECT,
+                  properties: {
+                    RecommendedRange: { type: Type.STRING },
+                    Justification: { type: Type.STRING }
+                  },
+                  required: ["RecommendedRange", "Justification"]
+                },
+                OptimizedInvestment: {
+                  type: Type.OBJECT,
+                  properties: {
+                    RecommendedRange: { type: Type.STRING },
+                    StagedStrategy: { type: Type.STRING }
+                  },
+                  required: ["RecommendedRange", "StagedStrategy"]
+                },
                 RealityCheck: { type: Type.STRING },
                 FinalVerdict: { type: Type.STRING }
               },
-              required: ["ValidationSummary", "RealityCheck", "FinalVerdict"]
+              required: ["ValidationSummary", "MetricClassifications", "OptimizedProduction", "OptimizedInvestment", "RealityCheck", "FinalVerdict"]
             },
             AuditAIReview: {
               type: Type.OBJECT,
@@ -713,10 +749,11 @@ export async function analyzeProject(inputs: {
             FinalFeasibilityScore: { type: Type.NUMBER },
             RiskExposureLevel: { type: Type.STRING, enum: ['Moderate', 'Significant', 'Critical'] },
             Rationale: { type: Type.STRING },
-            ExpertCounsel: { type: Type.ARRAY, items: { type: Type.STRING } }
+            ExpertCounsel: { type: Type.ARRAY, items: { type: Type.STRING } },
+            Dashboard: { type: Type.STRING }
           },
           required: [
-            "ProjectAnalyzer", "EconomicFeasibility", "SensitivityAnalysis", "FinalFeasibilityScore", "RiskExposureLevel", "Rationale"
+            "ProjectAnalyzer", "TechnicalAI", "FinancialAI", "AuditorAI", "RiskAI", "RecommendedBiofuelType", "EnergyDomain", "EconomicFeasibility", "EnvironmentalImpact", "KeyRisks", "AuditAIReview", "InvestorPerspective", "Vision2040Alignment", "ProjectReadiness", "AnalysisAssumptions", "AuditorAssessment", "SensitivityAnalysis", "FinalFeasibilityScore", "RiskExposureLevel", "Rationale", "ExpertCounsel", "Dashboard"
           ]
         }
       }
@@ -747,13 +784,15 @@ The system consists of five AI agents:
 5. Impact Evaluation AI: Evaluate environmental, economic, and strategic impact for Oman.
 
 Output MUST be valid JSON following the provided schema.
-Tone: Scientific, Clear, Practical, Educational, Realistic.`;
+Tone: Scientific, Clear, Practical, Educational, Realistic.${getLanguageInstruction()}`;
 
   const prompt = `Identify and solve a specific scientific and technical challenge related to: "${topic}".
   
   Context: Oman's biofuel industry, climate (high heat, humidity), and resource constraints (water scarcity).
   
-  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process.`;
+  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process.
+  
+  CRITICAL: You must provide highly detailed, comprehensive information. Do not be brief. Provide in-depth explanations of the problem, the underlying science, and step-by-step, actionable, and highly detailed solutions. Expand on the methodologies, potential pitfalls, and advanced mitigation strategies.`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
@@ -856,7 +895,7 @@ export async function analyzeResearchImplementation(
       config: {
         systemInstruction: `You are an advanced biofuel scientific application analyst. 
         Your tone must be professional, analytical, and research-oriented.
-        Output MUST be valid JSON following the provided schema.`,
+        Output MUST be valid JSON following the provided schema.${getLanguageInstruction()}`,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -1044,7 +1083,7 @@ export async function suggestProject(context: string): Promise<SuggestedProject>
       contents: `Suggest a realistic, Oman-specific project concept for ${context}. Focus on feasibility and Vision 2040 alignment. 
       Include a list of specific Omani government incentives (tax breaks, land grants, subsidies) the project qualifies for based on its type and location.`,
       config: {
-        systemInstruction: "You are an industrial project developer for the energy transition in Oman. Provide innovative but pilot-scale realistic projects.",
+        systemInstruction: `You are an industrial project developer for the energy transition in Oman. Provide innovative but pilot-scale realistic projects.${getLanguageInstruction()}`,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,

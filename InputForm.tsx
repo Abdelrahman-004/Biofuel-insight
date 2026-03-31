@@ -30,11 +30,11 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   const [location, setLocation] = React.useState(LOCATIONS[0]);
   const [category, setCategory] = React.useState<'Biofuel' | 'Renewable Energy'>('Biofuel');
   const [feedstock, setFeedstock] = React.useState(BIOFUEL_FEEDSTOCKS[0]);
-  const [production, setProduction] = React.useState(1500);
-  const [budget, setBudget] = React.useState(15000000);
-  const [sellingPrice, setSellingPrice] = React.useState(1200);
-  const [electricityCost, setElectricityCost] = React.useState(0.05);
-  const [laborCost, setLaborCost] = React.useState(500000);
+  const [production, setProduction] = React.useState<string | number>(1500);
+  const [budget, setBudget] = React.useState<string | number>(15000000);
+  const [sellingPrice, setSellingPrice] = React.useState<string | number>(1200);
+  const [electricityCost, setElectricityCost] = React.useState<string | number>(0.05);
+  const [laborCost, setLaborCost] = React.useState<string | number>(500000);
   const [co2Source, setCo2Source] = React.useState(CO2_SOURCES[0]);
 
   // Load initialInputs if provided
@@ -98,11 +98,11 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
       location,
       category,
       feedstock,
-      production,
-      budget,
-      sellingPrice: category === 'Biofuel' ? sellingPrice : 0,
-      electricityCost: category === 'Biofuel' ? electricityCost : undefined,
-      laborCost: category === 'Biofuel' ? laborCost : undefined,
+      production: Number(production),
+      budget: Number(budget),
+      sellingPrice: category === 'Biofuel' ? Number(sellingPrice) : 0,
+      electricityCost: category === 'Biofuel' ? Number(electricityCost) : undefined,
+      laborCost: category === 'Biofuel' ? Number(laborCost) : undefined,
       co2Source: category === 'Biofuel' ? co2Source : undefined
     });
   };
@@ -243,8 +243,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             </label>
             <input 
               type="number" 
-              value={production || ''}
-              onChange={(e) => setProduction(Number(e.target.value))}
+              value={production}
+              onChange={(e) => setProduction(e.target.value)}
               className={inputClasses}
               placeholder="0 (Automatic Estimate)"
             />
@@ -257,8 +257,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Investor Budget (USD)</label>
             <input 
               type="number" 
-              value={budget || ''}
-              onChange={(e) => setBudget(Number(e.target.value))}
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
               className={inputClasses}
               placeholder="0 (Automatic Estimate)"
             />
@@ -277,8 +277,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               </label>
               <input 
                 type="number" 
-                value={sellingPrice || ''}
-                onChange={(e) => setSellingPrice(Number(e.target.value))}
+                value={sellingPrice}
+                onChange={(e) => setSellingPrice(e.target.value)}
                 className={inputClasses}
               />
             </motion.div>
@@ -295,8 +295,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Electricity (USD/kWh)</label>
                 <input 
                   type="number" step="0.01"
-                  value={electricityCost || ''}
-                  onChange={(e) => setElectricityCost(Number(e.target.value))}
+                  value={electricityCost}
+                  onChange={(e) => setElectricityCost(e.target.value)}
                   className={inputClasses}
                 />
               </motion.div>
@@ -308,8 +308,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Labor Cost/Yr (USD)</label>
                 <input 
                   type="number" 
-                  value={laborCost || ''}
-                  onChange={(e) => setLaborCost(Number(e.target.value))}
+                  value={laborCost}
+                  onChange={(e) => setLaborCost(e.target.value)}
                   className={inputClasses}
                 />
               </motion.div>
