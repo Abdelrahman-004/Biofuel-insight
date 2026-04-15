@@ -2,10 +2,12 @@
 import * as React from 'react';
 import { Home } from './Home';
 import { InputForm } from './InputForm';
+import { StandardsChecker } from './StandardsChecker';
+import { ProposalGenerator } from './ProposalGenerator';
 
 interface NavbarProps {
   activeTab: string;
-  onTabChange: (tab: 'HOME' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'ZONES') => void;
+  onTabChange: (tab: 'HOME' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
 }
 
 const BiofuelOmanLogo = () => (
@@ -58,6 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
               { id: 'SOLVER', label: 'Challenge Solver' },
               { id: 'OPTIMIZER', label: 'Profit Optimizer' },
               { id: 'STANDARDS', label: 'Standards' },
+              { id: 'PROPOSAL', label: 'Proposal Gen' },
               { id: 'ZONES', label: 'Zones' }
             ].map(item => (
               <button 
@@ -147,7 +150,7 @@ const ACTIVE_TAB_KEY = 'biofuel_insight_active_tab';
 const CURRENT_ANALYSIS_KEY = 'biofuel_insight_current_analysis';
 const CURRENT_RESEARCH_KEY = 'biofuel_insight_current_research';
 
-type MainTab = 'HOME' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'ZONES';
+type MainTab = 'HOME' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
 type FeasibilityView = 'ANALYZE' | 'HISTORY' | 'COMPARE';
 type ResearchView = 'ANALYZE' | 'HISTORY';
 
@@ -681,9 +684,38 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'STANDARDS' && (
-          <section className="max-w-5xl mx-auto px-4 py-12">
-            <GlobalStandards />
-          </section>
+          <div className="animate-in fade-in duration-500">
+            <section className="bg-blue-900 text-white py-12 px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+                  Standards <span className="text-blue-400 underline decoration-blue-500/30">Compliance</span> Checker
+                </h1>
+                <p className="text-md text-blue-100/80 max-w-2xl mx-auto">
+                  Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability in Oman.
+                </p>
+              </div>
+            </section>
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20">
+              <StandardsChecker />
+            </section>
+          </div>
+        )}
+        {activeMainTab === 'PROPOSAL' && (
+          <div className="animate-in fade-in duration-500">
+            <section className="bg-emerald-900 text-white py-12 px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+                  Automated <span className="text-emerald-400 underline decoration-emerald-500/30">Proposal</span> Generator
+                </h1>
+                <p className="text-md text-emerald-100/80 max-w-2xl mx-auto">
+                  Generate professional, data-driven grant and investment proposals tailored for Oman's funding ecosystem.
+                </p>
+              </div>
+            </section>
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20">
+              <ProposalGenerator />
+            </section>
+          </div>
         )}
         {activeMainTab === 'ZONES' && (
           <section className="max-w-6xl mx-auto px-4 py-12">

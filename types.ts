@@ -116,6 +116,27 @@ export interface ResearchInputParameters {
   DesiredPilotScale: string;
 }
 
+export interface ResearchImplementationReadinessScore {
+  TechnicalScalability: number;
+  ExperimentalFeasibility: number;
+  SafetyEnvironmental: number;
+  ReadinessForSmallScale: number;
+  OverallScore: number;
+}
+
+export interface CostItem {
+  USD: string;
+  OMR: string;
+}
+
+export interface TRLRoadmapStep {
+  trl: number;
+  title: string;
+  description: string;
+  estimatedDuration: string;
+  keyMilestones: string[];
+}
+
 export interface ImplementationEstimator {
   FeedstockRequirements: string;
   EquipmentSetup: string[];
@@ -129,19 +150,6 @@ export interface ProductionOutputEstimation {
   EnergyOutput: string;
   ByProductValueEstimation: string;
   CarbonReductionPotential: string;
-}
-
-export interface ResearchImplementationReadinessScore {
-  TechnicalScalability: number;
-  ExperimentalFeasibility: number;
-  SafetyEnvironmental: number;
-  ReadinessForSmallScale: number;
-  OverallScore: number;
-}
-
-export interface CostItem {
-  USD: string;
-  OMR: string;
 }
 
 export interface PilotScaleCostEstimation {
@@ -170,23 +178,45 @@ export interface PilotScaleCostEstimation {
   CostAssumptions: string[];
 }
 
-export interface TRLRoadmapStep {
-  trl: number;
-  title: string;
-  description: string;
-  estimatedDuration: string;
-  keyMilestones: string[];
+export interface ResourceRequirements {
+  MassBalance: string;
+  PreTreatmentRequired: string;
+}
+
+export interface AdjustedFinancialApproximation {
+  EquipmentCost: CostItem;
+  InstallationCost: CostItem;
+  FeedstockCost: CostItem;
+  OperatingCost: CostItem;
+  ContingencyBuffer: CostItem;
+  TotalBudgetWithBuffer: CostItem;
+  OmanLogisticsMultiplierApplied: boolean;
+}
+
+export interface SensitivityAnalysis {
+  Scenario: string;
+  ImpactOnLiterPrice: string;
+}
+
+export interface TechnicalRiskAssessment {
+  ScientificChallenges: string[];
+  MitigationStrategies: string[];
 }
 
 export interface ResearchImplementationAnalysis {
   id: string;
   timestamp: string;
   ResearchInputs: ResearchInputParameters;
+  FeasibilityOverview: string;
   ImplementationEstimator: ImplementationEstimator;
+  ResourceRequirements: ResourceRequirements;
   ProductionOutput: ProductionOutputEstimation;
-  ReadinessScore: ResearchImplementationReadinessScore;
+  AdjustedFinancialApproximation: AdjustedFinancialApproximation;
   CostEstimation: PilotScaleCostEstimation;
+  SensitivityAnalysis: SensitivityAnalysis;
+  TechnicalRiskAssessment: TechnicalRiskAssessment;
   TRLRoadmap: TRLRoadmapStep[];
+  ReadinessScore: ResearchImplementationReadinessScore;
   ScientificSummary: string;
   Assumptions: string[];
   RiskFactors: string[];
@@ -347,4 +377,79 @@ export interface ProjectHistoryEntry {
 
 export type AnalysisStatus = 'IDLE' | 'ANALYZING' | 'COMPLETED' | 'ERROR';
 
-export type MainTab = 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'ZONES';
+export type MainTab = 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
+
+// Standards Checker Interfaces
+export interface StandardsInput {
+  biofuelType: string;
+  viscosity?: string;
+  flashPoint?: string;
+  waterContent?: string;
+  acidValue?: string;
+  density?: string;
+  cetaneNumber?: string;
+  sulfurContent?: string;
+}
+
+export interface ParameterEvaluation {
+  parameter: string;
+  userValue: string;
+  standardLimit: string;
+  status: 'Pass' | 'Fail' | 'Warning' | 'Not Provided';
+  implication: string;
+  fixRecommendation?: string;
+}
+
+export interface StandardsResult {
+  id: string;
+  timestamp: string;
+  biofuelType: string;
+  overallStatus: 'Compliant' | 'Non-Compliant' | 'Needs Adjustment';
+  targetStandard: string; // e.g., ASTM D6751, EN 14214
+  evaluations: ParameterEvaluation[];
+  expertSummary: string;
+  commercialViability: string;
+}
+
+export interface StandardsHistoryEntry {
+  id: string;
+  timestamp: string;
+  biofuelType: string;
+  overallStatus: string;
+  fullData: StandardsResult;
+}
+
+// Proposal Generator Interfaces
+export interface ProposalInput {
+  projectName: string;
+  feedstock: string;
+  biofuelType: string;
+  capacity: string;
+  budget: string;
+  targetAudience: string;
+}
+
+export interface ProposalResult {
+  id: string;
+  timestamp: string;
+  title: string;
+  executiveSummary: string;
+  problemStatement: string;
+  omanVision2040Alignment: string;
+  methodology: string;
+  financialViability: string;
+  carbonCreditPotential: {
+    estimatedTonsSaved: string;
+    monetaryValueRange: string;
+    explanation: string;
+  };
+  conclusion: string;
+}
+
+export interface ProposalHistoryEntry {
+  id: string;
+  timestamp: string;
+  projectName: string;
+  targetAudience: string;
+  fullData: ProposalResult;
+}

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 interface HomeProps {
-  onStart: (tool: 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'ZONES') => void;
+  onStart: (tool: 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onStart }) => {
@@ -59,11 +59,20 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'STANDARDS',
-      title: 'Global Standards',
-      description: 'Stay updated with international biofuel regulations and sustainability certifications.',
+      title: 'Standards Checker',
+      description: 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability.',
       icon: Globe,
       color: 'from-slate-500/20 to-slate-500/5',
       accent: 'text-slate-400',
+      size: 'small'
+    },
+    {
+      id: 'PROPOSAL',
+      title: 'Proposal Generator',
+      description: 'Generate professional, data-driven grant and investment proposals tailored for Oman.',
+      icon: Lightbulb,
+      color: 'from-emerald-500/20 to-emerald-500/5',
+      accent: 'text-emerald-400',
       size: 'small'
     },
     {

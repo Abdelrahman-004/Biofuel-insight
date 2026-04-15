@@ -296,19 +296,72 @@ const MOCK_DATA = {
         TechnologyReadinessLevel: inputs.trl || 4,
         DesiredPilotScale: scale
       },
+      FeasibilityOverview: `The research on ${feedstock} demonstrates high potential for localized ${biofuel} production in Oman.`,
+      ScientificSummary: `This project aims to convert ${feedstock} into ${biofuel} using a ${inputs.conversionPathway || "Biochemical"} pathway.`,
       ImplementationEstimator: {
         FeedstockRequirements: `Approximately 1.2x the target output of ${feedstock} daily.`,
-        EquipmentSetup: [`Batch reactor for ${biofuel}`, "Centrifuge system", "Vacuum distillation unit", "Quality control sensors"],
-        EnergyUtilities: "15 kWh daily electricity consumption.",
-        WasteManagement: "Byproduct recovery for secondary industrial use.",
-        EfficiencyAdjustments: "Heat recovery integration suggested for 12% energy saving."
+        EquipmentSetup: ["Reactor System", "Pre-treatment Unit", "Distillation Column"],
+        EnergyUtilities: "Requires 50 kWh/day of electricity and 200 L/day of cooling water.",
+        WasteManagement: "Solid residue can be used as fertilizer.",
+        EfficiencyAdjustments: "Expected 10% efficiency drop when scaling from lab to pilot."
+      },
+      ResourceRequirements: {
+        MassBalance: `Approximately 1.2x the target output of ${feedstock} daily.`,
+        PreTreatmentRequired: "Mechanical crushing and acid esterification required."
       },
       ProductionOutput: {
-        AnnualFuelOutput: `${scale} capacity estimated at 35,000 Liters/Year`,
-        EnergyOutput: "1,250 GJ/Year",
-        ByProductValueEstimation: "High - Byproducts can be sold to local manufacturers.",
-        CarbonReductionPotential: "92 Tons CO2-eq per year."
+        AnnualFuelOutput: "30,000 Liters",
+        EnergyOutput: "1,050,000 MJ",
+        ByProductValueEstimation: "Glycerol by-product valued at $500/year.",
+        CarbonReductionPotential: "Estimated 75 tons CO2e reduction annually."
       },
+      AdjustedFinancialApproximation: {
+        EquipmentCost: { USD: "$47,000", OMR: "18,095 OMR" },
+        InstallationCost: { USD: "$12,000", OMR: "4,620 OMR" },
+        FeedstockCost: { USD: "$5,000", OMR: "1,925 OMR" },
+        OperatingCost: { USD: "$12,500", OMR: "4,812 OMR" },
+        ContingencyBuffer: { USD: "$8,850", OMR: "3,407 OMR" },
+        TotalBudgetWithBuffer: { USD: "$85,350", OMR: "32,859 OMR" },
+        OmanLogisticsMultiplierApplied: true
+      },
+      CostEstimation: {
+        EquipmentCosts: {
+          ReactorSystem: { USD: "$20,000", OMR: "7,700 OMR" },
+          PreTreatmentSystem: { USD: "$10,000", OMR: "3,850 OMR" },
+          HeatingCoolingSystems: { USD: "$5,000", OMR: "1,925 OMR" },
+          DistillationUpgradingUnit: { USD: "$8,000", OMR: "3,080 OMR" },
+          StorageTanks: { USD: "$2,000", OMR: "770 OMR" },
+          SafetyMonitoringSystems: { USD: "$2,000", OMR: "770 OMR" },
+          TotalEquipmentCost: { USD: "$47,000", OMR: "18,095 OMR" }
+        },
+        InstallationSetupCost: { USD: "$12,000", OMR: "4,620 OMR" },
+        AnnualOperatingCost: {
+          FeedstockCost: { USD: "$5,000", OMR: "1,925 OMR" },
+          EnergyConsumption: { USD: "$3,000", OMR: "1,155 OMR" },
+          Maintenance: { USD: "$2,500", OMR: "962 OMR" },
+          LaboratoryStaff: "Covered by university payroll",
+          Consumables: { USD: "$2,000", OMR: "770 OMR" },
+          TotalAnnualOperatingCost: { USD: "$12,500", OMR: "4,812 OMR" }
+        },
+        TotalInitialBudgetRange: { USD: "$85,350", OMR: "32,859 OMR" },
+        CostAssumptions: [
+          "Equipment costs include 20% Oman logistics multiplier.",
+          "Staff costs are excluded (academic setting).",
+          "Includes 15% contingency buffer."
+        ]
+      },
+      SensitivityAnalysis: {
+        Scenario: "15% increase in raw material costs",
+        ImpactOnLiterPrice: "+$0.05 per liter"
+      },
+      TechnicalRiskAssessment: {
+        ScientificChallenges: ["Oxidation stability", "FFA saponification", "Filtration residue"],
+        MitigationStrategies: ["Use of antioxidants", "Pre-esterification step", "Advanced membrane filtration"]
+      },
+      TRLRoadmap: [
+        { trl: 5, title: "Pilot Scale Validation", description: `Testing ${biofuel} in a simulated environment.`, estimatedDuration: "6 months", keyMilestones: ["Successful 100L batch", "Quality certification"] },
+        { trl: 6, title: "Demonstration System", description: "Operational in a relevant environment.", estimatedDuration: "12 months", keyMilestones: ["Continuous operation", "Energy efficiency audit"] }
+      ],
       ReadinessScore: {
         TechnicalScalability: 75,
         ExperimentalFeasibility: 90,
@@ -316,35 +369,8 @@ const MOCK_DATA = {
         ReadinessForSmallScale: 70,
         OverallScore: 80
       },
-      CostEstimation: {
-        EquipmentCosts: {
-          ReactorSystem: { USD: "$15,000", OMR: "5,775 OMR" },
-          PreTreatmentSystem: { USD: "$8,000", OMR: "3,080 OMR" },
-          HeatingCoolingSystems: { USD: "$5,000", OMR: "1,925 OMR" },
-          DistillationUpgradingUnit: { USD: "$12,000", OMR: "4,620 OMR" },
-          StorageTanks: { USD: "$3,000", OMR: "1,155 OMR" },
-          SafetyMonitoringSystems: { USD: "$4,000", OMR: "1,540 OMR" },
-          TotalEquipmentCost: { USD: "$47,000", OMR: "18,095 OMR" }
-        },
-        InstallationSetupCost: { USD: "$12,000", OMR: "4,620 OMR" },
-        AnnualOperatingCost: {
-          FeedstockCost: { USD: "$5,000", OMR: "1,925 OMR" },
-          EnergyConsumption: { USD: "$2,500", OMR: "962 OMR" },
-          Maintenance: { USD: "$3,000", OMR: "1,155 OMR" },
-          LaboratoryStaff: "University-funded research assistants.",
-          Consumables: { USD: "$2,000", OMR: "770 OMR" },
-          TotalAnnualOperatingCost: { USD: "$12,500", OMR: "4,812 OMR" }
-        },
-        TotalInitialBudgetRange: { USD: "$55,000 - $65,000", OMR: "21,175 - 25,025 OMR" },
-        CostAssumptions: ["Based on research-grade equipment", "Excludes land cost", "Includes 1 year of consumables"]
-      },
-      TRLRoadmap: [
-        { trl: 5, title: "Pilot Scale Validation", description: `Testing ${biofuel} in a simulated environment.`, estimatedDuration: "6 months", keyMilestones: ["Successful 100L batch", "Quality certification"] },
-        { trl: 6, title: "Demonstration System", description: "Operational in a relevant environment.", estimatedDuration: "12 months", keyMilestones: ["Continuous operation", "Energy efficiency audit"] }
-      ],
-      ScientificSummary: `The research on ${feedstock} demonstrates high potential for localized ${biofuel} production in Oman.`,
-      Assumptions: ["Stable feedstock supply", "Access to university laboratory infrastructure"],
-      RiskFactors: ["Feedstock purity variations", "Scaling heat transfer efficiency"]
+      Assumptions: ["Feedstock is locally available in Oman.", "University lab has basic utilities."],
+      RiskFactors: ["Supply chain delays for specialized equipment.", "Fluctuating feedstock quality."]
     };
   },
   suggest: (context: string): SuggestedProject => ({
@@ -850,7 +876,7 @@ export async function analyzeResearchImplementation(
   }
   const ai = new GoogleGenAI({ apiKey });
   
-  const prompt = `Perform a professional techno-economic "Research Implementation" analysis for the following laboratory-scale biofuel research:
+  const prompt = `Perform a high-precision, feedstock-agnostic feasibility study for the following laboratory-scale biofuel research:
   - Biofuel Type: ${inputs.biofuelType}
   - Feedstock Type: ${inputs.feedstockType}
   - Conversion Pathway: ${inputs.conversionPathway}
@@ -861,7 +887,7 @@ export async function analyzeResearchImplementation(
 
   The goal is to estimate requirements for pilot-scale or small-scale application.
   The output must be purely research-focused, without financial calculations for investors.
-  
+
   Include a "SECTION 5: Academic Pilot-Scale Cost Approximation":
   - Assume the project is a UNIVERSITY-BASED PILOT SYSTEM, not an industrial demonstration plant.
   - Use research-grade equipment pricing, not full industrial automation pricing.
@@ -873,11 +899,37 @@ export async function analyzeResearchImplementation(
   - Clearly separate Equipment Cost, Installation Cost, and Estimated Total Initial Budget (all in USD + OMR).
   - Avoid investment language (no ROI, no IRR, no profit projections).
 
+  CORE LOGIC UPDATES TO APPLY:
+  1. Universal Feedstock Processing:
+     - Variable Yield Logic: Calculate land/raw material requirements based on the specific oil yield of the input (e.g., Algae: 30%, UCO: 100%, Camelina: 35%).
+     - Pre-treatment Analysis: Automatically detect if the feedstock requires a pre-treatment stage (e.g., acid esterification for high FFA waste oils or mechanical crushing for seeds) and adjust the Equipment Cost and OPEX accordingly.
+  2. Financial Realism & Sensitivity (CRITICAL ANCHORS):
+     - To prevent illogical numbers, strictly align the CAPEX with the requested scale (${inputs.scale}). These are ACADEMIC/RESEARCH pilot scales, so costs MUST BE LOW and realistic for Oman:
+       * Bench-scale (1-10 Liters/Day): Total Equipment Cost ~$5,000 - $15,000 USD.
+       * Small Pilot-scale (10-100 Liters/Day): Total Equipment Cost ~$15,000 - $40,000 USD.
+       * Large Pilot-scale (100-500 Liters/Day): Total Equipment Cost ~$40,000 - $90,000 USD.
+     - Dynamic Market Pricing: Calculate total feedstock cost using current regional market estimates (e.g., UCO ~$500-$800/ton, Date Seeds/Solid Biomass ~$100-$300/ton, Algae ~$2000+/ton).
+     - The "What-If" Feature (Sensitivity): Calculate the impact of a 15% increase in raw material costs on the final liter price.
+     - Oman Logistics Factor: Apply a standard 1.2x multiplier to equipment/shipping costs to account for import duties and local transportation within Oman.
+     - Contingency Buffer: Add a mandatory 15% "Safety Buffer" to the total budget to cover unforeseen technical or regulatory expenses.
+     - MATH CHECK: Ensure that (Equipment + Installation + Annual Operating) * 1.15 exactly equals the Total Budget With Buffer.
+     - CURRENCY FORMATTING: Every single financial value MUST include the currency symbol. USD values must start with '$' (e.g., '$15,000') and OMR values must end with 'OMR' (e.g., '5,775 OMR').
+  3. Scientific Bottleneck Detection:
+     - Generate feedstock-specific "Scientific Challenges":
+       - Seed-based: Heat stress, metabolic inhibition, and soil salinity.
+       - Waste-based: Oxidation stability, FFA saponification, and filtration residue.
+       - Algae: Harvesting energy intensity and water salinity management.
+  4. Adaptive TRL Roadmap:
+     - Adjust the scaling timeline based on Technology Maturity:
+       - Mature Pathways (UCO): 18-24 months to reach TRL 9.
+       - Experimental Pathways (Algae/New Crops): 36-48 months to reach TRL 9.
+
   SCORING LOGIC:
   - Normalize TRL as: TRL_score = (TRL / 9) * 100.
   - Final Readiness Score = (TRL_score * 0.4) + (ExperimentalFeasibility * 0.2) + (EnergyEfficiencyScore * 0.2) + (TechnicalScalability * 0.2).
   - All readiness metrics must be scaled 0–100.
-
+  - Provide both USD and OMR cost estimates (1 USD = 0.385 OMR) with explicit currency symbols (e.g. "$10,000" and "3,850 OMR").
+  
   UNIT CONVERSION:
   - Convert any energy output from GJ to KILOWATT (kWh) (1 GJ = 277.778 kWh).
 
@@ -903,9 +955,9 @@ export async function analyzeResearchImplementation(
             ResearchInputs: {
               type: Type.OBJECT,
               properties: {
-                BiofuelType: { type: Type.STRING, enum: ['Bioethanol', 'Biodiesel', 'Biogas', 'Biobutanol'] },
+                BiofuelType: { type: Type.STRING },
                 FeedstockType: { type: Type.STRING },
-                ConversionPathway: { type: Type.STRING, enum: ['Biochemical', 'Thermochemical', 'Hybrid'] },
+                ConversionPathway: { type: Type.STRING },
                 LaboratoryYield: { type: Type.STRING },
                 ConversionEfficiency: { type: Type.NUMBER },
                 TechnologyReadinessLevel: { type: Type.NUMBER },
@@ -913,6 +965,8 @@ export async function analyzeResearchImplementation(
               },
               required: ["BiofuelType", "FeedstockType", "ConversionPathway", "LaboratoryYield", "ConversionEfficiency", "TechnologyReadinessLevel", "DesiredPilotScale"]
             },
+            FeasibilityOverview: { type: Type.STRING },
+            ScientificSummary: { type: Type.STRING },
             ImplementationEstimator: {
               type: Type.OBJECT,
               properties: {
@@ -924,6 +978,14 @@ export async function analyzeResearchImplementation(
               },
               required: ["FeedstockRequirements", "EquipmentSetup", "EnergyUtilities", "WasteManagement", "EfficiencyAdjustments"]
             },
+            ResourceRequirements: {
+              type: Type.OBJECT,
+              properties: {
+                MassBalance: { type: Type.STRING },
+                PreTreatmentRequired: { type: Type.STRING }
+              },
+              required: ["MassBalance", "PreTreatmentRequired"]
+            },
             ProductionOutput: {
               type: Type.OBJECT,
               properties: {
@@ -934,16 +996,18 @@ export async function analyzeResearchImplementation(
               },
               required: ["AnnualFuelOutput", "EnergyOutput", "ByProductValueEstimation", "CarbonReductionPotential"]
             },
-            ReadinessScore: {
+            AdjustedFinancialApproximation: {
               type: Type.OBJECT,
               properties: {
-                TechnicalScalability: { type: Type.NUMBER },
-                ExperimentalFeasibility: { type: Type.NUMBER },
-                SafetyEnvironmental: { type: Type.NUMBER },
-                ReadinessForSmallScale: { type: Type.NUMBER },
-                OverallScore: { type: Type.NUMBER }
+                EquipmentCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                InstallationCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                FeedstockCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                OperatingCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                ContingencyBuffer: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                TotalBudgetWithBuffer: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                OmanLogisticsMultiplierApplied: { type: Type.BOOLEAN }
               },
-              required: ["TechnicalScalability", "ExperimentalFeasibility", "SafetyEnvironmental", "ReadinessForSmallScale", "OverallScore"]
+              required: ["EquipmentCost", "InstallationCost", "FeedstockCost", "OperatingCost", "ContingencyBuffer", "TotalBudgetWithBuffer", "OmanLogisticsMultiplierApplied"]
             },
             CostEstimation: {
               type: Type.OBJECT,
@@ -951,89 +1015,49 @@ export async function analyzeResearchImplementation(
                 EquipmentCosts: {
                   type: Type.OBJECT,
                   properties: {
-                    ReactorSystem: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    PreTreatmentSystem: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    HeatingCoolingSystems: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    DistillationUpgradingUnit: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    StorageTanks: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    SafetyMonitoringSystems: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    TotalEquipmentCost: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    }
+                    ReactorSystem: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    PreTreatmentSystem: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    HeatingCoolingSystems: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    DistillationUpgradingUnit: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    StorageTanks: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    SafetyMonitoringSystems: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    TotalEquipmentCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] }
                   },
                   required: ["ReactorSystem", "PreTreatmentSystem", "HeatingCoolingSystems", "DistillationUpgradingUnit", "StorageTanks", "SafetyMonitoringSystems", "TotalEquipmentCost"]
                 },
-                InstallationSetupCost: { 
-                  type: Type.OBJECT, 
-                  properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                  required: ["USD", "OMR"]
-                },
+                InstallationSetupCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
                 AnnualOperatingCost: {
                   type: Type.OBJECT,
                   properties: {
-                    FeedstockCost: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    EnergyConsumption: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    Maintenance: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
+                    FeedstockCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    EnergyConsumption: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    Maintenance: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
                     LaboratoryStaff: { type: Type.STRING },
-                    Consumables: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    },
-                    TotalAnnualOperatingCost: { 
-                      type: Type.OBJECT, 
-                      properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                      required: ["USD", "OMR"]
-                    }
+                    Consumables: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
+                    TotalAnnualOperatingCost: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] }
                   },
                   required: ["FeedstockCost", "EnergyConsumption", "Maintenance", "LaboratoryStaff", "Consumables", "TotalAnnualOperatingCost"]
                 },
-                TotalInitialBudgetRange: { 
-                  type: Type.OBJECT, 
-                  properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } },
-                  required: ["USD", "OMR"]
-                },
+                TotalInitialBudgetRange: { type: Type.OBJECT, properties: { USD: { type: Type.STRING }, OMR: { type: Type.STRING } }, required: ["USD", "OMR"] },
                 CostAssumptions: { type: Type.ARRAY, items: { type: Type.STRING } }
               },
               required: ["EquipmentCosts", "InstallationSetupCost", "AnnualOperatingCost", "TotalInitialBudgetRange", "CostAssumptions"]
+            },
+            SensitivityAnalysis: {
+              type: Type.OBJECT,
+              properties: {
+                Scenario: { type: Type.STRING },
+                ImpactOnLiterPrice: { type: Type.STRING }
+              },
+              required: ["Scenario", "ImpactOnLiterPrice"]
+            },
+            TechnicalRiskAssessment: {
+              type: Type.OBJECT,
+              properties: {
+                ScientificChallenges: { type: Type.ARRAY, items: { type: Type.STRING } },
+                MitigationStrategies: { type: Type.ARRAY, items: { type: Type.STRING } }
+              },
+              required: ["ScientificChallenges", "MitigationStrategies"]
             },
             TRLRoadmap: {
               type: Type.ARRAY,
@@ -1049,11 +1073,21 @@ export async function analyzeResearchImplementation(
                 required: ["trl", "title", "description", "estimatedDuration", "keyMilestones"]
               }
             },
-            ScientificSummary: { type: Type.STRING },
+            ReadinessScore: {
+              type: Type.OBJECT,
+              properties: {
+                TechnicalScalability: { type: Type.NUMBER },
+                ExperimentalFeasibility: { type: Type.NUMBER },
+                SafetyEnvironmental: { type: Type.NUMBER },
+                ReadinessForSmallScale: { type: Type.NUMBER },
+                OverallScore: { type: Type.NUMBER }
+              },
+              required: ["TechnicalScalability", "ExperimentalFeasibility", "SafetyEnvironmental", "ReadinessForSmallScale", "OverallScore"]
+            },
             Assumptions: { type: Type.ARRAY, items: { type: Type.STRING } },
             RiskFactors: { type: Type.ARRAY, items: { type: Type.STRING } }
           },
-          required: ["ResearchInputs", "ImplementationEstimator", "ProductionOutput", "ReadinessScore", "CostEstimation", "ScientificSummary", "Assumptions", "RiskFactors"]
+          required: ["ResearchInputs", "FeasibilityOverview", "ScientificSummary", "ImplementationEstimator", "ResourceRequirements", "ProductionOutput", "AdjustedFinancialApproximation", "CostEstimation", "SensitivityAnalysis", "TechnicalRiskAssessment", "TRLRoadmap", "ReadinessScore", "Assumptions", "RiskFactors"]
         }
       }
     }));
@@ -1116,3 +1150,143 @@ export async function suggestProject(context: string): Promise<SuggestedProject>
     return MOCK_DATA.suggest(context);
   }
 }
+
+export async function checkStandardsCompliance(inputs: StandardsInput): Promise<StandardsResult> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
+  
+  try {
+    const response = await withRetry(() => ai.models.generateContent({
+      model: 'gemini-3.1-pro-preview',
+      contents: `Evaluate the following biofuel lab results against international standards.
+      Biofuel Type: ${inputs.biofuelType}
+      Viscosity: ${inputs.viscosity || 'Not provided'}
+      Flash Point: ${inputs.flashPoint || 'Not provided'}
+      Water Content: ${inputs.waterContent || 'Not provided'}
+      Acid Value: ${inputs.acidValue || 'Not provided'}
+      Density: ${inputs.density || 'Not provided'}
+      Cetane Number: ${inputs.cetaneNumber || 'Not provided'}
+      Sulfur Content: ${inputs.sulfurContent || 'Not provided'}
+      `,
+      config: {
+        systemInstruction: `You are a strict Biofuel Quality Control Chemist and Regulatory Expert in Oman.
+        Your job is to compare the provided lab results against the relevant international standard (e.g., ASTM D6751 or EN 14214 for Biodiesel, ASTM D4814 for Bioethanol, etc.).
+        
+        RULES:
+        1. Be extremely accurate. Do not invent numbers. Use the actual standard limits.
+        2. If a value is 'Not provided', mark its status as 'Not Provided'.
+        3. If a value fails, provide a specific chemical or mechanical 'fixRecommendation' to correct it.
+        4. Provide an 'expertSummary' explaining the overall quality and what needs to be done before commercialization in Oman.
+        5. Provide a 'commercialViability' statement explaining if this can be sold locally or internationally.
+        ${getLanguageInstruction()}`,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            biofuelType: { type: Type.STRING },
+            overallStatus: { type: Type.STRING, enum: ['Compliant', 'Non-Compliant', 'Needs Adjustment'] },
+            targetStandard: { type: Type.STRING },
+            evaluations: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  parameter: { type: Type.STRING },
+                  userValue: { type: Type.STRING },
+                  standardLimit: { type: Type.STRING },
+                  status: { type: Type.STRING, enum: ['Pass', 'Fail', 'Warning', 'Not Provided'] },
+                  implication: { type: Type.STRING },
+                  fixRecommendation: { type: Type.STRING }
+                },
+                required: ["parameter", "userValue", "standardLimit", "status", "implication"]
+              }
+            },
+            expertSummary: { type: Type.STRING },
+            commercialViability: { type: Type.STRING }
+          },
+          required: ["biofuelType", "overallStatus", "targetStandard", "evaluations", "expertSummary", "commercialViability"]
+        }
+      }
+    }));
+
+    const data = JSON.parse(response.text || "{}");
+    return {
+      ...data,
+      id: Date.now().toString(),
+      timestamp: new Date().toLocaleString()
+    } as StandardsResult;
+  } catch (err: any) {
+    console.error("Standards API failed:", err);
+    throw err;
+  }
+}
+
+export async function generateProposal(inputs: ProposalInput): Promise<ProposalResult> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
+  
+  try {
+    const response = await withRetry(() => ai.models.generateContent({
+      model: 'gemini-3.1-pro-preview',
+      contents: `Generate a professional grant/investment proposal.
+      Project Name: ${inputs.projectName}
+      Feedstock: ${inputs.feedstock}
+      Biofuel Type: ${inputs.biofuelType}
+      Target Capacity: ${inputs.capacity}
+      Estimated Budget: ${inputs.budget}
+      Target Audience: ${inputs.targetAudience}
+      `,
+      config: {
+        systemInstruction: `You are an Expert Grant Writer and Investment Analyst specializing in Oman's energy sector.
+        Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI for academic grants, PDO/OQ for industrial investment, OTF for startups).
+        
+        RULES:
+        1. Align heavily with Oman Vision 2040 (Net Zero 2050, economic diversification, circular economy).
+        2. Include a specific section on Carbon Credit Potential. Estimate the tons of CO2 saved annually and provide a monetary value range in USD (assuming current carbon market prices, e.g., $40-$80/ton).
+        3. The tone must be formal, persuasive, and data-driven.
+        4. Do not use placeholder text. Generate realistic, well-thought-out content based on the inputs.
+        ${getLanguageInstruction()}`,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            executiveSummary: { type: Type.STRING },
+            problemStatement: { type: Type.STRING },
+            omanVision2040Alignment: { type: Type.STRING },
+            methodology: { type: Type.STRING },
+            financialViability: { type: Type.STRING },
+            carbonCreditPotential: {
+              type: Type.OBJECT,
+              properties: {
+                estimatedTonsSaved: { type: Type.STRING },
+                monetaryValueRange: { type: Type.STRING },
+                explanation: { type: Type.STRING }
+              },
+              required: ["estimatedTonsSaved", "monetaryValueRange", "explanation"]
+            },
+            conclusion: { type: Type.STRING }
+          },
+          required: ["title", "executiveSummary", "problemStatement", "omanVision2040Alignment", "methodology", "financialViability", "carbonCreditPotential", "conclusion"]
+        }
+      }
+    }));
+
+    const data = JSON.parse(response.text || "{}");
+    return {
+      ...data,
+      id: Date.now().toString(),
+      timestamp: new Date().toLocaleString()
+    } as ProposalResult;
+  } catch (err: any) {
+    console.error("Proposal API failed:", err);
+    throw err;
+  }
+}
+
