@@ -193,7 +193,7 @@ export interface AdjustedFinancialApproximation {
   OmanLogisticsMultiplierApplied: boolean;
 }
 
-export interface SensitivityAnalysis {
+export interface ResearchSensitivityAnalysis {
   Scenario: string;
   ImpactOnLiterPrice: string;
 }
@@ -213,7 +213,7 @@ export interface ResearchImplementationAnalysis {
   ProductionOutput: ProductionOutputEstimation;
   AdjustedFinancialApproximation: AdjustedFinancialApproximation;
   CostEstimation: PilotScaleCostEstimation;
-  SensitivityAnalysis: SensitivityAnalysis;
+  SensitivityAnalysis: ResearchSensitivityAnalysis;
   TechnicalRiskAssessment: TechnicalRiskAssessment;
   TRLRoadmap: TRLRoadmapStep[];
   ReadinessScore: ResearchImplementationReadinessScore;
@@ -321,6 +321,47 @@ export interface UnifiedProject {
   createdAt: string;
 }
 
+export interface OmanLegalRoadmap {
+  location: string;
+  authority: string;
+  requiredPermits: {
+    name: string;
+    description: string;
+    estimatedTime: string;
+  }[];
+}
+
+export interface AdvancedSensitivityAnalysis {
+  monteCarloSummary: string;
+  sellingPriceDropImpact: {
+    dropPercentage: number;
+    newPaybackPeriod: string;
+    viabilityStatus: 'High' | 'Moderate' | 'Low';
+  };
+}
+
+export interface OmanLocalLogic {
+  corporateTaxApplied: string;
+  omanizationCostEstimate: {
+    USD: string;
+    OMR: string;
+  };
+  utilityTariffDetails: string;
+}
+
+export interface DynamicScoring {
+  economicScore: number;
+  sustainabilityScore: number;
+  riskScore: number;
+  overallViabilityRating: 'A' | 'B' | 'C';
+  swotAnalysis: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  };
+}
+
 export interface BioFuelAnalysis {
   ProjectAnalyzer: ProjectAnalyzer;
   TechnicalAI: TechnicalEngineeringAI;
@@ -344,6 +385,11 @@ export interface BioFuelAnalysis {
   Rationale: string;
   ExpertCounsel: string[];
   Dashboard: string;
+  OmanLogic: OmanLocalLogic;
+  DynamicScores: DynamicScoring;
+  LegalRoadmap: OmanLegalRoadmap;
+  AdvancedSensitivity: AdvancedSensitivityAnalysis;
+  ExecutiveSummary: string;
 }
 
 export interface OmanIncentive {

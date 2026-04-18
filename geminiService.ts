@@ -1,6 +1,16 @@
 
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
-import { BioFuelAnalysis, SuggestedProject, ResearchImplementationAnalysis, ChallengeSolverResult, OptimizerResult } from "./types";
+import { 
+  BioFuelAnalysis, 
+  SuggestedProject, 
+  ResearchImplementationAnalysis, 
+  ChallengeSolverResult, 
+  OptimizerResult,
+  StandardsInput,
+  StandardsResult,
+  ProposalInput,
+  ProposalResult
+} from "./types";
 
 const SYSTEM_PROMPT = `You are an "Integrated Biofuel & Renewable Energy Investment-Grade Analysis Engine".
 Your purpose is to evaluate industrial-scale projects across biofuels and renewable energy using realistic engineering and financial benchmarks.
@@ -49,15 +59,25 @@ RENEWABLE ENERGY:
 - Wind Capacity Factor (Oman): 35–45%.
 
 ### OMAN CONTEXT ADJUSTMENTS:
-- Labor costs: Adjust for local industrial city rates.
-- Solar/Date Seed: Increase feasibility score due to abundance.
-- Algae: Flag evaporation risk in high-heat zones.
+- Corporate Tax: Apply 15% on Gross Profit. Formula: Net Profit = Gross Profit * 0.85.
+- Omanization Cost: Calculate the cost of hiring Omani nationals (avg salary $18,000/year) based on a 35% quota for the industrial sector. Add this to OPEX.
+- Utility Tariffs: Use Madayn (Ar-Rusayl) tariffs for electricity ($0.05/kWh) and water benchmarks if location is an industrial estate.
+- Special Economic Zones: For Duqm, assume Salalah/Duqm Port advantages.
 
-### FEASIBILITY PENALTIES:
-- Capital Adequacy Ratio < 0.7: -25% score, flag "Severe Underfunding".
-- Capital Adequacy Ratio 0.7–0.9: -15% score.
-- Installed Cost < lower benchmark: Flag "Unrealistic CAPEX".
-- Payback > 15 years: Flag "High Investment Risk".
+### DYNAMIC FEASIBILITY SCORING (WEIGHTED):
+Calculate "FinalFeasibilityScore" using:
+- Economic Score (40%): Based on NPV/IRR stability.
+- Sustainability Score (30%): Based on CO2 displacement and waste-to-energy efficiency.
+- Risk Score (30%): Based on Capital Adequacy Ratio (Budget/CAPEX).
+- VIABILITY RATING: A (Score > 85), B (Score 65-85), C (Score < 65).
+
+### LEGAL & PERMIT ROADMAP:
+- If Location is "Ar-Rusayl" or contains "Madayn": List permits for Madayn and Environment Authority.
+- If Location is "Duqm" or "Free Zone": List permits for OPAZ (Public Authority for Special Economic Zones and Free Zones).
+
+### SENSITIVITY & MONTE CARLO:
+- provide a "monteCarloSummary" text explaining the statistical probability of success.
+- calculate "sellingPriceDropImpact": show how a 10% drop affects payback period.
 
 Output MUST be valid JSON following the provided schema.`;
 
@@ -258,7 +278,45 @@ const MOCK_DATA = {
         "Apply for OPAZ land grants in the Duqm Free Zone.",
         "Partner with Sultan Qaboos University for technical validation."
       ],
-      Dashboard: "Detailed Analysis Dashboard Generated Successfully."
+      Dashboard: "Detailed Analysis Dashboard Generated Successfully.",
+      OmanLogic: {
+        corporateTaxApplied: "15% Corporate tax applied to gross profit as per Omani Law.",
+        omanizationCostEstimate: {
+          USD: "$18,500",
+          OMR: "7,122"
+        },
+        utilityTariffDetails: "Industrial estate tariffs ($0.05/kWh) and regional water benchmarks applied."
+      },
+      DynamicScores: {
+        economicScore: 85,
+        sustainabilityScore: 78,
+        riskScore: 90,
+        overallViabilityRating: "A",
+        swotAnalysis: {
+          strengths: ["Strong feedstock pipeline", "High regional demand", "Oman Vision 2040 support"],
+          weaknesses: ["Capital intensive", "High heat evaporation risk", "Limited local technical expertise"],
+          opportunities: ["Carbon credit export", "Free zone tax holidays", "Strategic logistics hub"],
+          threats: ["Feedstock price volatility", "Regional competition", "Water scarcity"]
+        }
+      },
+      LegalRoadmap: {
+        location: location,
+        authority: location.includes("Madayn") || location.includes("Rusayl") ? "Madayn Corporate Office" : "OPAZ (Duqm/Salalah Free Zones)",
+        requiredPermits: [
+          { name: "Environment Authority Permit", description: "Mandatory EIA and environmental clearance for industrial setup.", estimatedTime: "45-60 Days" },
+          { name: "Madayn/OPAZ Operational License", description: "Industrial operational permission for facility use.", estimatedTime: "15-20 Days" },
+          { name: "Ministry of Labour Approval", description: "Omanization quota compliance and labour visa clearance.", estimatedTime: "10-15 Days" }
+        ]
+      },
+      AdvancedSensitivity: {
+        monteCarloSummary: "Based on 1,000 simulations, there is a 94.2% statistical probability of the project maintaining a payback period under 6.5 years given current market volatility.",
+        sellingPriceDropImpact: {
+          dropPercentage: 10,
+          newPaybackPeriod: "5.2 Years",
+          viabilityStatus: "High"
+        }
+      },
+      ExecutiveSummary: `The ${inputs.projectName || 'project'} represents a robust and scalable opportunity for ${feedstock} conversion in ${location}. With a feasibility score of 88%, the project is strongly bankable, particularly when leveraged against Omani Special Economic Zone benefits and Vision 2040 incentives. Strategic focus on Omanization and local supply chain integration will further enhance the ROI.`
     };
   },
   solve: (topic: string): ChallengeSolverResult => ({
@@ -534,10 +592,12 @@ export async function analyzeProject(inputs: {
   - Stress Test 2: OPEX increases 15%
   - Stress Test 3: Production drops 10%
   - DataPoints: Generate at least 5 data points for the "Investment Sensitivity Visualizer" (label, payback, irr) showing a range of market scenarios from -20% to +20% shifts.
+  - Monte Carlo Simulation: Provide a summary of 1,000 simulated runs for these variables.
 
-  EXPERT COUNSEL (Crucial):
-  - Provide 3 to 5 highly specific, actionable recommendations in the "ExpertCounsel" array.
-  - If the FinalFeasibilityScore is low (e.g., under 50%, like Algae projects), these recommendations MUST explicitly tell the investor how to pivot or what specific technologies/subsidies/co-products are needed to raise the score to a viable level.
+  EXECUTIVE SUMMARY:
+  - Generate a professional Executive Summary (3-4 sentences).
+  - Include a SWOT Analysis (Strengths, Weaknesses, Opportunities, Threats).
+  - Explicitly mention strategic alignment with Oman Vision 2040 goals.
 
   Override investor optimism with realistic engineering numbers.${getLanguageInstruction()}`;
 
@@ -776,10 +836,83 @@ export async function analyzeProject(inputs: {
             RiskExposureLevel: { type: Type.STRING, enum: ['Moderate', 'Significant', 'Critical'] },
             Rationale: { type: Type.STRING },
             ExpertCounsel: { type: Type.ARRAY, items: { type: Type.STRING } },
-            Dashboard: { type: Type.STRING }
+            Dashboard: { type: Type.STRING },
+            OmanLogic: {
+              type: Type.OBJECT,
+              properties: {
+                corporateTaxApplied: { type: Type.STRING },
+                omanizationCostEstimate: {
+                  type: Type.OBJECT,
+                  properties: {
+                    USD: { type: Type.STRING },
+                    OMR: { type: Type.STRING }
+                  },
+                  required: ["USD", "OMR"]
+                },
+                utilityTariffDetails: { type: Type.STRING }
+              },
+              required: ["corporateTaxApplied", "omanizationCostEstimate", "utilityTariffDetails"]
+            },
+            DynamicScores: {
+              type: Type.OBJECT,
+              properties: {
+                economicScore: { type: Type.NUMBER },
+                sustainabilityScore: { type: Type.NUMBER },
+                riskScore: { type: Type.NUMBER },
+                overallViabilityRating: { type: Type.STRING, enum: ['A', 'B', 'C'] },
+                swotAnalysis: {
+                  type: Type.OBJECT,
+                  properties: {
+                    strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    opportunities: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    threats: { type: Type.ARRAY, items: { type: Type.STRING } }
+                  },
+                  required: ["strengths", "weaknesses", "opportunities", "threats"]
+                }
+              },
+              required: ["economicScore", "sustainabilityScore", "riskScore", "overallViabilityRating", "swotAnalysis"]
+            },
+            LegalRoadmap: {
+              type: Type.OBJECT,
+              properties: {
+                location: { type: Type.STRING },
+                authority: { type: Type.STRING },
+                requiredPermits: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      name: { type: Type.STRING },
+                      description: { type: Type.STRING },
+                      estimatedTime: { type: Type.STRING }
+                    },
+                    required: ["name", "description", "estimatedTime"]
+                  }
+                }
+              },
+              required: ["location", "authority", "requiredPermits"]
+            },
+            AdvancedSensitivity: {
+              type: Type.OBJECT,
+              properties: {
+                monteCarloSummary: { type: Type.STRING },
+                sellingPriceDropImpact: {
+                  type: Type.OBJECT,
+                  properties: {
+                    dropPercentage: { type: Type.NUMBER },
+                    newPaybackPeriod: { type: Type.STRING },
+                    viabilityStatus: { type: Type.STRING, enum: ['High', 'Moderate', 'Low'] }
+                  },
+                  required: ["dropPercentage", "newPaybackPeriod", "viabilityStatus"]
+                }
+              },
+              required: ["monteCarloSummary", "sellingPriceDropImpact"]
+            },
+            ExecutiveSummary: { type: Type.STRING }
           },
           required: [
-            "ProjectAnalyzer", "TechnicalAI", "FinancialAI", "AuditorAI", "RiskAI", "RecommendedBiofuelType", "EnergyDomain", "EconomicFeasibility", "EnvironmentalImpact", "KeyRisks", "AuditAIReview", "InvestorPerspective", "Vision2040Alignment", "ProjectReadiness", "AnalysisAssumptions", "AuditorAssessment", "SensitivityAnalysis", "FinalFeasibilityScore", "RiskExposureLevel", "Rationale", "ExpertCounsel", "Dashboard"
+            "ProjectAnalyzer", "TechnicalAI", "FinancialAI", "AuditorAI", "RiskAI", "RecommendedBiofuelType", "EnergyDomain", "EconomicFeasibility", "EnvironmentalImpact", "KeyRisks", "AuditAIReview", "InvestorPerspective", "Vision2040Alignment", "ProjectReadiness", "AnalysisAssumptions", "AuditorAssessment", "SensitivityAnalysis", "FinalFeasibilityScore", "RiskExposureLevel", "Rationale", "ExpertCounsel", "Dashboard", "OmanLogic", "DynamicScores", "LegalRoadmap", "AdvancedSensitivity", "ExecutiveSummary"
           ]
         }
       }

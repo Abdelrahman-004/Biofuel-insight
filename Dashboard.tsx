@@ -12,10 +12,13 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   const [showReport, setShowReport] = React.useState(false);
+  
+  const isArabic = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+  const t = (en: string, ar: string) => isArabic ? ar : en;
 
   const costData = [
-    { name: 'Min Invest', value: data?.EconomicFeasibility?.EstimatedInvestmentUSD?.Minimum || 0 },
-    { name: 'Max Invest', value: data?.EconomicFeasibility?.EstimatedInvestmentUSD?.Maximum || 0 },
+    { name: t('Min Invest', 'الحد الأدنى للاستثمار'), value: data?.EconomicFeasibility?.EstimatedInvestmentUSD?.Minimum || 0 },
+    { name: t('Max Invest', 'الحد الأقصى للاستثمار'), value: data?.EconomicFeasibility?.EstimatedInvestmentUSD?.Maximum || 0 },
   ];
 
   const isDataMissing = !data?.ProjectAnalyzer || data.ProjectAnalyzer.ExpectedProduction === null || data.ProjectAnalyzer.PreliminaryBudgetUSD === null;
@@ -70,6 +73,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   };
 
   const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const formatOMR = (val: string | number) => `${val} OMR`;
+
+  const budgetAdequacyRatio = data.EconomicFeasibility.CapitalAdequacyRatio;
+  const isBudgetInsufficient = budgetAdequacyRatio < 1.0;
 
   return (
     <motion.div 
@@ -78,6 +85,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       transition={{ duration: 0.5 }}
       className="space-y-8 pb-20"
     >
+      {/* Budget Adequacy Warning */}
+      <AnimatePresence>
+        {isBudgetInsufficient && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl flex items-center mb-4 shadow-sm"
+          >
+            <i className="fas fa-exclamation-triangle text-red-500 mr-4 text-xl"></i>
+            <div>
+              <p className="text-red-800 font-black text-sm uppercase">Severe Underfunding Detected</p>
+              <p className="text-red-700 text-xs font-medium">
+                The investor budget is only { (budgetAdequacyRatio * 100).toFixed(1) }% of the required realistic CAPEX. 
+                Consider scaling down production or securing additional funding.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Official Report Modal */}
       <AnimatePresence>
         {showReport && (
@@ -350,12 +377,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         >
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Investment Verdict</div>
           <div className={`text-lg font-black leading-tight ${
-            data.EconomicFeasibility.InvestmentVerdict === 'Investment Grade' ? 'text-emerald-600' : 
-            data.EconomicFeasibility.InvestmentVerdict === 'Conditionally Viable' ? 'text-blue-600' : 'text-red-600'
+            data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-600' : 
+            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-600' : 'text-red-600'
           }`}>
-            {data.EconomicFeasibility.InvestmentVerdict}
+            Rating: {data.DynamicScores?.overallViabilityRating || 'N/A'}
           </div>
-          <div className="mt-2 text-[10px] font-bold text-slate-300 italic">Financial Status</div>
+          <div className="mt-2 text-[10px] font-bold text-slate-300 italic">{data.EconomicFeasibility.InvestmentVerdict}</div>
         </motion.div>
 
         <motion.div 
@@ -375,12 +402,166 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           transition={{ delay: 0.5 }}
           className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center"
         >
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Capital Adequacy</div>
-          <div className={`text-3xl font-black ${data.EconomicFeasibility.CapitalAdequacyRatio >= 0.9 ? 'text-emerald-500' : 'text-amber-500'}`}>
-            {data.EconomicFeasibility.CapitalAdequacyRatio.toFixed(2)}
-          </div>
-          <div className="mt-2 text-[10px] font-bold text-slate-300 italic">Budget vs Required</div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Corporate Tax (Oman)</div>
+          <div className="text-2xl font-black text-slate-800">15% <span className="text-[10px] text-slate-400">Applied</span></div>
+          <div className="mt-2 text-[8px] text-slate-400 italic">Net Profit After Tax included in IRR</div>
         </motion.div>
+      </div>
+
+      {/* Dynamic Weighted Scoring & SWOT */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+           <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+            <i className="fas fa-chart-pie mr-2 text-indigo-500"></i> Dynamic AI Scoring
+           </h3>
+           <div className="space-y-6">
+             {[
+               { label: 'Economic stability', score: data.DynamicScores?.economicScore || 0, weight: '40%', color: 'from-blue-500 to-indigo-600' },
+               { label: 'Sustainability Impact', score: data.DynamicScores?.sustainabilityScore || 0, weight: '30%', color: 'from-emerald-500 to-teal-600' },
+               { label: 'Risk Resilience', score: data.DynamicScores?.riskScore || 0, weight: '30%', color: 'from-amber-500 to-orange-600' },
+             ].map((m, i) => (
+               <div key={i} className="space-y-2">
+                 <div className="flex justify-between text-xs">
+                   <span className="font-bold text-slate-600">{m.label} ({m.weight})</span>
+                   <span className="font-black text-slate-900">{m.score}%</span>
+                 </div>
+                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                   <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: `${m.score}%` }}
+                     className={`h-full bg-gradient-to-r ${m.color}`}
+                   />
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+
+        <div className="lg:col-span-2 bg-slate-950 p-8 rounded-3xl shadow-xl text-white">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center">
+            <i className="fas fa-search-plus mr-2 text-emerald-400"></i> SWOT Intelligence Analyze
+          </h3>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-[10px] font-black text-emerald-400 uppercase mb-2">Strengths</h4>
+              <ul className="space-y-1">
+                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-slate-300 flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-emerald-500/50"></i> {s}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black text-blue-400 uppercase mb-2">Opportunities</h4>
+              <ul className="space-y-1">
+                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-slate-300 flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-500/50"></i> {o}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black text-amber-400 uppercase mb-2">Weaknesses</h4>
+              <ul className="space-y-1">
+                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-slate-400 flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-500/50"></i> {w}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black text-red-400 uppercase mb-2">Threats</h4>
+              <ul className="space-y-1">
+                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-slate-400 flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-500/50"></i> {t}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Localization & Taxes */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+            <i className="fas fa-landmark mr-2 text-blue-600"></i> Omani Localization Logic
+          </h3>
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-2xl">
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Industry Tax (Oman)</p>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed">{data.OmanLogic?.corporateTaxApplied}</p>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
+              <div>
+                <p className="text-[10px] font-bold text-blue-500 uppercase mb-1">Omanization Cost Allocation</p>
+                <p className="text-lg font-black text-blue-900">{data.OmanLogic?.omanizationCostEstimate.OMR} OMR / Year</p>
+                <p className="text-[10px] text-blue-400 italic">35% Minimum Quota Applied</p>
+              </div>
+              <div className="bg-white p-3 rounded-xl shadow-sm text-center">
+                 <p className="text-[10px] font-bold text-slate-400 uppercase">In USD</p>
+                 <p className="text-xs font-black text-slate-900">{data.OmanLogic?.omanizationCostEstimate.USD}</p>
+              </div>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-2xl">
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Industrial Utility Tariffs</p>
+              <p className="text-xs text-slate-600 italic leading-relaxed">{data.OmanLogic?.utilityTariffDetails}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Legal Permit Roadmap */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+            <i className="fas fa-file-signature mr-2 text-emerald-600"></i> Legal & Permit Roadmap
+          </h3>
+          <div className="space-y-3 relative">
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-100"></div>
+            {data.LegalRoadmap?.requiredPermits.map((permit, i) => (
+              <div key={i} className="relative flex items-start space-x-4 pl-10 pb-4">
+                <div className="absolute left-3 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-800">{permit.name}</h4>
+                  <p className="text-[10px] text-slate-500 font-medium">{permit.description}</p>
+                  <p className="text-[10px] text-emerald-600 font-bold italic mt-1 flex items-center">
+                    <i className="fas fa-clock mr-1"></i> {permit.estimatedTime}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+            <p className="text-[10px] font-bold text-emerald-800 uppercase italic">Primary Authority: {data.LegalRoadmap?.authority}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Executive Summary */}
+        <div className="md:col-span-2 bg-gradient-to-br from-indigo-900 to-slate-900 p-8 rounded-3xl shadow-xl text-white">
+           <h3 className="text-sm font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center">
+            <i className="fas fa-scroll mr-2"></i> Executive Summary (AI Generated)
+           </h3>
+           <p className="text-lg font-light leading-relaxed mb-6 italic text-indigo-100">
+             "{data.ExecutiveSummary}"
+           </p>
+           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-white/5 p-3 rounded-xl border border-white/10 w-fit">
+              <i className="fas fa-flag text-sm"></i>
+              <span>Aligned with Oman Vision 2040 Economic Diversification</span>
+           </div>
+        </div>
+
+        {/* Enhanced Sensitivity */}
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+           <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center">
+            <i className="fas fa-robot mr-2 text-amber-500"></i> Monte Carlo Summary
+           </h3>
+           <p className="text-xs text-slate-600 leading-relaxed mb-4">
+             {data.AdvancedSensitivity?.monteCarloSummary}
+           </p>
+           <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+             <p className="text-[9px] font-black text-amber-700 uppercase mb-2 tracking-widest">Stress Test: 10% Market Price Drop</p>
+             <div className="flex justify-between items-center">
+               <div>
+                 <p className="text-xs font-bold text-slate-700">New Payback</p>
+                 <p className="text-lg font-black text-amber-600">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
+               </div>
+               <div className="text-right">
+                 <p className="text-[9px] font-bold text-slate-400 uppercase">Viability</p>
+                 <p className="text-xs font-black text-slate-800 uppercase tracking-widest">{data.AdvancedSensitivity?.sellingPriceDropImpact.viabilityStatus}</p>
+               </div>
+             </div>
+           </div>
+        </div>
       </div>
 
       {/* Detailed Financial Breakdown */}
@@ -496,8 +677,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '10px' }}
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '9px', paddingTop: '10px' }} />
-                    <Line yAxisId="left" type="monotone" dataKey="payback" name="Payback (Yrs)" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                    <Line yAxisId="right" type="monotone" dataKey="irr" name="IRR (%)" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line yAxisId="left" type="monotone" dataKey="payback" name={t("Payback (Yrs)", "فترة الاسترداد (سنوات)")} stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line yAxisId="right" type="monotone" dataKey="irr" name={t("IRR (%)", "معدل العائد الداخلي (%)")} stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -559,7 +740,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                 <Tooltip 
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} 
-                  formatter={(val: number) => [`$${val.toLocaleString()}`, "Capital (USD)"]} 
+                  formatter={(val: number) => [`$${val.toLocaleString()}`, t("Capital (USD)", "رأس المال (دولار)")]} 
                 />
                 <Bar dataKey="value" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={60} />
               </BarChart>
@@ -570,7 +751,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
               "{data.EconomicFeasibility.Justification}"
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {data.EconomicFeasibility.EstimatedInvestmentUSD.MajorCosts.map((cost, i) => (
+              {data.EconomicFeasibility.EstimatedInvestmentUSD.MajorCosts?.map((cost, i) => (
                 <div key={i} className="text-[11px] font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-lg flex items-center">
                   <i className="fas fa-check-circle text-emerald-400 mr-2"></i> {cost}
                 </div>
@@ -640,7 +821,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
             <i className="fas fa-shield-halved mr-3 text-amber-500"></i> Critical Risk Matrix
           </h3>
           <div className="space-y-4">
-            {data.KeyRisks.map((risk, i) => (
+            {data.KeyRisks?.map((risk, i) => (
               <div key={i} className="p-4 rounded-xl border border-slate-100 hover:border-amber-200 hover:bg-amber-50/20 transition group">
                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
                   risk.Type === 'Technical' ? 'bg-purple-100 text-purple-700' :
@@ -672,7 +853,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
               Consistency: {data.AuditAIReview.ConsistencyCheck}
             </div>
             <div className="space-y-2">
-              {data.AuditAIReview.DataWarnings.map((w, i) => (
+              {data.AuditAIReview.DataWarnings?.map((w, i) => (
                 <div key={i} className="text-xs text-slate-300 flex items-start">
                   <i className="fas fa-circle-info text-amber-400 mr-2 mt-0.5 shrink-0"></i>
                   {w}
@@ -689,7 +870,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Key Benchmarks</p>
                 <ul className="space-y-1">
-                  {data.AnalysisAssumptions.BenchmarkSources.map((s, i) => (
+                  {data.AnalysisAssumptions.BenchmarkSources?.map((s, i) => (
                     <li key={i} className="text-[10px] text-slate-500">• {s}</li>
                   ))}
                 </ul>
@@ -697,7 +878,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Analysis Limitations</p>
                 <ul className="space-y-1">
-                  {data.AnalysisAssumptions.ModelLimitations.map((l, i) => (
+                  {data.AnalysisAssumptions.ModelLimitations?.map((l, i) => (
                     <li key={i} className="text-[10px] text-slate-500">• {l}</li>
                   ))}
                 </ul>
