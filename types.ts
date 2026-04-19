@@ -473,17 +473,34 @@ export interface ProposalInput {
   capacity: string;
   budget: string;
   targetAudience: string;
+  language: 'English' | 'Arabic';
+}
+
+export interface Installment {
+  period: string;
+  paymentAmount: string;
+  milestoneDescription: string;
+}
+
+export interface FinancialTables {
+  totalCapex: string;
+  annualOpex: string;
+  expectedRevenue: string;
+  roiPercentage: string;
+  paybackPeriod: string;
+  fundingReturnStrategy: string;
+  installmentSchedule: Installment[];
 }
 
 export interface ProposalResult {
   id: string;
   timestamp: string;
   title: string;
-  executiveSummary: string;
-  problemStatement: string;
-  omanVision2040Alignment: string;
+  executiveSummary: string[];
+  problemStatement: string[];
+  omanVision2040Alignment: string[];
   methodology: string;
-  financialViability: string;
+  financials: FinancialTables;
   carbonCreditPotential: {
     estimatedTonsSaved: string;
     monetaryValueRange: string;

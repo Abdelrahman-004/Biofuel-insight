@@ -5,7 +5,18 @@ import { checkStandardsCompliance } from './geminiService';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-export const StandardsChecker: React.FC = () => {
+interface StandardsCheckerProps {
+  language?: 'English' | 'Arabic';
+}
+
+export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = 'English' }) => {
+  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+
+  React.useEffect(() => {
+    setLocalLanguage(language || 'Arabic');
+  }, [language]);
+
+  const isArabic = localLanguage === 'Arabic';
   const [inputs, setInputs] = useState<StandardsInput>({
     biofuelType: 'Biodiesel',
     viscosity: '',
@@ -29,7 +40,7 @@ export const StandardsChecker: React.FC = () => {
     e.preventDefault();
     setStatus('ANALYZING');
     try {
-      const res = await checkStandardsCompliance(inputs);
+      const res = await checkStandardsCompliance(inputs, localLanguage);
       setResult(res);
       setStatus('COMPLETED');
       setHistory(prev => [{
@@ -72,34 +83,46 @@ export const StandardsChecker: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"
         >
-          <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center">
-            <i className="fas fa-microscope mr-3 text-blue-600"></i> Lab Results Input
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-black text-slate-900 flex items-center">
+              <i className="fas fa-microscope mr-3 text-blue-600"></i> {isArabic ? 'قيم معمل الوقود ومقاييسه' : 'Lab Results Input'}
+            </h2>
+            
+            <select 
+              value={localLanguage}
+              onChange={(e) => setLocalLanguage(e.target.value)}
+              className="bg-slate-50 text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none font-bold"
+            >
+              <option value="Arabic">العربية (Arabic)</option>
+              <option value="English">English</option>
+            </select>
+          </div>
           <form onSubmit={handleAnalyze} className="space-y-4">
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Biofuel Type</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
               <select 
                 name="biofuelType" 
                 value={inputs.biofuelType} 
                 onChange={handleInputChange}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                dir={isArabic ? 'rtl' : 'ltr'}
               >
-                <option value="Biodiesel">Biodiesel (FAME)</option>
-                <option value="Bioethanol">Bioethanol</option>
-                <option value="Sustainable Aviation Fuel (SAF)">Sustainable Aviation Fuel (SAF)</option>
-                <option value="Biogas">Biogas</option>
+                <option value="Biodiesel">{isArabic ? 'الديزل الحيوي (FAME)' : 'Biodiesel (FAME)'}</option>
+                <option value="Bioethanol">{isArabic ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
+                <option value="Sustainable Aviation Fuel (SAF)">{isArabic ? 'وقود الطيران المستدام (SAF)' : 'Sustainable Aviation Fuel (SAF)'}</option>
+                <option value="Biogas">{isArabic ? 'الغاز الحيوي' : 'Biogas'}</option>
               </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               {[
-                { name: 'viscosity', label: 'Viscosity (mm²/s)' },
-                { name: 'flashPoint', label: 'Flash Point (°C)' },
-                { name: 'waterContent', label: 'Water Content (%)' },
-                { name: 'acidValue', label: 'Acid Value (mg KOH/g)' },
-                { name: 'density', label: 'Density (kg/m³)' },
-                { name: 'cetaneNumber', label: 'Cetane Number' },
-                { name: 'sulfurContent', label: 'Sulfur Content (ppm)' },
+                { name: 'viscosity', label: isArabic ? 'اللزوجة (مم²/ث)' : 'Viscosity (mm²/s)' },
+                { name: 'flashPoint', label: isArabic ? 'نقطة الوميض (°C)' : 'Flash Point (°C)' },
+                { name: 'waterContent', label: isArabic ? 'المحتوى المائي (%)' : 'Water Content (%)' },
+                { name: 'acidValue', label: isArabic ? 'قيمة الحمض (mg KOH/g)' : 'Acid Value (mg KOH/g)' },
+                { name: 'density', label: isArabic ? 'الكثافة (kg/m³)' : 'Density (kg/m³)' },
+                { name: 'cetaneNumber', label: isArabic ? 'رقم السيتان' : 'Cetane Number' },
+                { name: 'sulfurContent', label: isArabic ? 'محتوى الكبريت (ppm)' : 'Sulfur Content (ppm)' },
               ].map((field) => (
                 <div key={field.name}>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{field.label}</label>
@@ -108,8 +131,9 @@ export const StandardsChecker: React.FC = () => {
                     name={field.name} 
                     value={(inputs as any)[field.name]} 
                     onChange={handleInputChange}
-                    placeholder="Optional"
+                    placeholder={isArabic ? 'اختياري' : "Optional"}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
               ))}
@@ -121,9 +145,9 @@ export const StandardsChecker: React.FC = () => {
               className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === 'ANALYZING' ? (
-                <><i className="fas fa-circle-notch fa-spin"></i><span>Analyzing...</span></>
+                <><i className="fas fa-circle-notch fa-spin"></i><span>{isArabic ? 'جاري التحليل...' : 'Analyzing...'}</span></>
               ) : (
-                <><i className="fas fa-check-double"></i><span>Check Compliance</span></>
+                <><i className="fas fa-check-double"></i><span>{isArabic ? 'فحص المطابقة للمعايير' : 'Check Compliance'}</span></>
               )}
             </button>
           </form>
@@ -136,7 +160,7 @@ export const StandardsChecker: React.FC = () => {
             animate={{ opacity: 1 }}
             className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"
           >
-            <h3 className="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest">Recent Checks</h3>
+            <h3 className="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest">{isArabic ? 'السجل' : 'Recent Checks'}</h3>
             <div className="space-y-3">
               {history.map((entry) => (
                 <div 

@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { LOCATIONS, BIOFUEL_FEEDSTOCKS, RENEWABLE_ENERGY_TYPES, TECHNOLOGY_CATEGORIES } from './constants';
+import { LOCATIONS, BIOFUEL_FEEDSTOCKS, RENEWABLE_ENERGY_TYPES, TECHNOLOGY_CATEGORIES, translateTerm } from './constants';
 
 interface InputFormProps {
   onAnalyze: (inputs: {
@@ -15,9 +15,11 @@ interface InputFormProps {
     electricityCost?: number;
     laborCost?: number;
     co2Source?: string;
+    language: string;
   }) => void;
   isLoading: boolean;
   initialInputs?: any;
+  language?: 'English' | 'Arabic';
 }
 
 const BIOFUEL_SYSTEM_TYPES = ['Open Pond', 'Photobioreactor (PBR)'];
@@ -25,7 +27,14 @@ const CO2_SOURCES = ['Industrial waste CO2', 'Purchased CO2', 'Not specified'];
 
 const STORAGE_KEY = 'biofuel_insight_form_draft';
 
-export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, initialInputs }) => {
+export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, initialInputs, language = 'English' }) => {
+  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+
+  React.useEffect(() => {
+    setLocalLanguage(language || 'Arabic');
+  }, [language]);
+
+  const isArabic = localLanguage === 'Arabic';
   const [projectName, setProjectName] = React.useState('Green Oman Energy Project');
   const [location, setLocation] = React.useState(LOCATIONS[0]);
   const [category, setCategory] = React.useState<'Biofuel' | 'Renewable Energy'>('Biofuel');
@@ -103,7 +112,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
       sellingPrice: category === 'Biofuel' ? Number(sellingPrice) : 0,
       electricityCost: category === 'Biofuel' ? Number(electricityCost) : undefined,
       laborCost: category === 'Biofuel' ? Number(laborCost) : undefined,
-      co2Source: category === 'Biofuel' ? co2Source : undefined
+      co2Source: category === 'Biofuel' ? co2Source : undefined,
+      language: localLanguage
     });
   };
 
@@ -115,14 +125,23 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
       animate={{ opacity: 1, y: 0 }}
       className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden"
     >
-      <div className="bg-emerald-600/10 px-6 py-4 border-b border-slate-800">
+      <div className="bg-emerald-600/10 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
         <h2 className="text-white font-bold flex items-center text-lg">
           <i className="fas fa-sliders mr-3 text-emerald-400"></i>
-          Investment-Grade Analysis Parameters
+          {isArabic ? 'معايير تحليل الجدوى' : 'Investment-Grade Analysis Parameters'}
         </h2>
+        
+        <select 
+          value={localLanguage}
+          onChange={(e) => setLocalLanguage(e.target.value)}
+          className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-emerald-400 outline-none"
+        >
+          <option value="Arabic">العربية (Arabic)</option>
+          <option value="English">English</option>
+        </select>
       </div>
       <div className="px-6 pt-4 flex flex-wrap gap-2">
-        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">Try an Example:</span>
+        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
         {[
           { name: "Duqm Algae Bio-Hub", loc: "Duqm", cat: "Biofuel", fs: "Algae", prod: 5000, bud: 25000000 },
           { name: "Salalah Wind Phase 2", loc: "Salalah", cat: "Renewable Energy", fs: "Wind", prod: 150000, bud: 45000000 },
@@ -153,13 +172,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             transition={{ delay: 0.1 }}
             className="md:col-span-2"
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Project Name</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
             <input 
               type="text" 
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className={inputClasses}
-              placeholder="e.g., Solar Farm Duqm Phase 1"
+              placeholder={isArabic ? "مثال: مزرعة دوقم للطاقة الشمسية" : "e.g., Solar Farm Duqm Phase 1"}
+              dir={isArabic ? "rtl" : "ltr"}
             />
           </motion.div>
           <motion.div 
@@ -167,13 +187,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Strategic Location</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الموقع الاستراتيجي' : 'Strategic Location'}</label>
             <select 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className={inputClasses}
+              dir={isArabic ? "rtl" : "ltr"}
             >
-              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-slate-800 text-white">{loc}</option>)}
+              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-slate-800 text-white">{isArabic ? translateTerm(loc) : loc}</option>)}
             </select>
           </motion.div>
         </div>
@@ -184,13 +205,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Technology Category</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'نوع التكنولوجيا' : 'Technology Category'}</label>
             <select 
               value={category}
               onChange={(e) => setCategory(e.target.value as any)}
               className={inputClasses}
+              dir={isArabic ? "rtl" : "ltr"}
             >
-              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-slate-800 text-white">{cat}</option>)}
+              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-slate-800 text-white">{isArabic ? translateTerm(cat) : cat}</option>)}
             </select>
           </motion.div>
           <motion.div 
@@ -199,15 +221,16 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             transition={{ delay: 0.4 }}
           >
             <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
-              {category === 'Biofuel' ? 'Primary Feedstock' : 'Energy Type'}
+              {category === 'Biofuel' ? (isArabic ? 'المادة الخام الأساسية' : 'Primary Feedstock') : (isArabic ? 'نوع الطاقة' : 'Energy Type')}
             </label>
             <select 
               value={feedstock}
               onChange={(e) => setFeedstock(e.target.value)}
               className={inputClasses}
+              dir={isArabic ? "rtl" : "ltr"}
             >
               {(category === 'Biofuel' ? BIOFUEL_FEEDSTOCKS : RENEWABLE_ENERGY_TYPES).map(fs => (
-                <option key={fs} value={fs} className="bg-slate-800 text-white">{fs}</option>
+                <option key={fs} value={fs} className="bg-slate-800 text-white">{isArabic ? translateTerm(fs) : fs}</option>
               ))}
             </select>
           </motion.div>
@@ -220,13 +243,21 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             className="grid grid-cols-1 gap-6"
           >
             <div>
-              <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">CO2 Source</label>
+              <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'مصدر ثاني أكسيد الكربون' : 'CO2 Source'}</label>
               <select 
                 value={co2Source}
                 onChange={(e) => setCo2Source(e.target.value)}
                 className={inputClasses}
               >
-                {CO2_SOURCES.map(src => <option key={src} value={src} className="bg-slate-800 text-white">{src}</option>)}
+                {CO2_SOURCES.map(src => {
+                  let text = src;
+                  if (isArabic) {
+                    if (src === 'Industrial waste CO2') text = 'غاز ثاني أكسيد الكربون من العوادم الصناعية';
+                    if (src === 'Purchased CO2') text = 'شراء غاز ثاني أكسيد الكربون';
+                    if (src === 'Not specified') text = 'غير محدد';
+                  }
+                  return <option key={src} value={src} className="bg-slate-800 text-white">{text}</option>;
+                })}
               </select>
             </div>
           </motion.div>
@@ -239,14 +270,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             transition={{ delay: 0.5 }}
           >
             <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
-              Target Production ({category === 'Biofuel' ? 'Tons/Year' : 'MWh/Year'})
+              {isArabic ? 'الإنتاج المستهدف' : 'Target Production'} ({category === 'Biofuel' ? (isArabic ? 'طن/سنة' : 'Tons/Year') : (isArabic ? 'ميجاوات/سنة' : 'MWh/Year')})
             </label>
             <input 
               type="number" 
               value={production}
               onChange={(e) => setProduction(e.target.value)}
               className={inputClasses}
-              placeholder="0 (Automatic Estimate)"
+              placeholder={isArabic ? "0 (تقدير تلقائي)" : "0 (Automatic Estimate)"}
             />
           </motion.div>
           <motion.div 
@@ -254,13 +285,13 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Investor Budget (USD)</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'ميزانية المستثمر' : 'Investor Budget'} (USD)</label>
             <input 
               type="number" 
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
               className={inputClasses}
-              placeholder="0 (Automatic Estimate)"
+              placeholder={isArabic ? "0 (تقدير تلقائي)" : "0 (Automatic Estimate)"}
             />
           </motion.div>
         </div>
@@ -273,7 +304,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               transition={{ delay: 0.7 }}
             >
               <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
-                Selling Price (USD/ton)
+                {isArabic ? 'سعر البيع' : 'Selling Price'} (USD/{isArabic ? 'طن' : 'ton'})
               </label>
               <input 
                 type="number" 
@@ -292,7 +323,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
               >
-                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Electricity (USD/kWh)</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
                 <input 
                   type="number" step="0.01"
                   value={electricityCost}
@@ -305,7 +336,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
               >
-                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Labor Cost/Yr (USD)</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تكلفة العمالة/سنة' : 'Labor Cost/Yr'} (USD)</label>
                 <input 
                   type="number" 
                   value={laborCost}
@@ -328,12 +359,12 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
           {isLoading ? (
             <>
               <i className="fas fa-spinner fa-spin"></i>
-              <span>Investment Engine Computing...</span>
+              <span>{isArabic ? 'محرك الاستثمار يعمل...' : 'Investment Engine Computing...'}</span>
             </>
           ) : (
             <>
               <i className="fas fa-bolt"></i>
-              <span>Initiate Investment-Grade Analysis</span>
+              <span>{isArabic ? 'بدء تحليل الجدوى' : 'Initiate Investment-Grade Analysis'}</span>
             </>
           )}
         </motion.button>

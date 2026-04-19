@@ -9,11 +9,19 @@ interface ChallengeSolverProps {
   onClear: () => void;
   initialInputs?: { topic: string };
   initialResult?: ChallengeSolverResult;
+  language?: 'English' | 'Arabic';
 }
 
 const TOPIC_STORAGE_KEY = 'biofuel_insight_challenge_topic_draft';
 
-export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSave, onClear, initialInputs, initialResult }) => {
+export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSave, onClear, initialInputs, initialResult, language = 'English' }) => {
+  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+
+  React.useEffect(() => {
+    setLocalLanguage(language || 'Arabic');
+  }, [language]);
+
+  const isArabic = localLanguage === 'Arabic';
   const [topic, setTopic] = React.useState('');
   const [result, setResult] = React.useState<ChallengeSolverResult | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -49,7 +57,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
     setIsLoading(true);
     setError(null);
     try {
-      const data = await solveChallenge(topic);
+      const data = await solveChallenge(topic, localLanguage);
       setResult(data);
       
       const newEntry: ChallengeHistoryEntry = {
@@ -88,7 +96,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
               viewMode === 'SOLVE' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fas fa-lightbulb mr-2"></i> Solve
+            <i className="fas fa-lightbulb mr-2"></i> {isArabic ? 'حل تحدي' : 'Solve'}
           </button>
           <button 
             onClick={() => setViewMode('HISTORY')}
@@ -96,7 +104,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
               viewMode === 'HISTORY' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fas fa-history mr-2"></i> History ({history.length})
+            <i className="fas fa-history mr-2"></i> {isArabic ? 'السجل' : 'History'} ({history.length})
           </button>
         </div>
       </div>
@@ -112,17 +120,28 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             className="space-y-8"
           >
             <div className="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
-            <div className="bg-blue-600/10 px-8 py-6 border-b border-slate-800">
-              <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
-                <i className="fas fa-microscope mr-3 text-blue-400"></i>
-                Oman Biofuel Challenge Solver AI
-              </h2>
-              <p className="text-slate-400 text-sm mt-1">Identify and solve scientific bottlenecks in Oman's biofuel research.</p>
+            <div className="bg-blue-600/10 px-8 py-6 border-b border-slate-800 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
+                  <i className="fas fa-microscope mr-3 text-blue-400"></i>
+                  {isArabic ? 'الذكاء الاصطناعي لحل تحديات الوقود الحيوي' : 'Oman Biofuel Challenge Solver AI'}
+                </h2>
+                <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تحديد وحل العقبات العلمية في أبحاث الوقود الحيوي' : 'Identify and solve scientific bottlenecks in Oman\'s biofuel research.'}</p>
+              </div>
+              
+              <select 
+                value={localLanguage}
+                onChange={(e) => setLocalLanguage(e.target.value)}
+                className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none"
+              >
+                <option value="Arabic">العربية (Arabic)</option>
+                <option value="English">English</option>
+              </select>
             </div>
             
             <form onSubmit={handleSolve} className="p-8">
               <div className="flex flex-wrap gap-2 mb-6">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">Try an Example:</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
                 {[
                   "Algae salinity tolerance",
                   "Date seed oil extraction",
@@ -144,8 +163,9 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g., Algae cultivation in high salinity, Date seed oil extraction efficiency..."
+                  placeholder={isArabic ? 'مثال: تحمل الطحالب للملوحة العالية، كفاءة استخلاص الزيت...' : "e.g., Algae cultivation in high salinity, Date seed oil extraction efficiency..."}
                   className="flex-grow px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none transition placeholder:text-slate-500"
+                  dir={isArabic ? 'rtl' : 'ltr'}
                 />
                 <button 
                   disabled={isLoading || !topic.trim()}
@@ -156,12 +176,12 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   {isLoading ? (
                     <>
                       <i className="fas fa-spinner fa-spin"></i>
-                      <span>Solving...</span>
+                      <span>{isArabic ? 'جاري الحل...' : 'Solving...'}</span>
                     </>
                   ) : (
                     <>
                       <i className="fas fa-lightbulb"></i>
-                      <span>Generate Solution</span>
+                      <span>{isArabic ? 'إيجاد حل' : 'Generate Solution'}</span>
                     </>
                   )}
                 </button>
@@ -194,7 +214,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     <div className="bg-slate-900 px-8 py-4">
                       <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-triangle-exclamation mr-3 text-amber-400"></i>
-                        Identified Challenge
+                        {isArabic ? 'التحدي المحدد' : 'Identified Challenge'}
                       </h3>
                     </div>
                     <div className="p-8">

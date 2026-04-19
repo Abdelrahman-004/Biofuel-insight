@@ -16,15 +16,17 @@ import {
 
 interface HomeProps {
   onStart: (tool: 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
+  language?: 'English' | 'Arabic';
 }
 
-export const Home: React.FC<HomeProps> = ({ onStart }) => {
+export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => {
+  const isArabic = language === 'Arabic';
 
   const tools = [
     {
       id: 'INVESTOR_FEASIBILITY',
-      title: 'Investor Feasibility',
-      description: 'Professional assessment of technical and economic viability for energy projects in Oman.',
+      title: isArabic ? 'دراسة الجدوى الاستثمارية' : 'Investor Feasibility',
+      description: isArabic ? 'تقييم احترافي للجدوى الفنية والاقتصادية لمشاريع الطاقة والوقود الحيوي في عُمان، مدعوم بأرقام وحقائق استثمارية.' : 'Professional assessment of technical and economic viability for energy projects in Oman.',
       icon: TrendingUp,
       color: 'from-green-500/20 to-green-500/5',
       accent: 'text-green-400',
@@ -32,8 +34,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'RESEARCH',
-      title: 'Research Analyzer',
-      description: 'Bridge the gap between lab research and pilot-scale production with scientific scaling benchmarks.',
+      title: isArabic ? 'تحليل البحوث المخبرية' : 'Research Analyzer',
+      description: isArabic ? 'سد الفجوة بين الأبحاث المختبرية والإنتاج التجريبي بمعايير تقنية دقيقة لحساب الكفاءة.' : 'Bridge the gap between lab research and pilot-scale production with scientific scaling benchmarks.',
       icon: Microscope,
       color: 'from-blue-500/20 to-blue-500/5',
       accent: 'text-blue-400',
@@ -41,8 +43,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'SOLVER',
-      title: 'Challenge Solver',
-      description: "Identify and solve technical bottlenecks in the biofuel ecosystem using multi-agent AI.",
+      title: isArabic ? 'حل العوائق التقنية' : 'Challenge Solver',
+      description: isArabic ? 'تحديد وحل الاختناقات التقنية في قطاع الوقود الحيوي باستخدام الذكاء الاصطناعي المتقدم لإنتاج حلول مبتكرة.' : "Identify and solve technical bottlenecks in the biofuel ecosystem using multi-agent AI.",
       icon: Lightbulb,
       color: 'from-amber-500/20 to-amber-500/5',
       accent: 'text-amber-400',
@@ -50,8 +52,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'OPTIMIZER',
-      title: 'Profit Optimizer',
-      description: 'Maximize revenue streams and minimize carbon emissions through strategic co-product analysis.',
+      title: isArabic ? 'التحسين المالي وتقليل الانبعاثات' : 'Profit Optimizer',
+      description: isArabic ? 'تعظيم الإيرادات وتقليل الانبعاثات الكربونية من خلال تحليل المنتجات المشتركة وسلاسل الإمداد.' : 'Maximize revenue streams and minimize carbon emissions through strategic co-product analysis.',
       icon: Leaf,
       color: 'from-green-500/20 to-green-500/5',
       accent: 'text-green-400',
@@ -59,8 +61,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'STANDARDS',
-      title: 'Standards Checker',
-      description: 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability.',
+      title: isArabic ? 'مطابقة المعايير الدولية' : 'Standards Checker',
+      description: isArabic ? 'تأكد من نتائجك المختبرية مقابل المعايير الدولية (ASTM/EN) لضمان الجاهزية التجارية والامتثال.' : 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability.',
       icon: Globe,
       color: 'from-slate-500/20 to-slate-500/5',
       accent: 'text-slate-400',
@@ -68,8 +70,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'PROPOSAL',
-      title: 'Proposal Generator',
-      description: 'Generate professional, data-driven grant and investment proposals tailored for Oman.',
+      title: isArabic ? 'إنشاء المقترحات الاستثمارية' : 'Proposal Generator',
+      description: isArabic ? 'إصدار مقترحات مالية مبنية على البيانات والأرقام الموثوقة لجذب المستثمرين والمنح في عُمان.' : 'Generate professional, data-driven grant and investment proposals tailored for Oman.',
       icon: Lightbulb,
       color: 'from-emerald-500/20 to-emerald-500/5',
       accent: 'text-emerald-400',
@@ -77,8 +79,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
     },
     {
       id: 'ZONES',
-      title: 'Strategic Zones',
-      description: "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location.",
+      title: isArabic ? 'المناطق الاستراتيجية والحرة' : 'Strategic Zones',
+      description: isArabic ? 'استكشف المناطق الاستراتيجية (الدقم، صحار، صلالة) لتحديد الموقع المثالي والدعم الحكومي المتوفر.' : "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location.",
       icon: MapPin,
       color: 'from-indigo-500/20 to-indigo-500/5',
       accent: 'text-indigo-400',
@@ -87,7 +89,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
   ];
 
   return (
-    <div className="bg-slate-950 text-slate-200 selection:bg-green-500/30 selection:text-green-400 min-h-screen">
+    <div className="bg-slate-950 text-slate-200 selection:bg-green-500/30 selection:text-green-400 min-h-screen" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Hero Section - Modern Dark */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
         {/* Background Glows */}
@@ -99,13 +101,15 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="inline-flex items-center space-x-2 bg-green-500/10 border border-green-500/20 px-4 py-1.5 rounded-full mb-8"
+            className="inline-flex items-center space-x-2 bg-green-500/10 border border-green-500/20 px-4 py-1.5 rounded-full mb-8 rtl:space-x-reverse"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-green-400">Vision 2040 Intelligence Platform</span>
+            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-green-400">
+              {isArabic ? 'منصة ذكاء رؤية 2040' : 'Vision 2040 Intelligence Platform'}
+            </span>
           </motion.div>
           
           <motion.h1 
@@ -114,8 +118,10 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter text-white"
           >
-            BIOFUEL <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">INSIGHT AI</span>
+            {isArabic ? 'الوقود الحيوي' : 'BIOFUEL'} <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">
+              {isArabic ? 'رؤى الذكاء الاصطناعي' : 'INSIGHT AI'}
+            </span>
           </motion.h1>
           
           <motion.p 
@@ -124,8 +130,9 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed"
           >
-            The next-generation intelligence layer for Oman's energy transition. 
-            Bridging the gap between lab research and industrial investment.
+            {isArabic 
+              ? 'طبقة الاستخبارات من الجيل القادم لتحول الطاقة في عُمان. سد الفجوة بين الأبحاث المختبرية والاستثمار الصناعي.' 
+              : "The next-generation intelligence layer for Oman's energy transition. Bridging the gap between lab research and industrial investment."}
           </motion.p>
           
           <motion.div 
@@ -138,13 +145,13 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
               onClick={() => onStart('INVESTOR_FEASIBILITY')}
               className="bg-green-500 hover:bg-green-400 text-slate-950 px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_0_40px_rgba(34,197,94,0.2)] hover:shadow-[0_0_60px_rgba(34,197,94,0.4)] hover:-translate-y-1"
             >
-              Launch Analysis
+              {isArabic ? 'بدء التحليل' : 'Launch Analysis'}
             </button>
             <button 
               onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
               className="bg-slate-900/50 hover:bg-slate-800 border border-slate-800 text-white px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all backdrop-blur-md"
             >
-              Explore Tech
+              {isArabic ? 'اكتشف التقنية' : 'Explore Tech'}
             </button>
           </motion.div>
         </div>
@@ -159,20 +166,26 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
           transition={{ duration: 1 }}
           className="relative py-12"
         >
-          <span className="text-9xl font-serif text-green-500/10 absolute -top-10 left-0 select-none">“</span>
+          <span className={`text-9xl font-serif text-green-500/10 absolute -top-10 ${isArabic ? 'right-0' : 'left-0'} select-none`}>“</span>
           <blockquote className="relative z-10">
-            <p className="text-2xl md:text-4xl font-light italic text-slate-200 leading-relaxed mb-10 font-serif">
-              Oman Vision 2040 is the gateway to overcoming challenges, keeping pace with changes, and generating opportunities for the upcoming stage of Oman's development.
+            <p className="text-2xl md:text-3xl font-light italic text-slate-200 leading-relaxed mb-10 font-serif">
+              {isArabic 
+                ? 'رؤية عُمان 2040 هي بوابة عبور التحديات، ومواكبة المتغيرات، واستثمار المتاح من الفرص، من أجل بناء دولة حديثة قادرة على الانتقال للمستقبل بثقة.' 
+                : "Oman Vision 2040 is the gateway to overcoming challenges, keeping pace with changes, and generating opportunities for the upcoming stage of Oman's development."}
             </p>
             <footer className="flex flex-col items-center">
               <div className="w-16 h-px bg-gradient-to-r from-transparent via-green-500 to-transparent mb-6"></div>
               <cite className="not-italic">
-                <span className="block text-white font-black uppercase tracking-[0.4em] text-sm mb-1">His Majesty Sultan Haitham bin Tariq</span>
-                <span className="block text-green-500/60 text-[10px] uppercase font-black tracking-[0.2em]">Sultan of Oman</span>
+                <span className="block text-white font-black uppercase tracking-[0.4em] text-sm mb-1">
+                  {isArabic ? 'صاحب الجلالة السلطان هيثم بن طارق' : 'His Majesty Sultan Haitham bin Tariq'}
+                </span>
+                <span className="block text-green-500/60 text-[10px] uppercase font-black tracking-[0.2em]">
+                  {isArabic ? 'سلطان عُمان' : 'Sultan of Oman'}
+                </span>
               </cite>
             </footer>
           </blockquote>
-          <span className="text-9xl font-serif text-green-500/10 absolute -bottom-20 right-0 select-none">”</span>
+          <span className={`text-9xl font-serif text-green-500/10 absolute -bottom-20 ${isArabic ? 'left-0' : 'right-0'} select-none`}>”</span>
         </motion.div>
       </section>
 
@@ -187,7 +200,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
               viewport={{ once: true }}
               className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter"
             >
-              EXPLORE THE <span className="text-green-500">SUITE</span>
+              {isArabic ? <><span className="text-green-500">استكشف</span> المنصة</> : <>EXPLORE THE <span className="text-green-500">SUITE</span></>}
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0 }}
@@ -196,7 +209,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
               transition={{ delay: 0.2 }}
               className="text-slate-500 uppercase tracking-[0.3em] text-[10px] font-black"
             >
-              Comprehensive solutions for the 2040 Vision
+              {isArabic ? 'حلول شاملة متوافقة مع رؤية 2040' : 'Comprehensive solutions for the 2040 Vision'}
             </motion.p>
           </div>
 
@@ -227,9 +240,9 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                   </div>
 
                   <div className="flex items-center justify-between mt-4">
-                    <div className={`flex items-center ${tool.accent} text-[10px] font-black uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-[-10px] group-hover:translate-x-0`}>
-                      <span>Initialize Tool</span>
-                      <ArrowRight size={12} className="ml-2" />
+                    <div className={`flex items-center ${tool.accent} text-[10px] font-black uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 ${isArabic ? 'translate-x-[10px]' : 'translate-x-[-10px]'} group-hover:translate-x-0`}>
+                      <span>{isArabic ? 'تشغيل الأداة' : 'Initialize Tool'}</span>
+                      <ArrowRight size={12} className={isArabic ? 'mr-2 rotate-180' : 'ml-2'} />
                     </div>
                     <div className="text-slate-700 group-hover:text-green-500/30 transition-colors">
                       <tool.icon size={48} strokeWidth={1} className="opacity-10 group-hover:opacity-20" />
@@ -245,54 +258,53 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
       {/* How it Works & Benefits - Modern Split */}
       <section id="how-it-works" className="max-w-6xl mx-auto px-4 py-32 grid md:grid-cols-2 gap-20 items-center">
         <div className="relative">
-          <div className="absolute -left-10 top-0 w-1 h-20 bg-green-500"></div>
+          <div className={`absolute ${isArabic ? '-right-10' : '-left-10'} top-0 w-1 h-20 bg-green-500`}></div>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tighter">
-            INTELLIGENT <br />
-            <span className="text-green-500">ECOSYSTEM</span>
+            {isArabic ? <>نظام بيئي <br /><span className="text-green-500">ذكي</span></> : <>INTELLIGENT <br /><span className="text-green-500">ECOSYSTEM</span></>}
           </h2>
           <p className="text-slate-400 leading-relaxed mb-10 text-lg">
-            Biofuel Insight AI leverages advanced multi-agent systems to process complex technical and economic data. 
-            We integrate regional benchmarks from Oman's strategic free zones with global sustainability standards.
+            {isArabic 
+              ? 'تستفيد المنصة من أنظمة الذكاء الاصطناعي لتوفير تقييمات موثوقة ونماذج أعمال واقعية في عُمان.' 
+              : "Biofuel Insight AI leverages advanced multi-agent systems to process complex technical and economic data. We integrate regional benchmarks from Oman's strategic free zones with global sustainability standards."}
           </p>
           <div className="space-y-8">
-            <div className="flex items-start space-x-6 group">
+            <div className="flex items-start space-x-6 group rtl:space-x-reverse">
               <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl group-hover:bg-green-500 group-hover:text-black transition-all">
                 <Zap size={20} />
               </div>
               <div>
-                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">For Investors</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">Reduces financial risk by providing data-driven CAPEX/OPEX estimates and payback analysis.</p>
+                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'للمستثمرين' : 'For Investors'}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'يقلل من المخاطر المالية من خلال توفير تقديرات دقيقة.' : 'Reduces financial risk by providing data-driven CAPEX/OPEX estimates and payback analysis.'}</p>
               </div>
             </div>
-            <div className="flex items-start space-x-6 group">
+            <div className="flex items-start space-x-6 group rtl:space-x-reverse">
               <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl group-hover:bg-green-500 group-hover:text-black transition-all">
                 <Cpu size={20} />
               </div>
               <div>
-                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">For Researchers</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">Accelerates innovation by translating laboratory results into realistic implementation roadmaps.</p>
+                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'للباحثين' : 'For Researchers'}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'ينقل الأبحاث من المختبر إلى أرض الواقع لتكون جاهزة لسوق العمل.' : 'Accelerates innovation by translating laboratory results into realistic implementation roadmaps.'}</p>
               </div>
             </div>
           </div>
         </div>
         
         <div className="bg-slate-900/50 backdrop-blur-sm rounded-[2.5rem] p-12 border border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 blur-[50px] rounded-full"></div>
-          <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-widest">Platform Summary</h3>
+          <div className={`absolute top-0 ${isArabic ? 'left-0' : 'right-0'} w-32 h-32 bg-green-500/10 blur-[50px] rounded-full`}></div>
+          <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-widest">{isArabic ? 'ملخص المنصة' : 'Platform Summary'}</h3>
           <p className="text-slate-400 text-sm leading-relaxed mb-10">
-            Our platform bridges the gap between scientific discovery and industrial application. 
-            Whether you are calculating the IRR of a new biofuel facility in Oman's strategic free zones 
-            or scaling up diverse feedstock research—from waste oils to lignocellulosic biomass—at a 
-            university lab, Biofuel Insight AI provides the precision tools needed for success.
+            {isArabic 
+              ? 'تسد منصتنا الفجوة بين الاكتشاف العلمي والتطبيق الصناعي. سواء كنت تحسب معدل العائد لمنشأة في المناطق الحرة في عُمان، توفر لك المنصة الأدوات الدقيقة.'
+              : "Our platform bridges the gap between scientific discovery and industrial application. Whether you are calculating the IRR of a new biofuel facility in Oman's strategic free zones or scaling up diverse feedstock research at a university lab, Biofuel Insight AI provides the precision tools needed for success."}
           </p>
           <div className="grid grid-cols-2 gap-6">
             <div className="bg-black/40 p-6 rounded-3xl border border-white/5">
               <div className="text-4xl font-black text-green-500 mb-1">98%</div>
-              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Data Accuracy</div>
+              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'دقة مراجعة المعايير' : 'Data Accuracy'}</div>
             </div>
             <div className="bg-black/40 p-6 rounded-3xl border border-white/5">
               <div className="text-4xl font-black text-green-500 mb-1">6+</div>
-              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Expert Tools</div>
+              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'أدوات تحليل متخصصة' : 'Expert Tools'}</div>
             </div>
           </div>
         </div>

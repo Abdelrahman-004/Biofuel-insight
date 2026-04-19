@@ -5,9 +5,12 @@ import { ResearchImplementationAnalysis } from './types';
 
 interface ResearchDashboardProps {
   data: ResearchImplementationAnalysis;
+  language?: 'English' | 'Arabic';
 }
 
-export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data }) => {
+export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, language = 'English' }) => {
+  const isArabic = language === 'Arabic' || (typeof document !== 'undefined' && document.documentElement.dir === 'rtl');
+  const t = (en: string, ar: string) => isArabic ? ar : en;
   const scoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-500';
     if (score >= 60) return 'text-blue-500';

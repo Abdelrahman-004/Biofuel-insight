@@ -9,11 +9,19 @@ interface OptimizerToolProps {
   onClear: () => void;
   initialInputs?: { projectName: string; description: string };
   initialResult?: OptimizerResult;
+  language?: 'English' | 'Arabic';
 }
 
 const DRAFT_KEY = 'biofuel_insight_optimizer_draft';
 
-export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, onClear, initialInputs, initialResult }) => {
+export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, onClear, initialInputs, initialResult, language = 'English' }) => {
+  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+
+  React.useEffect(() => {
+    setLocalLanguage(language || 'Arabic');
+  }, [language]);
+
+  const isArabic = localLanguage === 'Arabic';
   const [projectName, setProjectName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [result, setResult] = React.useState<OptimizerResult | null>(null);
@@ -57,7 +65,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
     setIsLoading(true);
     setError(null);
     try {
-      const data = await optimizeProject(projectName, description);
+      const data = await optimizeProject(projectName, description, localLanguage);
       setResult(data);
       
       const newEntry: OptimizerHistoryEntry = {
@@ -96,7 +104,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               viewMode === 'OPTIMIZE' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fas fa-chart-line mr-2"></i> Optimize
+            <i className="fas fa-chart-line mr-2"></i> {isArabic ? 'التحسين' : 'Optimize'}
           </button>
           <button 
             onClick={() => setViewMode('HISTORY')}
@@ -104,7 +112,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               viewMode === 'HISTORY' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fas fa-history mr-2"></i> History ({history.length})
+            <i className="fas fa-history mr-2"></i> {isArabic ? 'السجل' : 'History'} ({history.length})
           </button>
         </div>
       </div>
@@ -120,17 +128,28 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             className="space-y-8"
           >
             <div className="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
-            <div className="bg-emerald-600/10 px-8 py-6 border-b border-slate-800">
-              <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
-                <i className="fas fa-leaf mr-3 text-emerald-400"></i>
-                Smart Profit & Low-Carbon Optimizer
-              </h2>
-              <p className="text-slate-400 text-sm mt-1">Maximize profitability while reaching net-zero milestones.</p>
+            <div className="bg-emerald-600/10 px-8 py-6 border-b border-slate-800 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
+                  <i className="fas fa-leaf mr-3 text-emerald-400"></i>
+                  {isArabic ? 'مُحسّن الأرباح وتقليل الكربون' : 'Smart Profit & Low-Carbon Optimizer'}
+                </h2>
+                <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تقصيد الأرباح وتخفيف الانبعاثات لمشاريعك' : 'Maximize profitability while reaching net-zero milestones.'}</p>
+              </div>
+
+              <select 
+                value={localLanguage}
+                onChange={(e) => setLocalLanguage(e.target.value)}
+                className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-emerald-400 outline-none"
+              >
+                <option value="Arabic">العربية (Arabic)</option>
+                <option value="English">English</option>
+              </select>
             </div>
             
             <form onSubmit={handleOptimize} className="p-8 space-y-6">
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">Try an Example:</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
                 {[
                   { name: "Algae Biofuel Hub", desc: "Large-scale algae cultivation in Duqm using industrial CO2 and seawater." },
                   { name: "Date Seed Oil Pilot", desc: "Extracting oil from date seeds for biodiesel production in Nizwa." },
@@ -148,22 +167,24 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Project Name</label>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
                   <input 
                     type="text"
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
-                    placeholder="e.g., Algae-to-Biofuel Hub Oman"
+                    placeholder={isArabic ? 'مثال: مزرعة الطحالب العمانية' : "e.g., Algae-to-Biofuel Hub Oman"}
                     className="w-full px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+                    dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Project Description & Goals</label>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">{isArabic ? 'وصف المشروع والتفاصيل' : 'Project Description & Goals'}</label>
                   <textarea 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your project, current feedstock, and target production scale..."
+                    placeholder={isArabic ? 'صف مشروعك والمواد الخام والأهداف...' : "Describe your project, current feedstock, and target production scale..."}
                     className="w-full px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition min-h-[120px]"
+                    dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
               </div>
@@ -176,12 +197,12 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                 {isLoading ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    <span>Optimizing Strategy...</span>
+                    <span>{isArabic ? 'يتم تحسين الاستراتيجية...' : 'Optimizing Strategy...'}</span>
                   </>
                 ) : (
                   <>
                     <i className="fas fa-rocket"></i>
-                    <span>Generate Optimization Strategy</span>
+                    <span>{isArabic ? 'توليد خطة التحسين المالي' : 'Generate Optimization Strategy'}</span>
                   </>
                 )}
               </button>

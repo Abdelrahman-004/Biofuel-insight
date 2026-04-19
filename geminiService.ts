@@ -478,11 +478,22 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay =
   throw lastError;
 }
 
-const getLanguageInstruction = () => {
-  return "";
+const getLanguageInstruction = (language?: string) => {
+  if (language === 'Arabic') {
+    return `
+CRITICAL INSTRUCTION FOR ARABIC:
+- You MUST translate everything into highly professional, formal, and eloquent Arabic (الفصحى المعاصرة).
+- Avoid literal, direct "machine" translations. Express ideas using natural business and financial phrasing.
+- The user's investors need PROOF with NUMBERS and TABLES. You MUST produce data-heavy, table-driven, empirically backed responses with specific financial ratios (IRR, ROI, Payback), engineering metrics, and clear Omani benchmarks.
+- Use tabular formats whenever possible.`;
+  }
+  return `
+CRITICAL INSTRUCTION:
+- Present your findings with a heavy emphasis on NUMBERS, TABLES, and EMPIRICAL PROOF. Investors need hard data.
+- Ensure specific financial ratios (IRR, ROI, Payback) and engineering metrics are clearly tabulated.`;
 };
 
-export async function optimizeProject(projectName: string, description: string): Promise<OptimizerResult> {
+export async function optimizeProject(projectName: string, description: string, language: string = 'English'): Promise<OptimizerResult> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
@@ -492,6 +503,8 @@ export async function optimizeProject(projectName: string, description: string):
   const SYSTEM_PROMPT = `You are Smart Profit and Low-Carbon Optimizer AI, a multi-agent system designed to help biofuel projects become profitable while minimizing lifecycle greenhouse gas emissions.
 Your goal is to support both investors and researchers by providing realistic and actionable strategies.
 
+CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+
 The system includes:
 1. Profit Strategy AI: Identify revenue streams, co-products (glycerol, biochar, fertilizers), carbon credits, and ESG financing.
 2. Carbon Reduction AI: Analyze lifecycle emissions (cultivation, processing, transport) and suggest renewable energy integration.
@@ -500,7 +513,7 @@ The system includes:
 5. Net-Zero Advisor AI: Estimate carbon intensity (kg CO2-eq per MJ) and provide a roadmap to net-zero.
 
 Tone: Clear, Practical, Scientific, Investor-friendly, Realistic.
-Output MUST be valid JSON following the provided schema.${getLanguageInstruction()}`;
+Output MUST be valid JSON following the provided schema.${getLanguageInstruction(language)}`;
 
   const prompt = `Optimize the following biofuel project for profit and low-carbon impact:
   Project Name: ${projectName}
@@ -558,7 +571,9 @@ export async function analyzeProject(inputs: {
   electricityCost?: number;
   laborCost?: number;
   co2Source?: string;
+  language?: string;
 }): Promise<BioFuelAnalysis> {
+  const isArabic = inputs.language === 'Arabic';
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
@@ -576,6 +591,9 @@ export async function analyzeProject(inputs: {
   - Electricity Cost: ${inputs.electricityCost || 'N/A'} USD/kWh
   - Labor Cost: ${inputs.laborCost || 'N/A'} USD/year
   - CO2 Source: ${inputs.co2Source || 'N/A'}
+
+  CRITICAL LANGUAGE INSTRUCTION:
+  The absolute MUST return all language text, summaries, labels, definitions, mitigation descriptions, strings, etc. exclusively in ${inputs.language || 'English'} natively. Do NOT return English if Arabic is requested.
 
   CALCULATIONS REQUIRED:
   1. Installed Capacity (${inputs.category === 'Biofuel' ? 'kg/year' : 'kW'})
@@ -599,7 +617,7 @@ export async function analyzeProject(inputs: {
   - Include a SWOT Analysis (Strengths, Weaknesses, Opportunities, Threats).
   - Explicitly mention strategic alignment with Oman Vision 2040 goals.
 
-  Override investor optimism with realistic engineering numbers.${getLanguageInstruction()}`;
+  Override investor optimism with realistic engineering numbers.${getLanguageInstruction(inputs.language)}`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
@@ -925,7 +943,7 @@ export async function analyzeProject(inputs: {
   }
 }
 
-export async function solveChallenge(topic: string): Promise<ChallengeSolverResult> {
+export async function solveChallenge(topic: string, language: string = 'English'): Promise<ChallengeSolverResult> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
@@ -934,6 +952,8 @@ export async function solveChallenge(topic: string): Promise<ChallengeSolverResu
   
   const SYSTEM_PROMPT = `You are Oman Biofuel Challenge Solver AI, a scientific multi-agent system designed to identify and solve biofuel research challenges in Oman.
 Your role is to support researchers, students, and industry by generating realistic, locally relevant scientific solutions.
+
+CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
 
 The system consists of five AI agents:
 1. Challenge Identifier AI: Identify key scientific and technical bottlenecks in biofuel production in Oman (climate, salinity, water scarcity, energy use).
@@ -1001,7 +1021,8 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.${getLanguageInstruct
 }
 
 export async function analyzeResearchImplementation(
-  inputs: any
+  inputs: any,
+  language: string = 'English'
 ): Promise<ResearchImplementationAnalysis> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -1017,6 +1038,8 @@ export async function analyzeResearchImplementation(
   - Conversion Efficiency: ${inputs.efficiency}%
   - Technology Readiness Level (TRL): ${inputs.trl}
   - Desired Pilot Production Scale: ${inputs.scale}
+
+  CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
 
   The goal is to estimate requirements for pilot-scale or small-scale application.
   The output must be purely research-focused, without financial calculations for investors.
@@ -1237,7 +1260,7 @@ export async function analyzeResearchImplementation(
   }
 }
 
-export async function suggestProject(context: string): Promise<SuggestedProject> {
+export async function suggestProject(context: string, language: string = 'English'): Promise<SuggestedProject> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
@@ -1247,7 +1270,8 @@ export async function suggestProject(context: string): Promise<SuggestedProject>
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `Suggest a realistic, Oman-specific project concept for ${context}. Focus on feasibility and Vision 2040 alignment. 
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+      Suggest a realistic, Oman-specific project concept for ${context}. Focus on feasibility and Vision 2040 alignment. 
       Include a list of specific Omani government incentives (tax breaks, land grants, subsidies) the project qualifies for based on its type and location.`,
       config: {
         systemInstruction: `You are an industrial project developer for the energy transition in Oman. Provide innovative but pilot-scale realistic projects.${getLanguageInstruction()}`,
@@ -1284,7 +1308,7 @@ export async function suggestProject(context: string): Promise<SuggestedProject>
   }
 }
 
-export async function checkStandardsCompliance(inputs: StandardsInput): Promise<StandardsResult> {
+export async function checkStandardsCompliance(inputs: StandardsInput, language: string = 'English'): Promise<StandardsResult> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.");
@@ -1294,7 +1318,9 @@ export async function checkStandardsCompliance(inputs: StandardsInput): Promise<
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `Evaluate the following biofuel lab results against international standards.
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+      
+      Evaluate the following biofuel lab results against international standards.
       Biofuel Type: ${inputs.biofuelType}
       Viscosity: ${inputs.viscosity || 'Not provided'}
       Flash Point: ${inputs.flashPoint || 'Not provided'}
@@ -1374,27 +1400,51 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
       Target Capacity: ${inputs.capacity}
       Estimated Budget: ${inputs.budget}
       Target Audience: ${inputs.targetAudience}
+      Requested Output Language: ${inputs.language}
       `,
       config: {
         systemInstruction: `You are an Expert Grant Writer and Investment Analyst specializing in Oman's energy sector.
         Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI for academic grants, PDO/OQ for industrial investment, OTF for startups).
         
         RULES:
-        1. Align heavily with Oman Vision 2040 (Net Zero 2050, economic diversification, circular economy).
-        2. Include a specific section on Carbon Credit Potential. Estimate the tons of CO2 saved annually and provide a monetary value range in USD (assuming current carbon market prices, e.g., $40-$80/ton).
-        3. The tone must be formal, persuasive, and data-driven.
-        4. Do not use placeholder text. Generate realistic, well-thought-out content based on the inputs.
-        ${getLanguageInstruction()}`,
+        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. If Arabic is requested, use professional Arabic business terms.
+        2. DO NOT output long paragraphs. Use concise bullet points for summaries, statements, and alignments.
+        3. FINANCIAL TABLES: Provide realistic numbers. Generate an 'installmentSchedule' showing exactly when and how the investor will get their money back (e.g., "Year 1", "Year 2") and if it is in installments.
+        4. Align heavily with Oman Vision 2040.
+        5. Carbon Credit Potential: Estimate tons of CO2 saved and provide a monetary value.`,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
             title: { type: Type.STRING },
-            executiveSummary: { type: Type.STRING },
-            problemStatement: { type: Type.STRING },
-            omanVision2040Alignment: { type: Type.STRING },
+            executiveSummary: { type: Type.ARRAY, items: { type: Type.STRING } },
+            problemStatement: { type: Type.ARRAY, items: { type: Type.STRING } },
+            omanVision2040Alignment: { type: Type.ARRAY, items: { type: Type.STRING } },
             methodology: { type: Type.STRING },
-            financialViability: { type: Type.STRING },
+            financials: {
+              type: Type.OBJECT,
+              properties: {
+                totalCapex: { type: Type.STRING },
+                annualOpex: { type: Type.STRING },
+                expectedRevenue: { type: Type.STRING },
+                roiPercentage: { type: Type.STRING },
+                paybackPeriod: { type: Type.STRING },
+                fundingReturnStrategy: { type: Type.STRING },
+                installmentSchedule: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      period: { type: Type.STRING },
+                      paymentAmount: { type: Type.STRING },
+                      milestoneDescription: { type: Type.STRING }
+                    },
+                    required: ["period", "paymentAmount", "milestoneDescription"]
+                  }
+                }
+              },
+              required: ["totalCapex", "annualOpex", "expectedRevenue", "roiPercentage", "paybackPeriod", "fundingReturnStrategy", "installmentSchedule"]
+            },
             carbonCreditPotential: {
               type: Type.OBJECT,
               properties: {
@@ -1406,7 +1456,7 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
             },
             conclusion: { type: Type.STRING }
           },
-          required: ["title", "executiveSummary", "problemStatement", "omanVision2040Alignment", "methodology", "financialViability", "carbonCreditPotential", "conclusion"]
+          required: ["title", "executiveSummary", "problemStatement", "omanVision2040Alignment", "methodology", "financials", "carbonCreditPotential", "conclusion"]
         }
       }
     }));

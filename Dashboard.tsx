@@ -8,12 +8,13 @@ import { BioFuelAnalysis } from './types';
 
 interface DashboardProps {
   data: BioFuelAnalysis;
+  language?: 'English' | 'Arabic';
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English' }) => {
   const [showReport, setShowReport] = React.useState(false);
   
-  const isArabic = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+  const isArabic = language === 'Arabic' || (typeof document !== 'undefined' && document.documentElement.dir === 'rtl');
   const t = (en: string, ar: string) => isArabic ? ar : en;
 
   const costData = [

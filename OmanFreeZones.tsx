@@ -4,14 +4,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { suggestProject } from './geminiService';
 import { SuggestedProject } from './types';
 
-export const OmanFreeZones: React.FC = () => {
+interface OmanFreeZonesProps {
+  language?: 'English' | 'Arabic';
+}
+
+export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'English' }) => {
+  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+
+  React.useEffect(() => {
+    setLocalLanguage(language || 'Arabic');
+  }, [language]);
+
+  const isArabic = localLanguage === 'Arabic';
   const [suggestion, setSuggestion] = React.useState<SuggestedProject | null>(null);
   const [loading, setLoading] = React.useState<string | null>(null);
 
   const handleSuggest = async (zone: string) => {
     setLoading(zone);
     try {
-      const proj = await suggestProject(`${zone} in Oman`);
+      const proj = await suggestProject(`${zone} in Oman`, localLanguage);
       setSuggestion(proj);
     } catch (e) {
       console.error(e);
@@ -56,8 +67,18 @@ export const OmanFreeZones: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
       >
-        <h2 className="text-3xl font-black text-slate-900 mb-2">Oman Free Zones Strategic Intelligence</h2>
-        <p className="text-slate-500 max-w-2xl">Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.</p>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-3xl font-black text-slate-900">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
+          <select 
+            value={localLanguage}
+            onChange={(e) => setLocalLanguage(e.target.value)}
+            className="bg-slate-50 text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none font-bold"
+          >
+            <option value="Arabic">العربية (Arabic)</option>
+            <option value="English">English</option>
+          </select>
+        </div>
+        <p className="text-slate-500 max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان.' : 'Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.'}</p>
       </motion.div>
 
       <AnimatePresence>
@@ -164,7 +185,7 @@ export const OmanFreeZones: React.FC = () => {
                     className="px-4 py-2 bg-slate-900 text-white text-[10px] font-black uppercase rounded-lg hover:bg-emerald-600 transition disabled:opacity-50"
                   >
                     {loading === z.name ? <i className="fas fa-spinner fa-spin mr-2"></i> : <i className="fas fa-bolt mr-2 text-emerald-400"></i>}
-                    Suggest Project for {z.name.split(' ')[0]}
+                    {isArabic ? `اقتراح مشروع لـ ${z.name.split(' ')[0]}` : `Suggest Project for ${z.name.split(' ')[0]}`}
                   </motion.button>
                 </div>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">{z.desc}</p>
