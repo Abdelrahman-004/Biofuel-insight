@@ -1,20 +1,46 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Oman Biofuel & Energy Transition AI
 
-# Run and deploy your AI Studio app
+An advanced multi-agent AI platform designed to evaluate, optimize, and research biofuel and renewable energy projects in Oman.
 
-This contains everything you need to run your app locally.
+## Features
+- **Feasibility Analyzer**: Evaluates the technical and economic viability of biofuel, hydrogen, and carbon pathways across Oman's strategic zones.
+- **Research Implementation Analyzer**: Bridges the gap between laboratory yields and pilot-scale production.
+- **Profit & Carbon Optimizer**: Maximizes revenue streams while minimizing lifecycle greenhouse gas emissions.
+- **Challenge Solver**: Identifies and solves scientific and technical bottlenecks in biofuel research specific to Oman's climate.
 
-View your app in AI Studio: https://ai.studio/apps/1332fd49-6c38-4df7-8fd1-713070a9c4b1
+## Getting Started
 
-## Run Locally
+### Prerequisites
+- Node.js (v18 or higher)
+- A Google Gemini API Key
 
-**Prerequisites:**  Node.js
+### Installation
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/oman-biofuel-ai.git
+   cd oman-biofuel-ai
+   ```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   - Copy the `.env.example` file to a new file named `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Open the `.env` file and add your Gemini API key:
+     ```env
+     VITE_GEMINI_API_KEY=your_actual_api_key_here
+     ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Deployment
+This project is configured for seamless deployment on Vercel. Simply import the GitHub repository into Vercel and add your `VITE_GEMINI_API_KEY` to the Environment Variables in the Vercel project settings.
