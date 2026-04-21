@@ -65,20 +65,20 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
+        className="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-8"
       >
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-3xl font-black text-slate-900">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
+          <h2 className="text-3xl font-black text-white">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
           <select 
             value={localLanguage}
             onChange={(e) => setLocalLanguage(e.target.value)}
-            className="bg-slate-50 text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none font-bold"
+            className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none font-bold"
           >
             <option value="Arabic">العربية (Arabic)</option>
             <option value="English">English</option>
           </select>
         </div>
-        <p className="text-slate-500 max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان.' : 'Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.'}</p>
+        <p className="text-slate-400 max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان.' : 'Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.'}</p>
       </motion.div>
 
       <AnimatePresence>

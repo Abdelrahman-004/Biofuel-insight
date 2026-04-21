@@ -15,31 +15,49 @@ interface NavbarProps {
 }
 
 const BiofuelOmanLogo = () => (
-  <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 48 48" className="w-10 h-10 flex-shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#22c55e" /> {/* Green */}
-        <stop offset="100%" stopColor="#FFFFFF" /> {/* White */}
+      <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#155944" />
+        <stop offset="100%" stopColor="#0B2F23" />
+      </linearGradient>
+      <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#7ADB4A" />
+        <stop offset="100%" stopColor="#2E8A5E" />
       </linearGradient>
     </defs>
+    
+    {/* Outer Khanjar / Coastline curve - Forest Green */}
     <path 
-      d="M12 2L20.6603 7V17L12 22L3.33975 17V7L12 2Z" 
-      fill="url(#logo-gradient)"
+      d="M24 2C36 2 44 10 44 22C44 38 28 46 16 46C28 42 34 32 34 22C34 12 28 6 24 2Z" 
+      fill="url(#primaryGrad)"
     />
     <path 
-      d="M12 2L20.6603 7V17L12 22L3.33975 17V7L12 2Z" 
-      stroke="rgba(255,255,255,0.2)" 
-      strokeWidth="1"
+      d="M22 6C12 6 4 14 4 26C4 32 8 38 14 42C12 36 12 30 16 24C18 20 22 16 22 6Z" 
+      fill="url(#primaryGrad)" opacity="0.8"
     />
-    {/* Geometric Detail */}
+
+    {/* AI Tech Network Nodes */}
+    <path d="M12 26 L22 26 L28 20" stroke="#ECECEC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M16 16 L20 20 L22 26" stroke="#ECECEC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M18 36 L22 32 L22 26" stroke="#7ADB4A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    
+    <circle cx="12" cy="26" r="2" fill="#ECECEC" />
+    <circle cx="16" cy="16" r="2" fill="#ECECEC" />
+    <circle cx="18" cy="36" r="2" fill="#7ADB4A" />
+    <circle cx="28" cy="20" r="2" fill="#7ADB4A" className="animate-pulse" />
+
+    {/* Biodiesel Drop / Leaf at the core */}
     <path 
-      d="M12 6V18 M6 9L18 15 M6 15L18 9" 
-      stroke="white" 
-      strokeWidth="0.75" 
-      strokeLinecap="round"
-      className="opacity-30"
+      d="M28 20 C28 20 36 20 36 28 C36 32 32 36 28 36 C24 36 20 32 20 28 C20 24 28 20 28 20Z" 
+      fill="url(#neonGrad)" 
     />
-    <circle cx="12" cy="12" r="2.5" fill="white" className="animate-pulse" />
+    <path 
+      d="M25 28 C25 30 26 32 28 32" 
+      stroke="#155944" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+    />
   </svg>
 );
 

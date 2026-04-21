@@ -81,17 +81,17 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"
+          className="bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-800"
         >
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-black text-slate-900 flex items-center">
-              <i className="fas fa-microscope mr-3 text-blue-600"></i> {isArabic ? 'قيم معمل الوقود ومقاييسه' : 'Lab Results Input'}
+            <h2 className="text-xl font-black text-white flex items-center">
+              <i className="fas fa-microscope mr-3 text-blue-400"></i> {isArabic ? 'قيم معمل الوقود ومقاييسه' : 'Lab Results Input'}
             </h2>
             
             <select 
               value={localLanguage}
               onChange={(e) => setLocalLanguage(e.target.value)}
-              className="bg-slate-50 text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none font-bold"
+              className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none font-bold"
             >
               <option value="Arabic">العربية (Arabic)</option>
               <option value="English">English</option>
@@ -104,13 +104,13 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 name="biofuelType" 
                 value={inputs.biofuelType} 
                 onChange={handleInputChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 dir={isArabic ? 'rtl' : 'ltr'}
               >
-                <option value="Biodiesel">{isArabic ? 'الديزل الحيوي (FAME)' : 'Biodiesel (FAME)'}</option>
-                <option value="Bioethanol">{isArabic ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
-                <option value="Sustainable Aviation Fuel (SAF)">{isArabic ? 'وقود الطيران المستدام (SAF)' : 'Sustainable Aviation Fuel (SAF)'}</option>
-                <option value="Biogas">{isArabic ? 'الغاز الحيوي' : 'Biogas'}</option>
+                <option value="Biodiesel" className="bg-slate-900">{isArabic ? 'الديزل الحيوي (FAME)' : 'Biodiesel (FAME)'}</option>
+                <option value="Bioethanol" className="bg-slate-900">{isArabic ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
+                <option value="Sustainable Aviation Fuel (SAF)" className="bg-slate-900">{isArabic ? 'وقود الطيران المستدام (SAF)' : 'Sustainable Aviation Fuel (SAF)'}</option>
+                <option value="Biogas" className="bg-slate-900">{isArabic ? 'الغاز الحيوي' : 'Biogas'}</option>
               </select>
             </div>
 
@@ -132,7 +132,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     value={(inputs as any)[field.name]} 
                     onChange={handleInputChange}
                     placeholder={isArabic ? 'اختياري' : "Optional"}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>

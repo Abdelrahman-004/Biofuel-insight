@@ -73,20 +73,20 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"
+          className="bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-800"
         >
-          <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center">
-            <i className="fas fa-file-signature mx-3 text-emerald-600"></i> {inputs.language === 'Arabic' ? 'تفاصيل المقترح' : 'Proposal Details'}
+          <h2 className="text-xl font-black text-white mb-6 flex items-center">
+            <i className="fas fa-file-signature mx-3 text-emerald-400"></i> {inputs.language === 'Arabic' ? 'تفاصيل المقترح' : 'Proposal Details'}
           </h2>
           <form onSubmit={handleGenerate} className="space-y-4">
             
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4">
+            <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 mb-4">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">اللغة / Language</label>
               <select 
                 name="language" 
                 value={inputs.language} 
                 onChange={handleInputChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 outline-none"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm font-bold text-emerald-400 outline-none"
               >
                 <option value="Arabic">العربية (Arabic)</option>
                 <option value="English">English</option>
@@ -102,7 +102,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 value={inputs.projectName} 
                 onChange={handleInputChange}
                 placeholder={inputs.language === 'Arabic' ? "مثال: مبادرة عمان للوقود الأخضر" : "e.g., Oman Green Fuel Initiative"}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500"
               />
             </div>
 
@@ -112,12 +112,12 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 name="targetAudience" 
                 value={inputs.targetAudience} 
                 onChange={handleInputChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                 dir={inputs.language === 'Arabic' ? 'rtl' : 'ltr'}
               >
-                <option value="MoHERI (Academic/Research)">{inputs.language === 'Arabic' ? 'البحث العلمي (MoHERI)' : 'MoHERI (Academic/Research Grant)'}</option>
-                <option value="PDO/OQ (Industrial/Commercial)">{inputs.language === 'Arabic' ? 'تنمية نفط عمان / أوكيو (استثمار صناعي)' : 'PDO / OQ (Industrial Investment)'}</option>
-                <option value="OTF (Startup/VC)">{inputs.language === 'Arabic' ? 'الصندوق العماني للتكنولوجيا (شركات ناشئة)' : 'Oman Technology Fund (Startup/VC)'}</option>
+                <option value="MoHERI (Academic/Research)" className="bg-slate-900">{inputs.language === 'Arabic' ? 'البحث العلمي (MoHERI)' : 'MoHERI (Academic/Research Grant)'}</option>
+                <option value="PDO/OQ (Industrial/Commercial)" className="bg-slate-900">{inputs.language === 'Arabic' ? 'تنمية نفط عمان / أوكيو (استثمار صناعي)' : 'PDO / OQ (Industrial Investment)'}</option>
+                <option value="OTF (Startup/VC)" className="bg-slate-900">{inputs.language === 'Arabic' ? 'الصندوق العماني للتكنولوجيا (شركات ناشئة)' : 'Oman Technology Fund (Startup/VC)'}</option>
               </select>
             </div>
 
@@ -131,7 +131,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   value={inputs.feedstock} 
                   onChange={handleInputChange}
                   placeholder={inputs.language === 'Arabic' ? 'زيت الطبخ المستخدم' : "e.g., Used Cooking Oil"}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500"
                   dir={inputs.language === 'Arabic' ? 'rtl' : 'ltr'}
                 />
               </div>
@@ -141,15 +141,15 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   name="biofuelType" 
                   value={inputs.biofuelType} 
                   onChange={handleInputChange}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                   dir={inputs.language === 'Arabic' ? 'rtl' : 'ltr'}
                 >
-                  <option value="Solar Farm">{inputs.language === 'Arabic' ? 'محطة طاقة شمسية' : 'Solar Farm'}</option>
-                  <option value="Green Hydrogen">{inputs.language === 'Arabic' ? 'هيدروجين أخضر (التحليل الكهربائي)' : 'Green Hydrogen Electrolysis'}</option>
-                  <option value="Biodiesel">{inputs.language === 'Arabic' ? 'الديزل الحيوي' : 'Biodiesel'}</option>
-                  <option value="SAF">{inputs.language === 'Arabic' ? 'وقود الطيران المستدام (SAF)' : 'SAF'}</option>
-                  <option value="Waste-to-Energy">{inputs.language === 'Arabic' ? 'تحويل النفايات إلى طاقة' : 'Waste-to-Energy'}</option>
-                  <option value="Biogas">{inputs.language === 'Arabic' ? 'الغاز الحيوي' : 'Biogas'}</option>
+                  <option value="Solar Farm" className="bg-slate-900">{inputs.language === 'Arabic' ? 'محطة طاقة شمسية' : 'Solar Farm'}</option>
+                  <option value="Green Hydrogen" className="bg-slate-900">{inputs.language === 'Arabic' ? 'هيدروجين أخضر (التحليل الكهربائي)' : 'Green Hydrogen Electrolysis'}</option>
+                  <option value="Biodiesel" className="bg-slate-900">{inputs.language === 'Arabic' ? 'الديزل الحيوي' : 'Biodiesel'}</option>
+                  <option value="SAF" className="bg-slate-900">{inputs.language === 'Arabic' ? 'وقود الطيران المستدام (SAF)' : 'SAF'}</option>
+                  <option value="Waste-to-Energy" className="bg-slate-900">{inputs.language === 'Arabic' ? 'تحويل النفايات إلى طاقة' : 'Waste-to-Energy'}</option>
+                  <option value="Biogas" className="bg-slate-900">{inputs.language === 'Arabic' ? 'الغاز الحيوي' : 'Biogas'}</option>
                 </select>
               </div>
             </div>
@@ -164,7 +164,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   value={inputs.capacity} 
                   onChange={handleInputChange}
                   placeholder={inputs.language === 'Arabic' ? '500 لتر/يوم' : "e.g., 500 L/Day"}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500"
                 />
               </div>
               <div>
@@ -176,7 +176,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   value={inputs.budget} 
                   onChange={handleInputChange}
                   placeholder={inputs.language === 'Arabic' ? '50,000 ريال' : "e.g., 50,000 OMR"}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none placeholder:text-slate-500"
                 />
               </div>
             </div>
