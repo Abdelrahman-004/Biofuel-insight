@@ -67,7 +67,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
   const scoreAssets = getScoreAssets(data?.FinalFeasibilityScore || 0);
 
   const getRiskColor = (level: string) => {
-    if (!level) return 'text-slate-500 bg-slate-50 border-slate-100';
+    if (!level) return 'text-slate-500 bg-[#0F172A] border-white/5';
     if (level === 'Moderate') return 'text-emerald-500 bg-emerald-50 border-emerald-100';
     if (level === 'Significant') return 'text-amber-500 bg-amber-50 border-amber-100';
     return 'text-red-500 bg-red-50 border-red-100';
@@ -119,7 +119,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200"
+              className="max-w-5xl mx-auto bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden border border-white/5"
             >
             {/* Header */}
             <div className="bg-slate-900 px-8 py-6 flex justify-between items-center border-b border-slate-800">
@@ -129,7 +129,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <button 
                 onClick={() => setShowReport(false)}
-                className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
+                className="w-10 h-10 rounded-full bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/10 text-white flex items-center justify-center hover:bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/20 transition"
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -141,26 +141,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 
                 {/* Technical AI */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-slate-100 pb-2">
+                  <div className="flex items-center space-x-3 border-b border-white/5 pb-2">
                     <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
                       <i className="fas fa-microchip"></i>
                     </div>
-                    <h3 className="font-black text-slate-800 uppercase text-sm tracking-wider">Technical Engineering AI</h3>
+                    <h3 className="font-black text-slate-200 uppercase text-sm tracking-wider">Technical Engineering AI</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Installed Capacity</p>
-                      <p className="text-sm font-black text-slate-800">{data?.TechnicalAI?.InstalledCapacity || 'N/A'}</p>
+                      <p className="text-sm font-black text-slate-200">{data?.TechnicalAI?.InstalledCapacity || 'N/A'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Energy Output</p>
-                      <p className="text-sm font-black text-slate-800">{data?.TechnicalAI?.EnergyOutput || 'N/A'}</p>
+                      <p className="text-sm font-black text-slate-200">{data?.TechnicalAI?.EnergyOutput || 'N/A'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Benchmark CAPEX</p>
-                      <p className="text-xs font-bold text-slate-700">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
+                      <p className="text-xs font-bold text-slate-300">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">TRL Level</p>
                       <p className="text-sm font-black text-blue-600">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
                     </div>
@@ -169,26 +169,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
                 {/* Financial AI */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-slate-100 pb-2">
+                  <div className="flex items-center space-x-3 border-b border-white/5 pb-2">
                     <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
                       <i className="fas fa-chart-line"></i>
                     </div>
-                    <h3 className="font-black text-slate-800 uppercase text-sm tracking-wider">Financial Modeling AI</h3>
+                    <h3 className="font-black text-slate-200 uppercase text-sm tracking-wider">Financial Modeling AI</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Realistic CAPEX</p>
-                      <p className="text-sm font-black text-slate-800">{formatCurrency(data?.FinancialAI?.RealisticCAPEX || 0)}</p>
+                      <p className="text-sm font-black text-slate-200">{formatCurrency(data?.FinancialAI?.RealisticCAPEX || 0)}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Annual OPEX</p>
-                      <p className="text-sm font-black text-slate-800">{formatCurrency(data?.FinancialAI?.OPEX || 0)}</p>
+                      <p className="text-sm font-black text-slate-200">{formatCurrency(data?.FinancialAI?.OPEX || 0)}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Payback Period</p>
                       <p className="text-sm font-black text-emerald-600">{data?.FinancialAI?.PaybackYears || 0} Years</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">IRR (Est.)</p>
                       <p className="text-sm font-black text-emerald-600">{data?.FinancialAI?.IRR_Simplified || 'N/A'}</p>
                     </div>
@@ -201,11 +201,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
                 {/* Auditor AI */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-slate-100 pb-2">
+                  <div className="flex items-center space-x-3 border-b border-white/5 pb-2">
                     <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white">
                       <i className="fas fa-gavel"></i>
                     </div>
-                    <h3 className="font-black text-slate-800 uppercase text-sm tracking-wider">Investment Auditor</h3>
+                    <h3 className="font-black text-slate-200 uppercase text-sm tracking-wider">Investment Auditor</h3>
                   </div>
                   <div className="p-5 bg-slate-900 rounded-2xl text-white space-y-4">
                     <div className="flex justify-between items-center">
@@ -249,21 +249,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
                 {/* Risk AI */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-slate-100 pb-2">
+                  <div className="flex items-center space-x-3 border-b border-white/5 pb-2">
                     <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white">
                       <i className="fas fa-shield-virus"></i>
                     </div>
-                    <h3 className="font-black text-slate-800 uppercase text-sm tracking-wider">Risk Assessment AI</h3>
+                    <h3 className="font-black text-slate-200 uppercase text-sm tracking-wider">Risk Assessment AI</h3>
                   </div>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Capital Adequacy</p>
                         <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-600' : 'text-red-600'}`}>
                           {data?.RiskAI?.CapitalAdequacyRatio?.toFixed(2) || '0.00'}
                         </p>
                       </div>
-                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Risk Level</p>
                         <p className={`text-sm font-black ${
                           data?.RiskAI?.RiskClassification === 'Moderate' ? 'text-emerald-600' : 
@@ -273,19 +273,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                         </p>
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                    <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5 space-y-3">
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Market Volatility</p>
-                        <p className="text-xs text-slate-700 font-medium">{data?.RiskAI?.MarketVolatility || 'N/A'}</p>
+                        <p className="text-xs text-slate-300 font-medium">{data?.RiskAI?.MarketVolatility || 'N/A'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Regulatory Risk</p>
-                        <p className="text-xs text-slate-700 font-medium">{data?.RiskAI?.RegulatoryRisk || 'N/A'}</p>
+                        <p className="text-xs text-slate-300 font-medium">{data?.RiskAI?.RegulatoryRisk || 'N/A'}</p>
                       </div>
                       {data?.ProjectAnalyzer?.TechnologyCategory === 'Biofuel' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Feedstock Stability</p>
-                          <p className="text-xs text-slate-700 font-medium">{data?.RiskAI?.FeedstockStability || 'N/A'}</p>
+                          <p className="text-xs text-slate-300 font-medium">{data?.RiskAI?.FeedstockStability || 'N/A'}</p>
                         </div>
                       )}
                     </div>
@@ -295,12 +295,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
 
               {/* Footer */}
-              <div className="bg-slate-50 -mx-8 -mb-8 p-8 border-t border-slate-200 flex justify-between items-center">
+              <div className="bg-[#0F172A] -mx-8 -mb-8 p-8 border-t border-white/10 flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                   <img src="https://picsum.photos/seed/oman/40/40" className="w-10 h-10 rounded-full grayscale opacity-50" referrerPolicy="no-referrer" />
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Report Generated By</p>
-                    <p className="text-xs font-black text-slate-700">BioFuel Insight AI Engine v2.5</p>
+                    <p className="text-xs font-black text-slate-300">BioFuel Insight AI Engine v2.5</p>
                   </div>
                 </div>
                 <button 
@@ -325,7 +325,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       >
         <div>
           <div className="flex items-center space-x-3 mb-1">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">{data?.ProjectAnalyzer?.ProjectName || 'Project Analysis'}</h2>
+            <h2 className="text-3xl font-black text-white tracking-tight">{data?.ProjectAnalyzer?.ProjectName || 'Project Analysis'}</h2>
             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${getRiskColor(data?.RiskExposureLevel || 'N/A')}`}>
               {data?.RiskExposureLevel || 'N/A'} Risk Exposure
             </span>
@@ -358,7 +358,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-emerald-100 transition-all"
+          className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 p-6 rounded-2xl border-2 border-white/5 shadow-xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-emerald-100 transition-all"
         >
           <div className={`absolute top-0 right-0 p-2 text-[8px] font-black uppercase text-white ${scoreAssets.bg} px-3 rounded-bl-xl shadow-md`}>
             {scoreAssets.label}
@@ -374,7 +374,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center"
+          className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Investment Verdict</div>
           <div className={`text-lg font-black leading-tight ${
@@ -390,10 +390,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center"
+          className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Payback Period</div>
-          <div className="text-3xl font-black text-slate-800">{data.EconomicFeasibility.PaybackPeriodYears} <span className="text-sm font-bold text-slate-400">Years</span></div>
+          <div className="text-3xl font-black text-slate-200">{data.EconomicFeasibility.PaybackPeriodYears} <span className="text-sm font-bold text-slate-400">Years</span></div>
           <div className="mt-2 text-[10px] font-bold text-slate-300 italic">Project ROI</div>
         </motion.div>
 
@@ -401,18 +401,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center"
+          className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Corporate Tax (Oman)</div>
-          <div className="text-2xl font-black text-slate-800">15% <span className="text-[10px] text-slate-400">Applied</span></div>
+          <div className="text-2xl font-black text-slate-200">15% <span className="text-[10px] text-slate-400">Applied</span></div>
           <div className="mt-2 text-[8px] text-slate-400 italic">Net Profit After Tax included in IRR</div>
         </motion.div>
       </div>
 
       {/* Dynamic Weighted Scoring & SWOT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-           <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+        <div className="lg:col-span-1 bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+           <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center">
             <i className="fas fa-chart-pie mr-2 text-indigo-500"></i> Dynamic AI Scoring
            </h3>
            <div className="space-y-6">
@@ -423,10 +423,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
              ].map((m, i) => (
                <div key={i} className="space-y-2">
                  <div className="flex justify-between text-xs">
-                   <span className="font-bold text-slate-600">{m.label} ({m.weight})</span>
-                   <span className="font-black text-slate-900">{m.score}%</span>
+                   <span className="font-bold text-slate-400">{m.label} ({m.weight})</span>
+                   <span className="font-black text-white">{m.score}%</span>
                  </div>
-                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                 <div className="w-full bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 h-2 rounded-full overflow-hidden">
                    <motion.div 
                      initial={{ width: 0 }}
                      animate={{ width: `${m.score}%` }}
@@ -473,14 +473,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Localization & Taxes */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center">
             <i className="fas fa-landmark mr-2 text-blue-600"></i> Omani Localization Logic
           </h3>
           <div className="space-y-4">
-            <div className="p-4 bg-slate-50 rounded-2xl">
+            <div className="p-4 bg-[#0F172A] rounded-2xl">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Industry Tax (Oman)</p>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed">{data.OmanLogic?.corporateTaxApplied}</p>
+              <p className="text-xs text-slate-300 font-medium leading-relaxed">{data.OmanLogic?.corporateTaxApplied}</p>
             </div>
             <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
               <div>
@@ -488,30 +488,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 <p className="text-lg font-black text-blue-900">{data.OmanLogic?.omanizationCostEstimate.OMR} OMR / Year</p>
                 <p className="text-[10px] text-blue-400 italic">35% Minimum Quota Applied</p>
               </div>
-              <div className="bg-white p-3 rounded-xl shadow-sm text-center">
+              <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 p-3 rounded-xl shadow-sm text-center">
                  <p className="text-[10px] font-bold text-slate-400 uppercase">In USD</p>
-                 <p className="text-xs font-black text-slate-900">{data.OmanLogic?.omanizationCostEstimate.USD}</p>
+                 <p className="text-xs font-black text-white">{data.OmanLogic?.omanizationCostEstimate.USD}</p>
               </div>
             </div>
-            <div className="p-4 bg-slate-50 rounded-2xl">
+            <div className="p-4 bg-[#0F172A] rounded-2xl">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Industrial Utility Tariffs</p>
-              <p className="text-xs text-slate-600 italic leading-relaxed">{data.OmanLogic?.utilityTariffDetails}</p>
+              <p className="text-xs text-slate-400 italic leading-relaxed">{data.OmanLogic?.utilityTariffDetails}</p>
             </div>
           </div>
         </div>
 
         {/* Legal Permit Roadmap */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center">
             <i className="fas fa-file-signature mr-2 text-emerald-600"></i> Legal & Permit Roadmap
           </h3>
           <div className="space-y-3 relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-100"></div>
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5"></div>
             {data.LegalRoadmap?.requiredPermits.map((permit, i) => (
               <div key={i} className="relative flex items-start space-x-4 pl-10 pb-4">
                 <div className="absolute left-3 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
                 <div>
-                  <h4 className="text-xs font-black text-slate-800">{permit.name}</h4>
+                  <h4 className="text-xs font-black text-slate-200">{permit.name}</h4>
                   <p className="text-[10px] text-slate-500 font-medium">{permit.description}</p>
                   <p className="text-[10px] text-emerald-600 font-bold italic mt-1 flex items-center">
                     <i className="fas fa-clock mr-1"></i> {permit.estimatedTime}
@@ -535,30 +535,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
            <p className="text-lg font-light leading-relaxed mb-6 italic text-indigo-100">
              "{data.ExecutiveSummary}"
            </p>
-           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-white/5 p-3 rounded-xl border border-white/10 w-fit">
+           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 p-3 rounded-xl border border-white/10 w-fit">
               <i className="fas fa-flag text-sm"></i>
               <span>Aligned with Oman Vision 2040 Economic Diversification</span>
            </div>
         </div>
 
         {/* Enhanced Sensitivity */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-           <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 p-6 rounded-3xl border border-white/10 shadow-sm">
+           <h3 className="text-xs font-black text-white uppercase tracking-widest mb-4 flex items-center">
             <i className="fas fa-robot mr-2 text-amber-500"></i> Monte Carlo Summary
            </h3>
-           <p className="text-xs text-slate-600 leading-relaxed mb-4">
+           <p className="text-xs text-slate-400 leading-relaxed mb-4">
              {data.AdvancedSensitivity?.monteCarloSummary}
            </p>
            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
              <p className="text-[9px] font-black text-amber-700 uppercase mb-2 tracking-widest">Stress Test: 10% Market Price Drop</p>
              <div className="flex justify-between items-center">
                <div>
-                 <p className="text-xs font-bold text-slate-700">New Payback</p>
+                 <p className="text-xs font-bold text-slate-300">New Payback</p>
                  <p className="text-lg font-black text-amber-600">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
                </div>
                <div className="text-right">
                  <p className="text-[9px] font-bold text-slate-400 uppercase">Viability</p>
-                 <p className="text-xs font-black text-slate-800 uppercase tracking-widest">{data.AdvancedSensitivity?.sellingPriceDropImpact.viabilityStatus}</p>
+                 <p className="text-xs font-black text-slate-200 uppercase tracking-widest">{data.AdvancedSensitivity?.sellingPriceDropImpact.viabilityStatus}</p>
                </div>
              </div>
            </div>
@@ -567,7 +567,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       {/* Detailed Financial Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 rounded-2xl border border-white/10 shadow-sm overflow-hidden">
           <div className="bg-slate-900 px-6 py-4 flex justify-between items-center">
             <h3 className="text-white font-bold text-sm flex items-center">
               <i className="fas fa-file-invoice-dollar mr-3 text-emerald-400"></i>
@@ -579,11 +579,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-slate-500">Realistic Required CAPEX</span>
-                <span className="text-sm font-black text-slate-800">{formatCurrency(data.EconomicFeasibility.RealisticRequiredCAPEX)}</span>
+                <span className="text-sm font-black text-slate-200">{formatCurrency(data.EconomicFeasibility.RealisticRequiredCAPEX)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-slate-500">Investor Budget</span>
-                <span className="text-sm font-black text-slate-800">{formatCurrency(data.ProjectAnalyzer.PreliminaryBudgetUSD || 0)}</span>
+                <span className="text-sm font-black text-slate-200">{formatCurrency(data.ProjectAnalyzer.PreliminaryBudgetUSD || 0)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-slate-500">Funding Gap</span>
@@ -593,7 +593,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-slate-500">Installed Cost per {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'kg' : 'kW'}</span>
-                <span className="text-sm font-black text-slate-800">${data.EconomicFeasibility.InstalledCostPerUnit.toFixed(2)}/{data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'kg' : 'kW'}</span>
+                <span className="text-sm font-black text-slate-200">${data.EconomicFeasibility.InstalledCostPerUnit.toFixed(2)}/{data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'kg' : 'kW'}</span>
               </div>
             </div>
             <div className="space-y-4">
@@ -613,14 +613,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-slate-500">Annual Production</span>
-                <span className="text-sm font-black text-slate-800">
+                <span className="text-sm font-black text-slate-200">
                   {data.ProjectAnalyzer.ExpectedProduction?.toLocaleString()} {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'Tons' : 'MWh'}
                 </span>
               </div>
             </div>
           </div>
-          <div className="bg-slate-50 p-4 border-t border-slate-100">
-            <p className="text-xs text-slate-600 italic leading-relaxed">
+          <div className="bg-[#0F172A] p-4 border-t border-white/5">
+            <p className="text-xs text-slate-400 italic leading-relaxed">
               <i className="fas fa-info-circle mr-2 text-blue-500"></i>
               {data.Rationale}
             </p>
@@ -628,7 +628,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         </div>
 
         {/* Sensitivity Analysis */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 rounded-2xl border border-white/10 shadow-sm overflow-hidden flex flex-col">
           <div className="bg-slate-800 px-6 py-4">
             <h3 className="text-white font-bold text-sm flex items-center">
               <i className="fas fa-vial mr-3 text-amber-400"></i>
@@ -636,28 +636,28 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </h3>
           </div>
           <div className="p-6 flex-grow space-y-6">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Price Drop (-10%)</p>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-700">Payback: {data.SensitivityAnalysis.PriceDrop10.PaybackPeriod.toFixed(1)} yrs</span>
+                <span className="text-xs font-bold text-slate-300">Payback: {data.SensitivityAnalysis.PriceDrop10.PaybackPeriod.toFixed(1)} yrs</span>
                 <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.PriceDrop10.RiskLevel)}`}>
                   {data.SensitivityAnalysis.PriceDrop10.RiskLevel}
                 </span>
               </div>
             </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">OPEX Increase (+15%)</p>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-700">Payback: {data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod.toFixed(1)} yrs</span>
+                <span className="text-xs font-bold text-slate-300">Payback: {data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod.toFixed(1)} yrs</span>
                 <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.OPEXIncrease15.RiskLevel)}`}>
                   {data.SensitivityAnalysis.OPEXIncrease15.RiskLevel}
                 </span>
               </div>
             </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Production Drop (-10%)</p>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-700">Payback: {data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod.toFixed(1)} yrs</span>
+                <span className="text-xs font-bold text-slate-300">Payback: {data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod.toFixed(1)} yrs</span>
                 <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.ProductionDrop10.RiskLevel)}`}>
                   {data.SensitivityAnalysis.ProductionDrop10.RiskLevel}
                 </span>
@@ -665,7 +665,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
 
             {/* Sensitivity Visualizer Chart */}
-            <div className="pt-4 border-t border-slate-100">
+            <div className="pt-4 border-t border-white/5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Investment Sensitivity Visualizer</p>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -712,7 +712,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.ExpertCounsel.map((counsel, index) => (
-                <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-start group hover:bg-white/10 transition-colors">
+                <div key={index} className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 border border-white/10 rounded-xl p-4 flex items-start group hover:bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/10 transition-colors">
                   <div className="bg-indigo-500/20 text-indigo-300 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shrink-0 mr-4 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                     {index + 1}
                   </div>
@@ -728,8 +728,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Economic Chart */}
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+          <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center">
             <i className="fas fa-coins mr-3 text-blue-500"></i> Capital Expenditure Profile
           </h3>
           <div className="h-64 mb-6">
@@ -748,12 +748,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </ResponsiveContainer>
           </div>
           <div className="space-y-4">
-            <p className="text-sm text-slate-500 leading-relaxed italic border-l-4 border-slate-100 pl-4">
+            <p className="text-sm text-slate-500 leading-relaxed italic border-l-4 border-white/5 pl-4">
               "{data.EconomicFeasibility.Justification}"
             </p>
             <div className="grid grid-cols-2 gap-2">
               {data.EconomicFeasibility.EstimatedInvestmentUSD.MajorCosts?.map((cost, i) => (
-                <div key={i} className="text-[11px] font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-lg flex items-center">
+                <div key={i} className="text-[11px] font-bold text-slate-400 bg-[#0F172A] px-3 py-2 rounded-lg flex items-center">
                   <i className="fas fa-check-circle text-emerald-400 mr-2"></i> {cost}
                 </div>
               ))}
@@ -785,26 +785,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       </div>
 
       {/* Investor Perspective AI */}
-      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
+      <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+        <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center">
           <i className="fas fa-briefcase mr-3 text-blue-600"></i> Investor Perspective AI
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Return Potential</p>
-            <p className="text-sm font-bold text-slate-800">{data.InvestorPerspective.ReturnPotential}</p>
+            <p className="text-sm font-bold text-slate-200">{data.InvestorPerspective.ReturnPotential}</p>
           </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Capital Intensity</p>
-            <p className="text-sm font-bold text-slate-800">{data.InvestorPerspective.CapitalIntensity}</p>
+            <p className="text-sm font-bold text-slate-200">{data.InvestorPerspective.CapitalIntensity}</p>
           </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Scalability Rating</p>
-            <p className="text-sm font-bold text-slate-800">{data.InvestorPerspective.ScalabilityRating}</p>
+            <p className="text-sm font-bold text-slate-200">{data.InvestorPerspective.ScalabilityRating}</p>
           </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Market Demand</p>
-            <p className="text-sm font-bold text-slate-800">{data.InvestorPerspective.MarketDemandAnalysis}</p>
+            <p className="text-sm font-bold text-slate-200">{data.InvestorPerspective.MarketDemandAnalysis}</p>
           </div>
         </div>
         <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
@@ -817,22 +817,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Risks */}
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+          <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center">
             <i className="fas fa-shield-halved mr-3 text-amber-500"></i> Critical Risk Matrix
           </h3>
           <div className="space-y-4">
             {data.KeyRisks?.map((risk, i) => (
-              <div key={i} className="p-4 rounded-xl border border-slate-100 hover:border-amber-200 hover:bg-amber-50/20 transition group">
+              <div key={i} className="p-4 rounded-xl border border-white/5 hover:border-amber-200 hover:bg-amber-50/20 transition group">
                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
                   risk.Type === 'Technical' ? 'bg-purple-100 text-purple-700' :
                   risk.Type === 'Financial' ? 'bg-blue-100 text-blue-700' :
                   risk.Type === 'Regulatory' ? 'bg-amber-100 text-amber-700' :
-                  'bg-slate-100 text-slate-700'
+                  'bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 text-slate-300'
                 }`}>
                   {risk.Type} Risk
                 </span>
-                <h4 className="text-sm font-bold text-slate-800 mb-2 mt-1">{risk.Description}</h4>
+                <h4 className="text-sm font-bold text-slate-200 mb-2 mt-1">{risk.Description}</h4>
                 <div className="flex items-start text-xs text-slate-500">
                   <i className="fas fa-lightbulb text-emerald-500 mr-2 mt-0.5 shrink-0"></i>
                   <p><span className="font-bold text-emerald-600 mr-1">Mitigation:</span> {risk.Mitigation}</p>
@@ -863,8 +863,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
+          <div className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+            <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
               <i className="fas fa-magnifying-glass mr-3 text-slate-400"></i> Model Assumptions & Transparency
             </h3>
             <div className="grid grid-cols-2 gap-4">

@@ -128,19 +128,19 @@ interface SidebarProps {
 }
 
 const SIDEBAR_ITEMS = [
-  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator' },
-  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope' },
-  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb' },
-  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line' },
-  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book' },
-  { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature' },
-  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map' }
+  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-emerald-500' },
+  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-500' },
+  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-500' },
+  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-emerald-400' },
+  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-slate-200' },
+  { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature', color: '#8B5CF6', colorClass: 'text-violet-500' },
+  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map', color: '#D97706', colorClass: 'text-amber-600' }
 ];
 
 const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language, isOpen, onToggle }) => {
   const isArabic = language === 'Arabic';
   return (
-    <aside className={`bg-slate-950/90 backdrop-blur-2xl border-white/5 transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0
+    <aside className={`bg-[#05080A]/90 backdrop-blur-2xl border-white/5 transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0
       ${isArabic ? 'border-l shadow-[-4px_0_24px_rgba(0,0,0,0.5)]' : 'border-r shadow-[4px_0_24px_rgba(0,0,0,0.5)]'}
       ${isOpen ? 'w-72' : 'w-20'}
     `}>
@@ -152,22 +152,34 @@ const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language,
       </button>
 
       {isOpen && (
-        <div className="flex flex-col space-y-3 px-3 animate-in fade-in duration-300">
+        <div className="flex flex-col space-y-2 px-3 animate-in fade-in duration-300">
            {SIDEBAR_ITEMS.map(item => {
              const isActive = activeTab === item.id || (activeTab === 'FEASIBILITY' && item.id === 'INVESTOR_FEASIBILITY');
              return (
                <button
                  key={item.id}
                  onClick={() => onTabChange(item.id)}
-                 className={`flex items-center p-4 rounded-xl transition-all group mb-2 justify-start ${
+                 className={`relative flex items-center p-3 rounded-lg transition-all group mb-1 justify-start overflow-hidden ${
                    isActive 
-                     ? 'bg-white text-emerald-600 shadow-md border border-slate-200' 
-                     : 'bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-emerald-600'
+                     ? 'bg-transparent text-white' 
+                     : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'
                  }`}
                  title={isArabic ? item.labelAr : item.labelEn}
                >
-                 <i className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'}`}></i>
-                 <span className="text-xs font-black uppercase tracking-wider whitespace-nowrap overflow-hidden text-left rtl:text-right">
+                 {isActive && (
+                   <div 
+                     className={`absolute ${isArabic ? 'right-0' : 'left-0'} top-0 bottom-0 w-1 rounded-full`} 
+                     style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}` }}
+                   />
+                 )}
+                 <i 
+                   className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'} transition-all`}
+                   style={isActive ? { color: item.color, textShadow: `0 0 15px ${item.color}` } : {}}
+                 ></i>
+                 <span 
+                   className="text-xs font-black uppercase tracking-wider whitespace-nowrap text-left rtl:text-right transition-all"
+                   style={isActive ? { textShadow: `0 0 10px ${item.color}` } : {}}
+                 >
                    {isArabic ? item.labelAr : item.labelEn}
                  </span>
                </button>
@@ -570,23 +582,23 @@ export default function App() {
       </div>
 
       {feasibilityView === 'ANALYZE' && (
-        <div className="animate-in fade-in duration-500 bg-white min-h-screen">
-          <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+        <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+          <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                 {language === 'Arabic' ? (
-                  <>أداة <span className="text-emerald-600 underline decoration-emerald-500/30">تحليل الجدوى الاستثمارية</span></>
+                  <>أداة <span className="text-emerald-500 underline decoration-emerald-500/30 glow-text-emerald">تحليل الجدوى الاستثمارية</span></>
                 ) : (
-                  <>Investor <span className="text-emerald-600 underline decoration-emerald-500/30">Feasibility</span> Tool</>
+                  <>Investor <span className="text-emerald-500 underline decoration-emerald-500/30 glow-text-emerald">Feasibility</span> Tool</>
                 )}
               </h1>
-              <p className="text-md text-slate-600 max-w-2xl mx-auto">
+              <p className="text-md text-slate-400 max-w-2xl mx-auto">
                 {language === 'Arabic' ? 'قم بتقييم الجدوى الاقتصادية والتقنية لمسارات الوقود الحيوي والطاقة ضمن المناطق الاستراتيجية في عُمان.' : "Evaluate technical and economic viability for Biofuel, Hydrogen, and Carbon pathways across Oman's strategic zones."}
               </p>
             </div>
           </section>
 
-          <section className="max-w-5xl mx-auto px-4 py-8 relative z-10 bg-white">
+          <section className="max-w-5xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
             <InputForm 
               onAnalyze={handleAnalyze} 
               isLoading={status === 'ANALYZING'} 
@@ -608,7 +620,7 @@ export default function App() {
           )}
 
           {status === 'COMPLETED' && analysis && (
-            <section id="dashboard-view" className="max-w-7xl mx-auto px-4 pb-20">
+            <section id="dashboard-view" className="max-w-7xl mx-auto px-4 pb-20 bg-[#05080A]">
               <Dashboard data={analysis} language={language} />
             </section>
           )}
@@ -616,7 +628,7 @@ export default function App() {
       )}
 
       {feasibilityView === 'HISTORY' && (
-        <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500">
+        <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
           <ProjectHistory 
             history={history} 
             onSelect={handleSelectFromHistory} 
@@ -627,7 +639,7 @@ export default function App() {
       )}
 
       {feasibilityView === 'COMPARE' && (
-        <section className="max-w-7xl mx-auto px-4 py-12 animate-in fade-in duration-500">
+        <section className="max-w-7xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
           <CompareProjects entries={comparisonItems} onBack={() => setFeasibilityView('HISTORY')} />
         </section>
       )}
@@ -698,23 +710,23 @@ export default function App() {
             </div>
 
             {researchView === 'ANALYZE' && (
-              <div className="bg-white min-h-screen">
-                <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+              <div className="bg-[#05080A] min-h-screen">
+                <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
                   <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                       {language === 'Arabic' ? (
-                        <>مُحَلِّل <span className="text-blue-600 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
+                        <>مُحَلِّل <span className="text-blue-500 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
                       ) : (
-                        <>Research Implementation <span className="text-blue-600 underline decoration-blue-500/30">Analyzer</span></>
+                        <>Research Implementation <span className="text-blue-500 underline decoration-blue-500/30">Analyzer</span></>
                       )}
                     </h1>
-                    <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-md text-slate-400 max-w-2xl mx-auto">
                       {language === 'Arabic' ? 'قم بسد الفجوة بين الأبحاث المخبرية والإنتاج التجريبي. تقييم علمي دقيق مخصص للباحثين.' : 'Bridge the gap between laboratory yields and pilot-scale production. Purely scientific assessment for researchers.'}
                     </p>
                   </div>
                 </section>
 
-                <section className="max-w-5xl mx-auto px-4 py-8 mb-16 relative z-10 bg-white">
+                <section className="max-w-5xl mx-auto px-4 py-8 mb-16 relative z-10 bg-[#05080A]">
                   <ResearchInputForm 
                     onAnalyze={handleResearchAnalyze} 
                     isLoading={status === 'ANALYZING'} 
@@ -736,7 +748,7 @@ export default function App() {
                 )}
 
                 {status === 'COMPLETED' && researchAnalysis && (
-                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20 bg-white">
+                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20 bg-[#05080A]">
                     <ResearchDashboard data={researchAnalysis} language={language} />
                   </section>
                 )}
@@ -744,7 +756,7 @@ export default function App() {
             )}
 
             {researchView === 'HISTORY' && (
-              <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500">
+              <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
                 <ResearchHistory 
                   history={researchHistory} 
                   onSelect={handleSelectFromResearchHistory}
@@ -755,22 +767,22 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'SOLVER' && (
-          <div className="animate-in fade-in duration-500">
-            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-blue-600 underline decoration-blue-500/30">حل العوائق العلمية</span></>
+                    <>أداة <span className="text-amber-500 underline decoration-amber-500/30">حل العوائق العلمية</span></>
                   ) : (
-                    <>Scientific <span className="text-blue-600 underline decoration-blue-500/30">Challenge</span> Solver</>
+                    <>Scientific <span className="text-amber-500 underline decoration-amber-500/30">Challenge</span> Solver</>
                   )}
                 </h1>
-                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                <p className="text-md text-slate-400 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'حل الاختناقات التقنية في قطاع الوقود الحيوي في عُمان باستخدام وكلاء الذكاء الاصطناعي.' : "Solving technical bottlenecks in Oman's biofuel ecosystem through multi-agent scientific reasoning."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 bg-white">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
               <ChallengeSolver 
                 history={challengeHistory} 
                 initialInputs={initialChallengeInputs}
@@ -791,22 +803,22 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'OPTIMIZER' && (
-          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
-            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>التحسين <span className="text-emerald-600 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
+                    <>التحسين <span className="text-emerald-400 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
                   ) : (
-                    <>Profit & <span className="text-emerald-600 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
+                    <>Profit & <span className="text-emerald-400 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
                   )}
                 </h1>
-                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                <p className="text-md text-slate-400 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'ذكاء اصطناعي لتعظيم الإيرادات وتقليل الانبعاثات الكربونية لمشاريع الوقود الحيوي.' : 'Strategic multi-agent AI to maximize revenue and minimize emissions for biofuel projects.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 bg-white">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
               <OptimizerTool 
                 history={optimizerHistory}
                 initialInputs={initialOptimizerInputs}
@@ -828,64 +840,64 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'STANDARDS' && (
-          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
-            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-blue-600 underline decoration-blue-500/30">الامتثال والمعايير</span></>
+                    <>أداة <span className="text-slate-200 underline decoration-slate-200/30">الامتثال والمعايير</span></>
                   ) : (
-                    <>Standards <span className="text-blue-600 underline decoration-blue-500/30">Compliance</span> Checker</>
+                    <>Standards <span className="text-slate-200 underline decoration-slate-200/30">Compliance</span> Checker</>
                   )}
                 </h1>
-                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                <p className="text-md text-slate-400 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'التحقق من نتائج المعامل المختبرية للوقود الحيوي واعتماديتها حسب المواصفات (ASTM/EN).' : 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability in Oman.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20 bg-white">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[#05080A]">
               <StandardsChecker language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'PROPOSAL' && (
-          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
-            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>توليد <span className="text-emerald-600 underline decoration-emerald-500/30">المقترحات الاستثمارية</span></>
+                    <>توليد <span className="text-violet-500 underline decoration-violet-500/30">المقترحات الاستثمارية</span></>
                   ) : (
-                    <>Automated <span className="text-emerald-600 underline decoration-emerald-500/30">Proposal</span> Generator</>
+                    <>Automated <span className="text-violet-500 underline decoration-violet-500/30">Proposal</span> Generator</>
                   )}
                 </h1>
-                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                <p className="text-md text-slate-400 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'إصدار مقترحات احترافية تستند إلى البيانات الموثوقة والمخصصة لمنظومة التمويل في عُمان.' : "Generate professional, data-driven grant and investment proposals tailored for Oman's funding ecosystem."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20 bg-white">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[#05080A]">
               <ProposalGenerator language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'ZONES' && (
-          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
-            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
+            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>قاعدة بيانات <span className="text-blue-600 underline decoration-blue-500/30">المناطق الحرة</span></>
+                    <>قاعدة بيانات <span className="text-amber-600 underline decoration-amber-600/30">المناطق الحرة</span></>
                   ) : (
-                    <>Strategic <span className="text-blue-600 underline decoration-blue-500/30">Free Zones</span> Database</>
+                    <>Strategic <span className="text-amber-600 underline decoration-amber-600/30">Free Zones</span> Database</>
                   )}
                 </h1>
-                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                <p className="text-md text-slate-400 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'استكشف المناطق الاستراتيجية (الدقم، صحار، صلالة) لتحديد الموقع المثالي والدعم الحكومي المتوفر.' : "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location."}
                 </p>
               </div>
             </section>
-            <section className="max-w-6xl mx-auto px-4 py-12 bg-white">
+            <section className="max-w-6xl mx-auto px-4 py-12 bg-[#05080A]">
               <OmanFreeZones language={language} />
             </section>
           </div>

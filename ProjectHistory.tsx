@@ -21,18 +21,18 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ history, onSelec
 
   if (history.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center">
-        <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 rounded-2xl p-8 border border-white/10 text-center">
+        <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
           <i className="fas fa-history text-slate-400 text-2xl"></i>
         </div>
-        <h3 className="text-lg font-bold text-slate-900">No History Records</h3>
+        <h3 className="text-lg font-bold text-white">No History Records</h3>
         <p className="text-slate-500 text-sm mt-2">Analyzed projects will automatically appear here.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 rounded-2xl shadow-sm border border-white/10 overflow-hidden">
       <div className="bg-slate-900 px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <h3 className="text-white font-bold flex items-center">
@@ -58,7 +58,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ history, onSelec
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
+            <tr className="bg-[#0F172A] border-b border-white/5">
               <th className="px-6 py-3 w-10"></th>
               <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Project / Date</th>
               <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Domain & Feedstock</th>
@@ -83,7 +83,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ history, onSelec
                   />
                 </td>
                 <td className="px-6 py-4">
-                  <div className="font-bold text-slate-800 text-sm">{entry.projectName}</div>
+                  <div className="font-bold text-slate-200 text-sm">{entry.projectName}</div>
                   <div className="text-[10px] text-slate-400">{entry.timestamp}</div>
                 </td>
                 <td className="px-6 py-4">
@@ -95,7 +95,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ history, onSelec
                   <div className="text-xs text-slate-500 mt-1">{entry.feedstock}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm font-black text-slate-800">{entry.score}%</div>
+                  <div className="text-sm font-black text-slate-200">{entry.score}%</div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{entry.level}</div>
                 </td>
                 <td className="px-6 py-4 text-right">

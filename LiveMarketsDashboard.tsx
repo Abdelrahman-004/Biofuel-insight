@@ -153,7 +153,7 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
   return (
     <div className="w-full text-slate-200 font-sans" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/5 pb-6">
         <div>
           <h2 className="text-3xl font-black text-white flex items-center">
             <i className="fas fa-satellite-dish text-blue-500 mx-3 animate-pulse"></i>
@@ -172,7 +172,7 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
       </div>
 
       {/* Ticker Tape */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 mb-8 overflow-hidden flex items-center relative">
+      <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 rounded-xl p-3 mb-8 overflow-hidden flex items-center relative">
         <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-900 to-transparent z-10 hidden md:block"></div>
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-900 to-transparent z-10 hidden md:block"></div>
         <div className="flex space-x-8 animate-[ticker_30s_linear_infinite] whitespace-nowrap rtl:space-x-reverse">
@@ -197,7 +197,7 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
             <motion.div 
               key={c.id}
               layout
-              className="bg-slate-900/50 border border-slate-800 p-5 rounded-2xl hover:border-slate-700 transition-colors relative overflow-hidden group flex flex-col items-center justify-center text-center"
+              className="bg-[#0D141A]/50 border border-white/5 p-5 rounded-2xl hover:border-white/10 transition-colors relative overflow-hidden group flex flex-col items-center justify-center text-center"
             >
               <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none`}>
                 <i className={`fas fa-${c.category === 'Carbon' ? 'leaf text-green-500' : c.category === 'Renewable' ? 'solar-panel text-amber-500' : c.category === 'Bio' ? 'flask text-blue-500' : 'oil-can text-red-500'} text-7xl`}></i>
@@ -217,7 +217,7 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
                   <span className="text-[10px] sm:text-xs text-slate-400 font-bold mt-1 sm:mt-0">{c.unit}</span>
                 </div>
                 
-                <div className="flex items-center justify-center w-full border-t border-slate-800/50 pt-3">
+                <div className="flex items-center justify-center w-full border-t border-white/5/50 pt-3">
                   <div className={`flex items-center space-x-1 rtl:space-x-reverse ${c.change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                     <span className="text-[10px] sm:text-xs font-black flex items-center whitespace-nowrap">
                       <i className={`fas fa-arrow-${c.change >= 0 ? 'up' : 'down'} mx-1 text-[8px]`}></i>
@@ -234,8 +234,8 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
         </div>
 
         {/* Right Column: Terminal News */}
-        <div className="col-span-1 bg-black/40 border border-slate-800 rounded-2xl p-5 flex flex-col min-h-[300px]">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="col-span-1 bg-black/40 border border-white/5 rounded-2xl p-5 flex flex-col min-h-[300px]">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center justify-between border-b border-white/5 pb-4">
             <span>
               <i className="far fa-newspaper text-slate-400 mx-2"></i> {isArabic ? 'أخبار القطاع (عاجل وموثوق)' : 'Live Sector Headlines'}
             </span>
@@ -250,7 +250,7 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 rtl:ml-1.5 animate-pulse"></div>
                     {item.time}
                   </span>
-                  {item.source && <span className="text-[9px] text-slate-500 font-black tracking-wider uppercase bg-slate-800 px-1.5 py-0.5 rounded">{item.source}</span>}
+                  {item.source && <span className="text-[9px] text-slate-500 font-black tracking-wider uppercase bg-white/5 px-1.5 py-0.5 rounded">{item.source}</span>}
                 </div>
                 <p className="text-xs font-semibold text-slate-200 leading-snug group-hover:text-white transition-colors line-clamp-3">
                   {isArabic ? item.ar : item.en}
@@ -261,9 +261,9 @@ export const LiveMarketsDashboard: React.FC<Props> = ({ language }) => {
               <div className="flex flex-col space-y-4 h-full pt-2">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="animate-pulse flex flex-col space-y-2">
-                    <div className="h-2 bg-slate-800 rounded w-1/4"></div>
-                    <div className="h-3 bg-slate-800 rounded w-full"></div>
-                    <div className="h-3 bg-slate-800 rounded w-5/6"></div>
+                    <div className="h-2 bg-white/5 rounded w-1/4"></div>
+                    <div className="h-3 bg-white/5 rounded w-full"></div>
+                    <div className="h-3 bg-white/5 rounded w-5/6"></div>
                   </div>
                 ))}
               </div>

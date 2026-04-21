@@ -119,11 +119,11 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-            <div className="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
-            <div className="bg-blue-600/10 px-8 py-6 border-b border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+          <div className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#F59E0B]/50 transition-all duration-300 overflow-hidden">
+            <div className="bg-[#F59E0B]/10 px-8 py-6 border-b border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
-                <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
-                  <i className="fas fa-microscope mr-3 text-blue-400"></i>
+                <h2 className="text-2xl font-black text-[#F59E0B] flex items-center tracking-tight drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">
+                  <i className="fas fa-lightbulb mr-3"></i>
                   {isArabic ? 'الذكاء الاصطناعي لحل تحديات الوقود الحيوي' : 'Oman Biofuel Challenge Solver AI'}
                 </h2>
                 <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تحديد وحل العقبات العلمية في أبحاث الوقود الحيوي' : 'Identify and solve scientific bottlenecks in Oman\'s biofuel research.'}</p>
@@ -132,10 +132,10 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
               <select 
                 value={localLanguage}
                 onChange={(e) => setLocalLanguage(e.target.value)}
-                className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none shadow-sm"
+                className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#F59E0B] outline-none shadow-sm"
               >
-                <option value="Arabic">العربية (Arabic)</option>
-                <option value="English">English</option>
+                <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
+                <option value="English" className="bg-[#0D141A] text-white">English</option>
               </select>
             </div>
             
@@ -152,7 +152,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     key={i}
                     type="button"
                     onClick={() => setTopic(ex)}
-                    className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-blue-400 hover:border-blue-500/50 transition-all shadow-sm"
+                    className="px-3 py-1.5 bg-[#0F172A] border border-white/10 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.3)] transition-all"
                   >
                     {ex}
                   </button>
@@ -164,13 +164,13 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder={isArabic ? 'مثال: تحمل الطحالب للملوحة العالية، كفاءة استخلاص الزيت...' : "e.g., Algae cultivation in high salinity, Date seed oil extraction efficiency..."}
-                  className="flex-grow px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none transition placeholder:text-slate-500"
+                  className="flex-grow px-6 py-4 rounded-xl bg-[#0F172A] border border-white/10 text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-slate-500"
                   dir={isArabic ? 'rtl' : 'ltr'}
                 />
                 <button 
                   disabled={isLoading || !topic.trim()}
-                  className={`px-8 py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-lg ${
-                    isLoading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
+                  className={`px-8 py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${
+                    isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
                   }`}
                 >
                   {isLoading ? (
@@ -209,16 +209,16 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
                   >
-                    <div className="bg-slate-900 px-8 py-4">
+                    <div className="bg-[#0F172A] px-8 py-4 border-b border-white/5">
                       <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-triangle-exclamation mr-3 text-amber-400"></i>
                         {isArabic ? 'التحدي المحدد' : 'Identified Challenge'}
                       </h3>
                     </div>
                     <div className="p-8">
-                      <p className="text-slate-700 leading-relaxed font-medium">{result.IdentifiedChallenge}</p>
+                      <p className="text-slate-300 leading-relaxed font-medium">{result.IdentifiedChallenge}</p>
                     </div>
                   </motion.div>
 
@@ -226,16 +226,16 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
                   >
-                    <div className="bg-blue-600 px-8 py-4">
-                      <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center">
-                        <i className="fas fa-flask mr-3 text-blue-100"></i>
+                    <div className="bg-blue-600/20 px-8 py-4 border-b border-white/5">
+                      <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
+                        <i className="fas fa-flask mr-3 text-blue-400"></i>
                         Scientific Hypothesis
                       </h3>
                     </div>
                     <div className="p-8">
-                      <p className="text-slate-700 leading-relaxed font-medium italic">"{result.ScientificHypothesis}"</p>
+                      <p className="text-slate-300 leading-relaxed font-medium italic">"{result.ScientificHypothesis}"</p>
                     </div>
                   </motion.div>
 
@@ -243,17 +243,17 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
                   >
-                    <div className="bg-emerald-600 px-8 py-4">
-                      <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center">
-                        <i className="fas fa-vial mr-3 text-emerald-100"></i>
+                    <div className="bg-emerald-600/20 px-8 py-4 border-b border-white/5">
+                      <h3 className="text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
+                        <i className="fas fa-vial mr-3 text-emerald-400"></i>
                         Experimental Design
                       </h3>
                     </div>
                     <div className="p-8 space-y-6">
                       <div>
-                        <h4 className="text-lg font-black text-slate-900 mb-2">{result.ExperimentalDesign.Title}</h4>
+                        <h4 className="text-lg font-black text-white mb-2">{result.ExperimentalDesign.Title}</h4>
                         <p className="text-xs text-slate-500 italic mb-4">{result.ExperimentalDesign.FeasibilityNote}</p>
                       </div>
                       
@@ -262,7 +262,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                           <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Key Variables</h5>
                           <ul className="space-y-2">
                             {result.ExperimentalDesign.Variables.map((v, i) => (
-                              <li key={i} className="text-sm text-slate-700 flex items-start">
+                              <li key={i} className="text-sm text-slate-300 flex items-start">
                                 <i className="fas fa-check text-emerald-500 mr-2 mt-1 shrink-0"></i>
                                 {v}
                               </li>
@@ -273,7 +273,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                           <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Control Conditions</h5>
                           <ul className="space-y-2">
                             {result.ExperimentalDesign.ControlConditions.map((c, i) => (
-                              <li key={i} className="text-sm text-slate-700 flex items-start">
+                              <li key={i} className="text-sm text-slate-300 flex items-start">
                                 <i className="fas fa-sliders text-blue-500 mr-2 mt-1 shrink-0"></i>
                                 {c}
                               </li>
@@ -282,11 +282,11 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                         </div>
                       </div>
 
-                      <div className="pt-6 border-t border-slate-100">
-                        <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Expected Outcomes</h5>
+                      <div className="pt-6 border-t border-white/5">
+                        <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Expected Outcomes</h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {result.ExperimentalDesign.ExpectedOutcomes.map((o, i) => (
-                            <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 font-medium">
+                            <div key={i} className="p-3 bg-[#0F172A] rounded-xl border border-white/5 text-xs text-slate-300 font-medium">
                               {o}
                             </div>
                           ))}
@@ -301,7 +301,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="bg-slate-900 rounded-3xl shadow-xl p-8 text-white relative overflow-hidden"
+                    className="bg-[#0F172A] rounded-3xl shadow-xl border border-white/5 p-8 text-white relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 p-8 opacity-10">
                       <i className="fas fa-industry text-8xl"></i>
@@ -317,30 +317,30 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
                   >
-                    <div className="bg-slate-100 px-8 py-4 border-b border-slate-200">
-                      <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest flex items-center">
-                        <i className="fas fa-chart-pie mr-3 text-blue-600"></i>
+                    <div className="bg-[#0F172A] px-8 py-4 border-b border-white/5">
+                      <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center">
+                        <i className="fas fa-chart-pie mr-3 text-blue-400"></i>
                         Impact Evaluation
                       </h3>
                     </div>
                     <div className="p-8 space-y-6">
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Environmental</p>
-                        <p className="text-xs text-slate-600 leading-relaxed">{result.ExpectedImpact.Environmental}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Environmental</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">{result.ExpectedImpact.Environmental}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Economic</p>
-                        <p className="text-xs text-slate-600 leading-relaxed">{result.ExpectedImpact.Economic}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Economic</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">{result.ExpectedImpact.Economic}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Strategic (Oman Vision 2040)</p>
-                        <p className="text-xs text-slate-600 leading-relaxed">{result.ExpectedImpact.Strategic}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Strategic (Oman Vision 2040)</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">{result.ExpectedImpact.Strategic}</p>
                       </div>
-                      <div className="pt-4 border-t border-slate-100">
-                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Scalability Potential</p>
-                        <p className="text-sm font-black text-slate-800">{result.ExpectedImpact.Scalability}</p>
+                      <div className="pt-4 border-t border-white/5">
+                        <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Scalability Potential</p>
+                        <p className="text-sm font-black text-white">{result.ExpectedImpact.Scalability}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -355,13 +355,13 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+            className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
           >
-          <div className="bg-slate-900 px-8 py-6 flex justify-between items-center">
+          <div className="bg-[#0F172A] border-b border-white/5 px-8 py-6 flex justify-between items-center">
             <h3 className="text-white font-bold text-lg">Challenge History</h3>
             <button 
               onClick={onClear}
-              className="text-xs font-black text-red-400 uppercase tracking-widest hover:text-red-300 transition"
+              className="text-xs font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition"
             >
               Clear All
             </button>
@@ -369,8 +369,8 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
           <div className="p-8">
             {history.length === 0 ? (
               <div className="text-center py-12">
-                <i className="fas fa-folder-open text-slate-200 text-5xl mb-4"></i>
-                <p className="text-slate-400 font-medium">No history found. Generate your first solution!</p>
+                <i className="fas fa-folder-open text-slate-600 text-5xl mb-4"></i>
+                <p className="text-slate-500 font-medium">No history found. Generate your first solution!</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -378,14 +378,14 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   <div 
                     key={entry.id}
                     onClick={() => handleSelectFromHistory(entry)}
-                    className="p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition cursor-pointer group"
+                    className="p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-[#0F172A] transition cursor-pointer group bg-[#0F172A]/50"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition">{entry.topic}</h4>
-                        <p className="text-xs text-slate-400 mt-1">{entry.timestamp}</p>
+                        <h4 className="font-bold text-white group-hover:text-blue-400 transition">{entry.topic}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{entry.timestamp}</p>
                       </div>
-                      <i className="fas fa-chevron-right text-slate-300 group-hover:text-blue-400 transition"></i>
+                      <i className="fas fa-chevron-right text-slate-600 group-hover:text-blue-400 transition"></i>
                     </div>
                   </div>
                 ))}

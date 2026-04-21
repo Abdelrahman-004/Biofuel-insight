@@ -68,9 +68,9 @@ export const GlobalStandards: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center md:text-left"
+        className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 rounded-2xl shadow-sm border border-white/10 p-8 text-center md:text-left"
       >
-        <h2 className="text-3xl font-black text-slate-900 mb-2">International Standards & Compliance</h2>
+        <h2 className="text-3xl font-black text-white mb-2">International Standards & Compliance</h2>
         <p className="text-slate-500 max-w-2xl">Education and strategy alignment for projects targeting global export markets and rigorous environmental benchmarks.</p>
         
         <motion.button 
@@ -117,11 +117,11 @@ export const GlobalStandards: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 p-4 rounded-xl border border-white/10">
                   <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Standard Technology</p>
                   <p className="text-sm">{suggestion.Technology}</p>
                 </div>
-                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50/5 p-4 rounded-xl border border-white/10">
                   <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Indicative Scale</p>
                   <p className="text-sm">{suggestion.EstimatedScale}</p>
                 </div>
@@ -138,26 +138,26 @@ export const GlobalStandards: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-500 hover:shadow-md transition-all group"
+            className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-emerald-500 hover:shadow-md transition-all group"
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-black text-slate-800 group-hover:text-emerald-600 transition-colors">{s.title}</h3>
+                <h3 className="text-lg font-black text-slate-200 group-hover:text-emerald-600 transition-colors">{s.title}</h3>
                 <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{s.subtitle}</p>
               </div>
-              <div className="bg-slate-50 p-2 rounded-lg text-slate-300 group-hover:text-emerald-400 transition-colors">
+              <div className="bg-[#0F172A] p-2 rounded-lg text-slate-300 group-hover:text-emerald-400 transition-colors">
                 <i className="fas fa-shield-check"></i>
               </div>
             </div>
-            <p className="text-sm text-slate-600 mb-6 leading-relaxed">{s.desc}</p>
+            <p className="text-sm text-slate-400 mb-6 leading-relaxed">{s.desc}</p>
             <div className="space-y-4 pt-4 border-t border-slate-50">
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Criticality</p>
-                <p className="text-xs text-slate-700 font-medium">{s.why}</p>
+                <p className="text-xs text-slate-300 font-medium">{s.why}</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Applicable Sectors</p>
-                <p className="text-xs text-slate-700 font-medium">{s.applies}</p>
+                <p className="text-xs text-slate-300 font-medium">{s.applies}</p>
               </div>
             </div>
           </motion.div>

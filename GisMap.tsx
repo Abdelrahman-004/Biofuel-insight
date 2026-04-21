@@ -124,7 +124,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
 
   return (
     <div className="w-full text-slate-200 font-sans relative z-0" dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className="mb-8 border-b border-slate-800 pb-6 text-center md:text-start">
+      <div className="mb-8 border-b border-white/5 pb-6 text-center md:text-start">
         <h2 className="text-3xl font-black text-white flex justify-center md:justify-start items-center">
           <i className="fas fa-map-marked-alt text-emerald-500 mx-3"></i>
           {isArabic ? 'خريطة عُمان الاستراتيجية (GIS)' : 'Oman Strategic GIS Map'}
@@ -138,7 +138,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
 
       <div className="flex flex-col lg:flex-row gap-8 relative z-0">
         {/* Real Geographic Map UI */}
-        <div className="w-full lg:w-1/2 rounded-2xl border border-slate-800 relative h-[600px] overflow-hidden z-0">
+        <div className="w-full lg:w-1/2 rounded-2xl border border-white/5 relative h-[600px] overflow-hidden z-0">
           <MapContainer 
             center={centerOfOman} 
             zoom={6} 
@@ -156,7 +156,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
             {ZONES.map(z => (
               <Marker key={z.id} position={[z.lat, z.lng]} icon={createCustomIcon(z.color)}>
                 <Popup className="custom-popup">
-                  <div className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-center" dir={isArabic ? 'rtl' : 'ltr'}>
+                  <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 p-3 rounded-lg text-center" dir={isArabic ? 'rtl' : 'ltr'}>
                     <p className="text-sm font-black text-white m-0">{isArabic ? z.nameAr : z.nameEn}</p>
                     <p className="text-[10px] text-slate-400 m-0 mt-1 uppercase tracking-widest">{isArabic ? z.descAr : z.descEn}</p>
                   </div>
@@ -173,8 +173,8 @@ export const GisMap: React.FC<Props> = ({ language }) => {
         </div>
 
         <div className="w-full lg:w-1/2 flex flex-col space-y-6 relative z-10">
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 border-b border-slate-800 pb-2">
+          <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 p-6 rounded-2xl shadow-xl">
+            <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 border-b border-white/5 pb-2">
               {isArabic ? 'إدخال بيانات الشحنة' : 'LOGISTIC PARAMETERS'}
             </h3>
             
@@ -187,7 +187,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
                     value={feedstockName} 
                     onChange={(e) => setFeedstockName(e.target.value)} 
                     placeholder={isArabic ? 'مثال: زيت مستعمل' : 'e.g. UCO, Biomass'}
-                    className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg p-2 text-xs focus:border-emerald-500 outline-none" 
+                    className="w-full bg-[#0F172A] border border-white/10 text-white rounded-lg p-2 text-xs focus:border-emerald-500 outline-none" 
                   />
                 </div>
                 <div>
@@ -196,7 +196,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
                     type="number" 
                     value={weight} 
                     onChange={(e) => setWeight(Number(e.target.value))} 
-                    className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg p-2 text-xs outline-none focus:border-emerald-500 transition-colors" 
+                    className="w-full bg-[#0F172A] border border-white/10 text-white rounded-lg p-2 text-xs outline-none focus:border-emerald-500 transition-colors" 
                   />
                 </div>
               </div>
@@ -204,20 +204,20 @@ export const GisMap: React.FC<Props> = ({ language }) => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 mb-1">{isArabic ? 'نقطة الانطلاق' : 'LOGISTIC ORIGIN'}</label>
-                  <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg p-2 text-xs">
+                  <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-[#0F172A] border border-white/10 text-white rounded-lg p-2 text-xs">
                     {ZONES.map(z => <option key={`src-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 mb-1">{isArabic ? 'نقطة الوصول' : 'DESTINATION'}</label>
-                  <select value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg p-2 text-xs">
+                  <select value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-[#0F172A] border border-white/10 text-white rounded-lg p-2 text-xs">
                     {ZONES.map(z => <option key={`dst-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
                   </select>
                 </div>
               </div>
             </div>
 
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+            <div className="bg-[#0F172A] p-3 rounded-lg border border-white/5">
                <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1 tracking-widest">
                  {isArabic ? 'مؤشر سعر الديزل (ر.ع/لتر)' : 'DIESEL PRICE INDEX (OMR/L)'}
                </label>
@@ -228,7 +228,7 @@ export const GisMap: React.FC<Props> = ({ language }) => {
                  step="0.005"
                  value={dieselPrice} 
                  onChange={(e) => setDieselPrice(Number(e.target.value))}
-                 className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                 className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                />
                <div className="flex justify-between mt-1 text-[9px] font-black text-emerald-400">
                  <span>0.200 OMR</span>
@@ -238,14 +238,14 @@ export const GisMap: React.FC<Props> = ({ language }) => {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex-1 overflow-hidden">
-            <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 border-b border-slate-800 pb-2">
+          <div className="bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 p-6 rounded-2xl flex-1 overflow-hidden">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 border-b border-white/5 pb-2">
               {isArabic ? 'التقديرات اللوجستية المفصلة' : 'Detailed Logistics Output'}
             </h3>
             
             {results ? (
               <div className="space-y-4">
-                <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
+                <div className="p-4 bg-[#0F172A] rounded-xl border border-white/5">
                   <h4 className="text-sm font-black text-white mb-2 underline decoration-emerald-500/50 underline-offset-4">
                      {isArabic 
                        ? `مسار لوجستي لـ [${feedstockName}]: من ${sourceZone?.nameAr} إلى ${destZone?.nameAr}`
@@ -264,20 +264,20 @@ export const GisMap: React.FC<Props> = ({ language }) => {
                 </div>
 
                 <div className="space-y-2 text-[11px]">
-                   <div className="flex justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[#0F172A]/40 border border-white/5/50">
                       <span className="text-slate-500">* {isArabic ? 'تكلفة الشحن الأساسية:' : 'Base Freight:'}</span>
                       <span className="font-bold text-slate-300">{results.baseFreight.toFixed(3)} OMR</span>
                    </div>
-                   <div className="flex justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[#0F172A]/40 border border-white/5/50">
                       <span className="text-slate-500">* {isArabic ? 'رسوم الوقود (مؤشر 2026):' : 'Fuel Surcharge (2026 Index):'}</span>
                       <span className="font-bold text-rose-400">{results.fuelSurcharge.toFixed(3)} OMR</span>
                    </div>
-                   <div className="flex justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[#0F172A]/40 border border-white/5/50">
                       <span className="text-slate-500">* {isArabic ? `مناولة خاصة (${results.category.typeAr}):` : `Special Handling (${results.category.typeEn}):`}</span>
                       <span className="font-bold text-emerald-400">{results.specialHandling.toFixed(3)} OMR</span>
                    </div>
                    {results.portFees > 0 && (
-                     <div className="flex justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                     <div className="flex justify-between p-2 rounded-lg bg-[#0F172A]/40 border border-white/5/50">
                         <span className="text-slate-500">* {isArabic ? 'رسوم الموانئ العمانية:' : 'Oman Port Fees:'}</span>
                         <span className="font-bold text-blue-400">{results.portFees.toFixed(3)} OMR</span>
                      </div>

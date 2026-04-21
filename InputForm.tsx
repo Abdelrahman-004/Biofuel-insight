@@ -117,17 +117,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition placeholder:text-slate-400";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-white/10 bg-[#0F172A] text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-slate-500";
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+      className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#10B981]/50 transition-all duration-300 overflow-hidden"
     >
-      <div className="bg-emerald-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-        <h2 className="text-emerald-900 font-bold flex items-center text-lg">
-          <i className="fas fa-sliders mr-3 text-emerald-500"></i>
+      <div className="bg-[#10B981]/10 px-6 py-4 border-b border-white/5 flex justify-between items-center">
+        <h2 className="text-[#10B981] font-bold flex items-center text-lg drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
+          <i className="fas fa-sliders mr-3"></i>
           {isArabic ? 'معايير تحليل الجدوى' : 'Investment-Grade Analysis Parameters'}
         </h2>
       </div>
@@ -149,7 +149,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               setProduction(ex.prod);
               setBudget(ex.bud);
             }}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-500 hover:bg-white hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+            className="px-3 py-1.5 bg-[#0F172A] border border-white/10 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:border-[#10B981] hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all"
           >
             {ex.name}
           </button>
@@ -185,7 +185,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-white text-slate-800">{isArabic ? translateTerm(loc) : loc}</option>)}
+              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-slate-900 text-white">{isArabic ? translateTerm(loc) : loc}</option>)}
             </select>
           </motion.div>
         </div>
@@ -203,7 +203,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-white text-slate-800">{isArabic ? translateTerm(cat) : cat}</option>)}
+              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-slate-900 text-white">{isArabic ? translateTerm(cat) : cat}</option>)}
             </select>
           </motion.div>
           <motion.div 
@@ -221,7 +221,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               dir={isArabic ? "rtl" : "ltr"}
             >
               {(category === 'Biofuel' ? BIOFUEL_FEEDSTOCKS : RENEWABLE_ENERGY_TYPES).map(fs => (
-                <option key={fs} value={fs} className="bg-white text-slate-800">{isArabic ? translateTerm(fs) : fs}</option>
+                <option key={fs} value={fs} className="bg-slate-900 text-white">{isArabic ? translateTerm(fs) : fs}</option>
               ))}
             </select>
           </motion.div>
@@ -247,7 +247,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                     if (src === 'Purchased CO2') text = 'شراء غاز ثاني أكسيد الكربون';
                     if (src === 'Not specified') text = 'غير محدد';
                   }
-                  return <option key={src} value={src} className="bg-white text-slate-800">{text}</option>;
+                  return <option key={src} value={src} className="bg-slate-900 text-white">{text}</option>;
                 })}
               </select>
             </div>
@@ -343,8 +343,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           disabled={isLoading}
-          className={`w-full py-5 rounded-2xl font-black text-white flex items-center justify-center space-x-3 transition-all shadow-xl uppercase tracking-widest text-xs ${
-            isLoading ? 'bg-slate-700 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20'
+          className={`w-full py-5 rounded-lg font-black text-white flex items-center justify-center space-x-3 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] uppercase tracking-widest text-xs ${
+            isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
           }`}
         >
           {isLoading ? (

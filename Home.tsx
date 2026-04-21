@@ -223,7 +223,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 transition={{ delay: index * 0.1 }}
                 onClick={() => onStart(tool.id as any)}
                 className={`
-                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-slate-200 bg-white transition-all duration-500 hover:border-emerald-500 hover:shadow-xl shadow-sm
+                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-white/10 bg-[#0D141A]/70 backdrop-blur-[10px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-white/5 hover:border-emerald-500/50 transition-all duration-500 hover:border-emerald-500 hover:shadow-xl shadow-sm
                   ${tool.size === 'large' ? 'md:col-span-2' : 'md:col-span-1'}
                 `}
               >
@@ -232,11 +232,11 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 
                 <div className="relative h-full p-8 flex flex-col justify-between z-10">
                   <div>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 ${tool.accent} mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-[#0F172A] border border-white/5 ${tool.accent} mb-6 group-hover:scale-110 transition-transform duration-500`}>
                       <tool.icon size={24} strokeWidth={2.5} />
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase tracking-widest">{tool.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed max-w-md transition-colors duration-500">{tool.description}</p>
+                    <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-widest">{tool.title}</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed max-w-md transition-colors duration-500">{tool.description}</p>
                   </div>
 
                   <div className="flex items-center justify-between mt-4">

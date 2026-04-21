@@ -65,17 +65,17 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-8"
+        className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#D97706]/50 p-8 transition-all duration-300"
       >
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-3xl font-black text-white">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
+          <h2 className="text-3xl font-black text-[#D97706] drop-shadow-[0_0_8px_rgba(217,119,6,0.5)]">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
           <select 
             value={localLanguage}
             onChange={(e) => setLocalLanguage(e.target.value)}
-            className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none font-bold"
+            className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#D97706] outline-none font-bold shadow-sm"
           >
-            <option value="Arabic">العربية (Arabic)</option>
-            <option value="English">English</option>
+            <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
+            <option value="English" className="bg-[#0D141A] text-white">English</option>
           </select>
         </div>
         <p className="text-slate-400 max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان.' : 'Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.'}</p>
@@ -87,11 +87,11 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-slate-900 text-white rounded-2xl p-8 shadow-2xl"
+            className="bg-[#0D141A]/70 backdrop-blur-[10px] text-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-[#D97706]/30 p-8 transition-all duration-300"
           >
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-xl font-bold flex items-center">
-                <i className="fas fa-location-arrow text-emerald-400 mr-3"></i> Zone-Specific Concept
+                <i className="fas fa-location-arrow text-[#D97706] mr-3 drop-shadow-[0_0_5px_rgba(217,119,6,0.5)]"></i> Zone-Specific Concept
               </h3>
               <button onClick={() => setSuggestion(null)} className="text-slate-400 hover:text-white transition">
                 <i className="fas fa-times"></i>
@@ -171,51 +171,51 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition"
+            className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl border border-white/5 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:border-[#D97706]/50 transition-all duration-300"
           >
             <div className="flex flex-col md:flex-row">
               <div className="p-8 md:w-2/3">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-black text-slate-900">{z.name}</h3>
+                  <h3 className="text-2xl font-black text-white">{z.name}</h3>
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleSuggest(z.name)}
                     disabled={!!loading}
-                    className="px-4 py-2 bg-slate-900 text-white text-[10px] font-black uppercase rounded-lg hover:bg-emerald-600 transition disabled:opacity-50"
+                    className="px-4 py-2 bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] text-white text-[10px] font-black uppercase rounded-lg transition disabled:opacity-50"
                   >
-                    {loading === z.name ? <i className="fas fa-spinner fa-spin mr-2"></i> : <i className="fas fa-bolt mr-2 text-emerald-400"></i>}
+                    {loading === z.name ? <i className="fas fa-spinner fa-spin mr-2"></i> : <i className="fas fa-bolt mr-2 text-white"></i>}
                     {isArabic ? `اقتراح مشروع لـ ${z.name.split(' ')[0]}` : `Suggest Project for ${z.name.split(' ')[0]}`}
                   </motion.button>
                 </div>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6">{z.desc}</p>
+                <p className="text-slate-400 text-sm leading-relaxed mb-6">{z.desc}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Zone Advantages</h4>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Zone Advantages</h4>
                     <ul className="space-y-2">
                       {z.advantages.map((adv, idx) => (
-                        <li key={idx} className="text-xs text-slate-700 flex items-center">
-                          <i className="fas fa-check text-emerald-500 mr-2 text-[10px]"></i> {adv}
+                        <li key={idx} className="text-xs text-slate-300 flex items-center">
+                          <i className="fas fa-check text-[#D97706] mr-2 text-[10px]"></i> {adv}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Best-Suited Projects</h4>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Best-Suited Projects</h4>
                     <ul className="space-y-2">
                       {z.bestSuited.map((proj, idx) => (
-                        <li key={idx} className="text-xs text-slate-700 flex items-center">
-                          <i className="fas fa-star text-amber-500 mr-2 text-[10px]"></i> {proj}
+                        <li key={idx} className="text-xs text-slate-300 flex items-center">
+                          <i className="fas fa-star text-[#D97706] mr-2 text-[10px]"></i> {proj}
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-50 p-8 md:w-1/3 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Strategic Insight</h4>
-                <p className="text-sm text-slate-600 italic font-medium">"{z.note}"</p>
-                <div className="mt-6 flex items-center space-x-2 text-emerald-600 font-bold text-xs">
+              <div className="bg-[#0F172A] p-8 md:w-1/3 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/5">
+                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Strategic Insight</h4>
+                <p className="text-sm text-slate-300 italic font-medium">"{z.note}"</p>
+                <div className="mt-6 flex items-center space-x-2 text-[#D97706] font-bold text-xs drop-shadow-[0_0_5px_rgba(217,119,6,0.3)]">
                   <i className="fas fa-arrow-right-long"></i>
                   <span>Align with Vision 2040</span>
                 </div>

@@ -64,23 +64,23 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition placeholder:text-slate-400";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-white/10 bg-[#0F172A] text-white focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-none transition placeholder:text-slate-500";
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-      <div className="bg-blue-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-        <h2 className="text-blue-900 font-bold flex items-center">
-          <i className="fas fa-microscope mr-2 text-blue-500"></i>
+    <div className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#3B82F6]/50 transition-all duration-300 overflow-hidden">
+      <div className="bg-[#3B82F6]/10 px-6 py-4 border-b border-white/5 flex justify-between items-center">
+        <h2 className="text-[#3B82F6] font-bold flex items-center drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+          <i className="fas fa-microscope mr-2 text-[#3B82F6]"></i>
           {isArabic ? 'معايير البحث (من المختبر إلى النطاق التجريبي)' : 'Research Parameters (Lab to Pilot-Scale)'}
         </h2>
         
         <select 
           value={localLanguage}
           onChange={(e) => setLocalLanguage(e.target.value)}
-          className="bg-white text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none shadow-sm"
+          className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#3B82F6] outline-none shadow-sm"
         >
-          <option value="Arabic">العربية (Arabic)</option>
-          <option value="English">English</option>
+          <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
+          <option value="English" className="bg-[#0D141A] text-white">English</option>
         </select>
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -193,8 +193,8 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
 
         <button 
           disabled={isLoading}
-          className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-lg ${
-            isLoading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
+          className={`w-full py-4 rounded-lg font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${
+            isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
           }`}
         >
           {isLoading ? (
