@@ -64,20 +64,20 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition placeholder:text-slate-500";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition placeholder:text-slate-400";
 
   return (
-    <div className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-      <div className="bg-blue-600/10 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
-        <h2 className="text-white font-bold flex items-center">
-          <i className="fas fa-microscope mr-2 text-blue-400"></i>
+    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+      <div className="bg-blue-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+        <h2 className="text-blue-900 font-bold flex items-center">
+          <i className="fas fa-microscope mr-2 text-blue-500"></i>
           {isArabic ? 'معايير البحث (من المختبر إلى النطاق التجريبي)' : 'Research Parameters (Lab to Pilot-Scale)'}
         </h2>
         
         <select 
           value={localLanguage}
           onChange={(e) => setLocalLanguage(e.target.value)}
-          className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none"
+          className="bg-white text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none shadow-sm"
         >
           <option value="Arabic">العربية (Arabic)</option>
           <option value="English">English</option>

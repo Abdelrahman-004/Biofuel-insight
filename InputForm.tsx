@@ -117,28 +117,19 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition placeholder:text-slate-500";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition placeholder:text-slate-400";
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden"
+      className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
     >
-      <div className="bg-emerald-600/10 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
-        <h2 className="text-white font-bold flex items-center text-lg">
-          <i className="fas fa-sliders mr-3 text-emerald-400"></i>
+      <div className="bg-emerald-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+        <h2 className="text-emerald-900 font-bold flex items-center text-lg">
+          <i className="fas fa-sliders mr-3 text-emerald-500"></i>
           {isArabic ? 'معايير تحليل الجدوى' : 'Investment-Grade Analysis Parameters'}
         </h2>
-        
-        <select 
-          value={localLanguage}
-          onChange={(e) => setLocalLanguage(e.target.value)}
-          className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-emerald-400 outline-none"
-        >
-          <option value="Arabic">العربية (Arabic)</option>
-          <option value="English">English</option>
-        </select>
       </div>
       <div className="px-6 pt-4 flex flex-wrap gap-2">
         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
@@ -158,7 +149,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               setProduction(ex.prod);
               setBudget(ex.bud);
             }}
-            className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all"
+            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-500 hover:bg-white hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
           >
             {ex.name}
           </button>
@@ -194,7 +185,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-slate-800 text-white">{isArabic ? translateTerm(loc) : loc}</option>)}
+              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-white text-slate-800">{isArabic ? translateTerm(loc) : loc}</option>)}
             </select>
           </motion.div>
         </div>
@@ -212,7 +203,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-slate-800 text-white">{isArabic ? translateTerm(cat) : cat}</option>)}
+              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-white text-slate-800">{isArabic ? translateTerm(cat) : cat}</option>)}
             </select>
           </motion.div>
           <motion.div 
@@ -230,7 +221,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               dir={isArabic ? "rtl" : "ltr"}
             >
               {(category === 'Biofuel' ? BIOFUEL_FEEDSTOCKS : RENEWABLE_ENERGY_TYPES).map(fs => (
-                <option key={fs} value={fs} className="bg-slate-800 text-white">{isArabic ? translateTerm(fs) : fs}</option>
+                <option key={fs} value={fs} className="bg-white text-slate-800">{isArabic ? translateTerm(fs) : fs}</option>
               ))}
             </select>
           </motion.div>
@@ -256,7 +247,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                     if (src === 'Purchased CO2') text = 'شراء غاز ثاني أكسيد الكربون';
                     if (src === 'Not specified') text = 'غير محدد';
                   }
-                  return <option key={src} value={src} className="bg-slate-800 text-white">{text}</option>;
+                  return <option key={src} value={src} className="bg-white text-slate-800">{text}</option>;
                 })}
               </select>
             </div>

@@ -38,7 +38,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
         />
       )}
 
-      <aside className={`fixed top-0 right-0 h-full bg-slate-900 border-l border-slate-800 z-50 transition-all duration-300 shadow-2xl flex flex-col ${
+      <aside className={`fixed top-0 right-0 h-full bg-slate-950/90 backdrop-blur-2xl border-l border-white/5 z-50 transition-all duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] flex flex-col ${
         isOpen ? 'w-80' : 'w-0 overflow-hidden border-none'
       }`}>
         <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
@@ -123,7 +123,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
           )}
         </div>
 
-        <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0">
+        <div className="p-4 bg-transparent border-t border-white/5 shrink-0">
           <p className="text-[10px] text-slate-500 text-center italic">
             Projects are saved locally in your browser.
           </p>
@@ -134,9 +134,9 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
       {!isOpen && (
         <button 
           onClick={onToggle}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-emerald-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-emerald-500 hover:scale-110 active:scale-95 transition-all z-40 group print:hidden"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-slate-800 border border-slate-700 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-slate-700 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all z-40 group print:hidden"
         >
-          <i className="fas fa-folder-tree text-xl"></i>
+          <i className="fas fa-folder-tree text-xl text-emerald-500"></i>
           <span className="absolute right-full mr-4 px-3 py-1 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap border border-slate-800">
             Project History
           </span>

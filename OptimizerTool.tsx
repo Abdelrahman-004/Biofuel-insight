@@ -127,20 +127,20 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-            <div className="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
-            <div className="bg-emerald-600/10 px-8 py-6 border-b border-slate-800 flex justify-between items-center">
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div className="bg-emerald-50 px-8 py-6 border-b border-slate-200 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
-                <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
-                  <i className="fas fa-leaf mr-3 text-emerald-400"></i>
+                <h2 className="text-2xl font-black text-slate-900 flex items-center tracking-tight">
+                  <i className="fas fa-leaf mr-3 text-emerald-600"></i>
                   {isArabic ? 'مُحسّن الأرباح وتقليل الكربون' : 'Smart Profit & Low-Carbon Optimizer'}
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تقصيد الأرباح وتخفيف الانبعاثات لمشاريعك' : 'Maximize profitability while reaching net-zero milestones.'}</p>
+                <p className="text-slate-600 text-sm mt-1">{isArabic ? 'تقصيد الأرباح وتخفيف الانبعاثات لمشاريعك' : 'Maximize profitability while reaching net-zero milestones.'}</p>
               </div>
 
               <select 
                 value={localLanguage}
                 onChange={(e) => setLocalLanguage(e.target.value)}
-                className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-emerald-400 outline-none"
+                className="bg-white text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-emerald-600 outline-none shadow-sm"
               >
                 <option value="Arabic">العربية (Arabic)</option>
                 <option value="English">English</option>
@@ -158,8 +158,11 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   <button
                     key={i}
                     type="button"
-                    onClick={() => { setProjectName(ex.name); setDescription(ex.desc); }}
-                    className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all"
+                    onClick={() => {
+                      setProjectName(ex.name);
+                      setDescription(ex.desc);
+                    }}
+                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-white hover:text-emerald-600 hover:border-emerald-300 transition-all shadow-sm"
                   >
                     {ex.name}
                   </button>
@@ -173,7 +176,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder={isArabic ? 'مثال: مزرعة الطحالب العمانية' : "e.g., Algae-to-Biofuel Hub Oman"}
-                    className="w-full px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+                    className="w-full px-6 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none transition placeholder:text-slate-400 shadow-sm"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
@@ -183,7 +186,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={isArabic ? 'صف مشروعك والمواد الخام والأهداف...' : "Describe your project, current feedstock, and target production scale..."}
-                    className="w-full px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition min-h-[120px]"
+                    className="w-full px-6 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none transition min-h-[120px] placeholder:text-slate-400 shadow-sm"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
@@ -191,7 +194,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               <button 
                 disabled={isLoading || !projectName.trim() || !description.trim()}
                 className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-lg ${
-                  isLoading ? 'bg-slate-700 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500 active:scale-95'
+                  isLoading ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500 active:scale-95'
                 }`}
               >
                 {isLoading ? (
@@ -210,7 +213,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
           </div>
 
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center">
               <i className="fas fa-exclamation-circle mr-2"></i>
               {error}
             </div>

@@ -89,7 +89,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
   ];
 
   return (
-    <div className="bg-slate-950 text-slate-200 selection:bg-green-500/30 selection:text-green-400 min-h-screen" dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className="text-slate-200 selection:bg-green-500/30 selection:text-green-400 min-h-screen" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Hero Section - Modern Dark */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
         {/* Background Glows */}
@@ -118,9 +118,9 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter text-white"
           >
-            {isArabic ? 'الوقود الحيوي' : 'BIOFUEL'} <br />
+            {isArabic ? 'عُمان' : 'OMAN'} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">
-              {isArabic ? 'رؤى الذكاء الاصطناعي' : 'INSIGHT AI'}
+              {isArabic ? 'إيكو سينك' : 'ECOSYNC'}
             </span>
           </motion.h1>
           
@@ -131,8 +131,8 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
             className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed"
           >
             {isArabic 
-              ? 'طبقة الاستخبارات من الجيل القادم لتحول الطاقة في عُمان. سد الفجوة بين الأبحاث المختبرية والاستثمار الصناعي.' 
-              : "The next-generation intelligence layer for Oman's energy transition. Bridging the gap between lab research and industrial investment."}
+              ? 'نمذجة استثمارية ومالية متقدمة لمشاريع الطاقة الشمسية، الهيدروجين الأخضر، والوقود الحيوي في عُمان. صُنع للمستثمرين والباحثين.' 
+              : "Advanced financial and technical modeling for Solar, Green Hydrogen, and Biofuel projects in Oman. Built for investors and researchers."}
           </motion.p>
           
           <motion.div 
@@ -223,7 +223,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 transition={{ delay: index * 0.1 }}
                 onClick={() => onStart(tool.id as any)}
                 className={`
-                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/40 backdrop-blur-md transition-all duration-500 hover:border-green-500/30 hover:bg-slate-900/60
+                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-slate-200 bg-white transition-all duration-500 hover:border-emerald-500 hover:shadow-xl shadow-sm
                   ${tool.size === 'large' ? 'md:col-span-2' : 'md:col-span-1'}
                 `}
               >
@@ -232,11 +232,11 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 
                 <div className="relative h-full p-8 flex flex-col justify-between z-10">
                   <div>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-950/50 border border-white/10 ${tool.accent} mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 ${tool.accent} mb-6 group-hover:scale-110 transition-transform duration-500`}>
                       <tool.icon size={24} strokeWidth={2.5} />
                     </div>
-                    <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-widest">{tool.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed max-w-md group-hover:text-slate-200 transition-colors duration-500">{tool.description}</p>
+                    <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase tracking-widest">{tool.title}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed max-w-md transition-colors duration-500">{tool.description}</p>
                   </div>
 
                   <div className="flex items-center justify-between mt-4">
@@ -244,8 +244,8 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                       <span>{isArabic ? 'تشغيل الأداة' : 'Initialize Tool'}</span>
                       <ArrowRight size={12} className={isArabic ? 'mr-2 rotate-180' : 'ml-2'} />
                     </div>
-                    <div className="text-slate-700 group-hover:text-green-500/30 transition-colors">
-                      <tool.icon size={48} strokeWidth={1} className="opacity-10 group-hover:opacity-20" />
+                    <div className="text-slate-200 group-hover:text-emerald-500/20 transition-colors">
+                      <tool.icon size={48} strokeWidth={1} className="opacity-50 group-hover:opacity-100" />
                     </div>
                   </div>
                 </div>
@@ -260,30 +260,39 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
         <div className="relative">
           <div className={`absolute ${isArabic ? '-right-10' : '-left-10'} top-0 w-1 h-20 bg-green-500`}></div>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tighter">
-            {isArabic ? <>نظام بيئي <br /><span className="text-green-500">ذكي</span></> : <>INTELLIGENT <br /><span className="text-green-500">ECOSYSTEM</span></>}
+            {isArabic ? <>الميزة <br /><span className="text-green-500">التنافسية</span></> : <>OUR UNIQUE <br /><span className="text-green-500">ADVANTAGE</span></>}
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-10 text-lg">
+          <p className="text-slate-400 leading-relaxed mb-6 text-lg">
             {isArabic 
-              ? 'تستفيد المنصة من أنظمة الذكاء الاصطناعي لتوفير تقييمات موثوقة ونماذج أعمال واقعية في عُمان.' 
-              : "Biofuel Insight AI leverages advanced multi-agent systems to process complex technical and economic data. We integrate regional benchmarks from Oman's strategic free zones with global sustainability standards."}
+              ? 'الأداة ليست مجرد محادثة عامة (Chat). نحن نقدم منصة عمليات متخصصة (Vertical AI) لنمذجة المشاريع الخضراء والطاقة.' 
+              : "We are not a general-purpose chatbot. Insight AI is a Vertical AI platform running structured, multi-agent workflows specifically designed for clean energy modeling."}
           </p>
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="flex items-start space-x-6 group rtl:space-x-reverse">
               <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl group-hover:bg-green-500 group-hover:text-black transition-all">
-                <Zap size={20} />
+                <Shield size={20} />
               </div>
               <div>
-                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'للمستثمرين' : 'For Investors'}</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'يقلل من المخاطر المالية من خلال توفير تقديرات دقيقة.' : 'Reduces financial risk by providing data-driven CAPEX/OPEX estimates and payback analysis.'}</p>
+                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'هندسة مالية محددة وليس نصوص عامة' : 'Deterministic Financial Modeling'}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'بعكس LLMs العامة، المنصة تفرض قوالب حسابية للمصروفات (CAPEX/OPEX) وتخرج أرقاماً متسقة للإيرادات بناءً على المعايير العالمية.' : 'Unlike generic LLMs, our platform enforces structured mathematical templates for CAPEX/OPEX calculations, producing consistent, enterprise-grade numbers.'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-6 group rtl:space-x-reverse">
               <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl group-hover:bg-green-500 group-hover:text-black transition-all">
-                <Cpu size={20} />
+                <MapPin size={20} />
               </div>
               <div>
-                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'للباحثين' : 'For Researchers'}</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'ينقل الأبحاث من المختبر إلى أرض الواقع لتكون جاهزة لسوق العمل.' : 'Accelerates innovation by translating laboratory results into realistic implementation roadmaps.'}</p>
+                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'بيانات السوق العماني (المناطق الحرة)' : 'Localized Oman Free Zone Data'}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'يتم دمج إعفاءات الضرائب المحددة والرسوم الجمركية للمناطق الحرة (صحار، الدقم، صلالة) مباشرة في التقرير الاستثماري.' : 'Tax exemptions and logistical parameters specific to Sohar, Duqm, and Salalah Free Zones are naturally injected into your investment proposals.'}</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-6 group rtl:space-x-reverse">
+              <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl group-hover:bg-green-500 group-hover:text-black transition-all">
+                <Globe size={20} />
+              </div>
+              <div>
+                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-2">{isArabic ? 'دعم المعايير الصناعية (ASTM/EN)' : 'Industrial Standards Compliance'}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{isArabic ? 'يتم مطابقة نتائج الأبحاث والمشاريع آلياً مع المواصفات العالمية قبل تقديمها للمستثمرين.' : 'Research and facility outputs are programmatically validated against ASTM and EN standard rulesets before finalizing the pitch to investors.'}</p>
               </div>
             </div>
           </div>
@@ -291,20 +300,20 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
         
         <div className="bg-slate-900/50 backdrop-blur-sm rounded-[2.5rem] p-12 border border-white/5 relative overflow-hidden">
           <div className={`absolute top-0 ${isArabic ? 'left-0' : 'right-0'} w-32 h-32 bg-green-500/10 blur-[50px] rounded-full`}></div>
-          <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-widest">{isArabic ? 'ملخص المنصة' : 'Platform Summary'}</h3>
+          <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-widest">{isArabic ? 'دعم كافة قطاعات الطاقة' : 'All Clean Energy Sectors'}</h3>
           <p className="text-slate-400 text-sm leading-relaxed mb-10">
             {isArabic 
-              ? 'تسد منصتنا الفجوة بين الاكتشاف العلمي والتطبيق الصناعي. سواء كنت تحسب معدل العائد لمنشأة في المناطق الحرة في عُمان، توفر لك المنصة الأدوات الدقيقة.'
-              : "Our platform bridges the gap between scientific discovery and industrial application. Whether you are calculating the IRR of a new biofuel facility in Oman's strategic free zones or scaling up diverse feedstock research at a university lab, Biofuel Insight AI provides the precision tools needed for success."}
+              ? 'صممت المنصة للتوسع وخدمة شريحة المستثمرين، سواء كنت تحسب العائد لمشروع طاقة شمسية واسع النطاق، أو منشأة هيدروجين أخضر، أو إعادة تدوير النفايات.'
+              : "Built to adapt to any sustainable transition fund. Whether calculating the operational return of a massive Solar farm, evaluating Green Hydrogen electrolysis scaling, or researching e-fuels, Insight AI provides the localized precision needed for success."}
           </p>
           <div className="grid grid-cols-2 gap-6">
             <div className="bg-black/40 p-6 rounded-3xl border border-white/5">
-              <div className="text-4xl font-black text-green-500 mb-1">98%</div>
-              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'دقة مراجعة المعايير' : 'Data Accuracy'}</div>
+              <div className="text-3xl font-black text-green-500 mb-1">AI</div>
+              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'وكلاء متخصصين' : 'Specialized Agents'}</div>
             </div>
             <div className="bg-black/40 p-6 rounded-3xl border border-white/5">
-              <div className="text-4xl font-black text-green-500 mb-1">6+</div>
-              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'أدوات تحليل متخصصة' : 'Expert Tools'}</div>
+              <div className="text-3xl font-black text-green-500 mb-1">API</div>
+              <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{isArabic ? 'تقارير مهيكلة' : 'Structured Data'}</div>
             </div>
           </div>
         </div>

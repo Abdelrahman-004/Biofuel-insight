@@ -4,10 +4,12 @@ import { Home } from './Home';
 import { InputForm } from './InputForm';
 import { StandardsChecker } from './StandardsChecker';
 import { ProposalGenerator } from './ProposalGenerator';
+import { LiveMarketsDashboard } from './LiveMarketsDashboard';
+import { GisMap } from './GisMap';
 
 interface NavbarProps {
   activeTab: string;
-  onTabChange: (tab: 'HOME' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
+  onTabChange: (tab: 'HOME' | 'LIVE_MARKETS' | 'GIS_MAP' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
   language: 'English' | 'Arabic';
   onLanguageChange: (lang: 'English' | 'Arabic') => void;
 }
@@ -41,56 +43,121 @@ const BiofuelOmanLogo = () => (
   </svg>
 );
 
-const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, onLanguageChange }) => {
+const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, onLanguageChange }) => {
+  const isArabic = language === 'Arabic';
   return (
-    <nav className="bg-black/80 backdrop-blur-xl text-white border-b border-white/5 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-slate-950/90 backdrop-blur-2xl text-white border-b border-white/5 sticky top-0 z-50 transition-all shadow-sm">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <div 
-            className="flex items-center cursor-pointer group" 
-            onClick={() => onTabChange('HOME')}
-          >
-            <BiofuelOmanLogo />
-            <span className="text-xl font-black tracking-tighter text-white group-hover:text-green-500 transition-colors mx-3">
-              BIOFUEL <span className="text-green-600">INSIGHT</span> AI
-            </span>
-          </div>
-          <div className="flex items-center">
-            <div className="hidden lg:flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] rtl:space-x-reverse mr-4 rtl:mr-0 rtl:ml-4">
+          
+          <div className="flex items-center space-x-8 rtl:space-x-reverse">
+            <div 
+              className="flex items-center cursor-pointer group" 
+              onClick={() => onTabChange('HOME')}
+            >
+              <BiofuelOmanLogo />
+              <span className="text-xl font-black tracking-tighter text-white group-hover:text-emerald-400 transition-colors mx-3">
+                OMAN <span className="text-emerald-500">ECOSYNC</span>
+              </span>
+            </div>
+            
+            <div className="hidden lg:flex items-center space-x-4 rtl:space-x-reverse">
               {[
-                { id: 'HOME', label: language === 'Arabic' ? 'الرئيسية' : 'Home' },
-                { id: 'INVESTOR_FEASIBILITY', label: language === 'Arabic' ? 'دراسة الجدوى الاستثمارية' : 'Investor Feasibility' },
-                { id: 'RESEARCH', label: language === 'Arabic' ? 'تحليل البحوث المخبرية' : 'Research Analyzer' },
-                { id: 'SOLVER', label: language === 'Arabic' ? 'حل العوائق التقنية' : 'Challenge Solver' },
-                { id: 'OPTIMIZER', label: language === 'Arabic' ? 'التحسين المالي والانبعاثات' : 'Profit Optimizer' },
-                { id: 'STANDARDS', label: language === 'Arabic' ? 'مطابقة المعايير الدولية' : 'Standards' },
-                { id: 'PROPOSAL', label: language === 'Arabic' ? 'إنشاء مقترح استثماري' : 'Proposal Gen' },
-                { id: 'ZONES', label: language === 'Arabic' ? 'المناطق الحرة (OPAZ)' : 'Zones' }
+                { id: 'LIVE_MARKETS', label: isArabic ? 'مؤشرات السوق' : 'Live Markets', icon: 'fa-chart-pie' },
+                { id: 'GIS_MAP', label: isArabic ? 'خريطة GIS' : 'GIS Map', icon: 'fa-map-marked-alt' },
               ].map(item => (
                 <button 
                   key={item.id}
                   onClick={() => onTabChange(item.id as any)}
-                  className={`px-4 py-2 rounded-xl transition-all border ${
+                  className={`px-5 py-2.5 rounded-full transition-all text-xs font-black uppercase tracking-widest border flex items-center ${
                     activeTab === item.id 
-                      ? 'bg-green-500/10 border-green-500/50 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.1)]' 
-                      : 'border-transparent text-slate-400 hover:text-white hover:border-white/10'
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
+                      : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
+                  <i className={`fas ${item.icon} mr-2 flex-shrink-0 rtl:ml-2 rtl:mr-0`}></i>
                   {item.label}
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="flex items-center space-x-4 rtl:space-x-reverse">
             <button
-              onClick={() => onLanguageChange(language === 'Arabic' ? 'English' : 'Arabic')}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-slate-700 transition"
+              onClick={() => onLanguageChange(isArabic ? 'English' : 'Arabic')}
+              className="px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700 text-white rounded-full border border-slate-700 transition flex items-center text-xs font-bold"
             >
               <i className="fas fa-globe mx-2 text-emerald-400"></i>
-              {language === 'Arabic' ? 'English' : 'العربية'}
+              {isArabic ? 'EN' : 'AR'}
+            </button>
+            <div className="w-px h-6 bg-slate-700 mx-2 hidden md:block"></div>
+            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:border-emerald-500 transition-colors text-slate-300 hover:text-white">
+               <i className="fas fa-user-circle text-xl"></i>
             </button>
           </div>
         </div>
       </div>
     </nav>
+  );
+};
+
+interface SidebarProps {
+  activeTab: string;
+  onTabChange: (tab: any) => void;
+  language: 'English' | 'Arabic';
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+const SIDEBAR_ITEMS = [
+  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator' },
+  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope' },
+  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb' },
+  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line' },
+  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book' },
+  { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature' },
+  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map' }
+];
+
+const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language, isOpen, onToggle }) => {
+  const isArabic = language === 'Arabic';
+  return (
+    <aside className={`bg-slate-950/90 backdrop-blur-2xl border-white/5 transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0
+      ${isArabic ? 'border-l shadow-[-4px_0_24px_rgba(0,0,0,0.5)]' : 'border-r shadow-[4px_0_24px_rgba(0,0,0,0.5)]'}
+      ${isOpen ? 'w-72' : 'w-20'}
+    `}>
+      <button 
+        onClick={onToggle}
+        className={`mx-4 mb-8 flex items-center justify-center w-10 h-10 rounded-xl bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 transition ${isOpen ? 'self-end' : 'mx-auto'}`}
+      >
+         <i className={`fas fa-chevron-${isOpen ? (isArabic ? 'right' : 'left') : (isArabic ? 'left' : 'right')}`}></i>
+      </button>
+
+      {isOpen && (
+        <div className="flex flex-col space-y-3 px-3 animate-in fade-in duration-300">
+           {SIDEBAR_ITEMS.map(item => {
+             const isActive = activeTab === item.id || (activeTab === 'FEASIBILITY' && item.id === 'INVESTOR_FEASIBILITY');
+             return (
+               <button
+                 key={item.id}
+                 onClick={() => onTabChange(item.id)}
+                 className={`flex items-center p-4 rounded-xl transition-all group mb-2 justify-start ${
+                   isActive 
+                     ? 'bg-white text-emerald-600 shadow-md border border-slate-200' 
+                     : 'bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-emerald-600'
+                 }`}
+                 title={isArabic ? item.labelAr : item.labelEn}
+               >
+                 <i className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'}`}></i>
+                 <span className="text-xs font-black uppercase tracking-wider whitespace-nowrap overflow-hidden text-left rtl:text-right">
+                   {isArabic ? item.labelAr : item.labelEn}
+                 </span>
+               </button>
+             )
+           })}
+        </div>
+      )}
+    </aside>
   );
 };
 
@@ -103,11 +170,11 @@ const Footer: React.FC = () => {
             <div className="flex items-center space-x-2 mb-4 opacity-50 grayscale hover:grayscale-0 transition-all">
               <BiofuelOmanLogo />
               <span className="text-xs font-black tracking-tighter text-white">
-                BIOFUEL INSIGHT AI
+                OMAN ECOSYNC
               </span>
             </div>
             <p className="text-xs leading-relaxed max-w-xs mx-auto md:mx-0 font-medium">
-              The next-generation intelligence layer for Oman's sustainable energy infrastructure and biofuel research.
+              The next-generation intelligence layer for Oman's clean energy infrastructure, sustainability modeling, and research.
             </p>
           </div>
           <div className="flex flex-col items-center space-y-6">
@@ -132,7 +199,7 @@ const Footer: React.FC = () => {
         </div>
         <div className="mt-20 pt-10 border-t border-white/5 text-center">
           <p className="text-[10px] uppercase tracking-[0.4em] font-black text-slate-600">
-            © 2026 Biofuel Insight AI. PROPELLED BY ADVANCED INTELLIGENCE.
+            © 2026 OMAN ECOSYNC. PROPELLED BY ADVANCED INTELLIGENCE.
           </p>
         </div>
       </div>
@@ -162,7 +229,7 @@ const ACTIVE_TAB_KEY = 'biofuel_insight_active_tab';
 const CURRENT_ANALYSIS_KEY = 'biofuel_insight_current_analysis';
 const CURRENT_RESEARCH_KEY = 'biofuel_insight_current_research';
 
-type MainTab = 'HOME' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
+type MainTab = 'HOME' | 'LIVE_MARKETS' | 'GIS_MAP' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
 type FeasibilityView = 'ANALYZE' | 'HISTORY' | 'COMPARE';
 type ResearchView = 'ANALYZE' | 'HISTORY';
 
@@ -180,6 +247,7 @@ export default function App() {
   const [optimizerHistory, setOptimizerHistory] = React.useState<OptimizerHistoryEntry[]>([]);
   const [unifiedProjects, setUnifiedProjects] = React.useState<UnifiedProject[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [isMainSidebarOpen, setIsMainSidebarOpen] = React.useState(true);
   const [initialFeasibilityInputs, setInitialFeasibilityInputs] = React.useState<any>(null);
   const [initialResearchInputs, setInitialResearchInputs] = React.useState<any>(null);
   const [initialChallengeInputs, setInitialChallengeInputs] = React.useState<any>(null);
@@ -484,23 +552,23 @@ export default function App() {
       </div>
 
       {feasibilityView === 'ANALYZE' && (
-        <div className="animate-in fade-in duration-500">
-          <section className="bg-emerald-900 text-white py-12 px-4">
+        <div className="animate-in fade-in duration-500 bg-white min-h-screen">
+          <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                 {language === 'Arabic' ? (
-                  <>أداة <span className="text-emerald-400 underline decoration-emerald-500/30">تحليل الجدوى الاستثمارية</span></>
+                  <>أداة <span className="text-emerald-600 underline decoration-emerald-500/30">تحليل الجدوى الاستثمارية</span></>
                 ) : (
-                  <>Investor <span className="text-emerald-400 underline decoration-emerald-500/30">Feasibility</span> Tool</>
+                  <>Investor <span className="text-emerald-600 underline decoration-emerald-500/30">Feasibility</span> Tool</>
                 )}
               </h1>
-              <p className="text-md text-emerald-100/80 max-w-2xl mx-auto">
+              <p className="text-md text-slate-600 max-w-2xl mx-auto">
                 {language === 'Arabic' ? 'قم بتقييم الجدوى الاقتصادية والتقنية لمسارات الوقود الحيوي والطاقة ضمن المناطق الاستراتيجية في عُمان.' : "Evaluate technical and economic viability for Biofuel, Hydrogen, and Carbon pathways across Oman's strategic zones."}
               </p>
             </div>
           </section>
 
-          <section className="max-w-5xl mx-auto px-4 -mt-12 mb-16 relative z-10">
+          <section className="max-w-5xl mx-auto px-4 py-8 relative z-10 bg-white">
             <InputForm 
               onAnalyze={handleAnalyze} 
               isLoading={status === 'ANALYZING'} 
@@ -548,8 +616,8 @@ export default function App() {
     </>
   );
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-500" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
-      <Navbar 
+    <div className="h-screen flex flex-col bg-slate-950 font-sans selection:bg-emerald-100/30 selection:text-emerald-400 transition-colors duration-500 overflow-hidden text-slate-200" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
+      <TopNavbar 
         activeTab={activeMainTab} 
         onTabChange={(tab) => {
           setActiveMainTab(tab);
@@ -559,8 +627,31 @@ export default function App() {
         onLanguageChange={setLanguage}
       />
 
-      <main className="flex-grow">
-        {activeMainTab === 'HOME' && <Home onStart={(tab) => setActiveMainTab(tab)} language={language} />}
+      <div className="flex flex-1 overflow-hidden relative">
+        <MainSidebar 
+          activeTab={activeMainTab}
+          onTabChange={(tab) => {
+            setActiveMainTab(tab);
+            if (tab === 'INVESTOR_FEASIBILITY' && feasibilityView === 'COMPARE') setFeasibilityView('ANALYZE');
+          }}
+          language={language}
+          isOpen={isMainSidebarOpen}
+          onToggle={() => setIsMainSidebarOpen(!isMainSidebarOpen)}
+        />
+
+        <main className="flex-1 overflow-y-auto">
+          <div className="min-h-full flex flex-col">
+            {activeMainTab === 'HOME' && <Home onStart={(tab) => setActiveMainTab(tab)} language={language} />}
+            {activeMainTab === 'LIVE_MARKETS' && (
+              <section className="max-w-7xl mx-auto px-4 py-8 flex-1">
+                <LiveMarketsDashboard language={language} />
+              </section>
+            )}
+            {activeMainTab === 'GIS_MAP' && (
+              <section className="max-w-7xl mx-auto px-4 py-8 flex-1">
+                <GisMap language={language} />
+              </section>
+            )}
         {(activeMainTab === 'INVESTOR_FEASIBILITY' || activeMainTab === 'FEASIBILITY') && renderFeasibilityTool()}
         {activeMainTab === 'RESEARCH' && (
           <div className="animate-in fade-in duration-500">
@@ -589,23 +680,23 @@ export default function App() {
             </div>
 
             {researchView === 'ANALYZE' && (
-              <>
-                <section className="bg-blue-900 text-white py-12 px-4">
+              <div className="bg-white min-h-screen">
+                <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
                   <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                       {language === 'Arabic' ? (
-                        <>مُحَلِّل <span className="text-blue-400 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
+                        <>مُحَلِّل <span className="text-blue-600 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
                       ) : (
-                        <>Research Implementation <span className="text-blue-400 underline decoration-blue-500/30">Analyzer</span></>
+                        <>Research Implementation <span className="text-blue-600 underline decoration-blue-500/30">Analyzer</span></>
                       )}
                     </h1>
-                    <p className="text-md text-blue-100/80 max-w-2xl mx-auto">
+                    <p className="text-md text-slate-600 max-w-2xl mx-auto">
                       {language === 'Arabic' ? 'قم بسد الفجوة بين الأبحاث المخبرية والإنتاج التجريبي. تقييم علمي دقيق مخصص للباحثين.' : 'Bridge the gap between laboratory yields and pilot-scale production. Purely scientific assessment for researchers.'}
                     </p>
                   </div>
                 </section>
 
-                <section className="max-w-5xl mx-auto px-4 -mt-12 mb-16 relative z-10">
+                <section className="max-w-5xl mx-auto px-4 py-8 mb-16 relative z-10 bg-white">
                   <ResearchInputForm 
                     onAnalyze={handleResearchAnalyze} 
                     isLoading={status === 'ANALYZING'} 
@@ -627,11 +718,11 @@ export default function App() {
                 )}
 
                 {status === 'COMPLETED' && researchAnalysis && (
-                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20">
+                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20 bg-white">
                     <ResearchDashboard data={researchAnalysis} language={language} />
                   </section>
                 )}
-              </>
+              </div>
             )}
 
             {researchView === 'HISTORY' && (
@@ -647,21 +738,21 @@ export default function App() {
         )}
         {activeMainTab === 'SOLVER' && (
           <div className="animate-in fade-in duration-500">
-            <section className="bg-slate-900 text-white py-12 px-4">
+            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-blue-400 underline decoration-blue-500/30">حل العوائق العلمية</span></>
+                    <>أداة <span className="text-blue-600 underline decoration-blue-500/30">حل العوائق العلمية</span></>
                   ) : (
-                    <>Scientific <span className="text-blue-400 underline decoration-blue-500/30">Challenge</span> Solver</>
+                    <>Scientific <span className="text-blue-600 underline decoration-blue-500/30">Challenge</span> Solver</>
                   )}
                 </h1>
-                <p className="text-md text-slate-300 max-w-2xl mx-auto">
+                <p className="text-md text-slate-600 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'حل الاختناقات التقنية في قطاع الوقود الحيوي في عُمان باستخدام وكلاء الذكاء الاصطناعي.' : "Solving technical bottlenecks in Oman's biofuel ecosystem through multi-agent scientific reasoning."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10">
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 bg-white">
               <ChallengeSolver 
                 history={challengeHistory} 
                 initialInputs={initialChallengeInputs}
@@ -682,22 +773,22 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'OPTIMIZER' && (
-          <div className="animate-in fade-in duration-500">
-            <section className="bg-emerald-900 text-white py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
+            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>التحسين <span className="text-emerald-400 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
+                    <>التحسين <span className="text-emerald-600 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
                   ) : (
-                    <>Profit & <span className="text-emerald-400 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
+                    <>Profit & <span className="text-emerald-600 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
                   )}
                 </h1>
-                <p className="text-md text-emerald-100/80 max-w-2xl mx-auto">
+                <p className="text-md text-slate-600 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'ذكاء اصطناعي لتعظيم الإيرادات وتقليل الانبعاثات الكربونية لمشاريع الوقود الحيوي.' : 'Strategic multi-agent AI to maximize revenue and minimize emissions for biofuel projects.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10">
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 bg-white">
               <OptimizerTool 
                 history={optimizerHistory}
                 initialInputs={initialOptimizerInputs}
@@ -719,56 +810,88 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'STANDARDS' && (
-          <div className="animate-in fade-in duration-500">
-            <section className="bg-blue-900 text-white py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
+            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-blue-400 underline decoration-blue-500/30">الامتثال والمعايير</span></>
+                    <>أداة <span className="text-blue-600 underline decoration-blue-500/30">الامتثال والمعايير</span></>
                   ) : (
-                    <>Standards <span className="text-blue-400 underline decoration-blue-500/30">Compliance</span> Checker</>
+                    <>Standards <span className="text-blue-600 underline decoration-blue-500/30">Compliance</span> Checker</>
                   )}
                 </h1>
-                <p className="text-md text-blue-100/80 max-w-2xl mx-auto">
+                <p className="text-md text-slate-600 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'التحقق من نتائج المعامل المختبرية للوقود الحيوي واعتماديتها حسب المواصفات (ASTM/EN).' : 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability in Oman.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20">
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20 bg-white">
               <StandardsChecker language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'PROPOSAL' && (
-          <div className="animate-in fade-in duration-500">
-            <section className="bg-emerald-900 text-white py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
+            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>توليد <span className="text-emerald-400 underline decoration-emerald-500/30">المقترحات الاستثمارية</span></>
+                    <>توليد <span className="text-emerald-600 underline decoration-emerald-500/30">المقترحات الاستثمارية</span></>
                   ) : (
-                    <>Automated <span className="text-emerald-400 underline decoration-emerald-500/30">Proposal</span> Generator</>
+                    <>Automated <span className="text-emerald-600 underline decoration-emerald-500/30">Proposal</span> Generator</>
                   )}
                 </h1>
-                <p className="text-md text-emerald-100/80 max-w-2xl mx-auto">
+                <p className="text-md text-slate-600 max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'إصدار مقترحات احترافية تستند إلى البيانات الموثوقة والمخصصة لمنظومة التمويل في عُمان.' : "Generate professional, data-driven grant and investment proposals tailored for Oman's funding ecosystem."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20">
+            <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10 pb-20 bg-white">
               <ProposalGenerator language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'ZONES' && (
-          <section className="max-w-6xl mx-auto px-4 py-12">
-            <OmanFreeZones language={language} />
-          </section>
+          <div className="animate-in fade-in duration-500 bg-white min-h-screen">
+            <section className="bg-white text-slate-900 border-b border-slate-200 py-12 px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+                  {language === 'Arabic' ? (
+                    <>قاعدة بيانات <span className="text-blue-600 underline decoration-blue-500/30">المناطق الحرة</span></>
+                  ) : (
+                    <>Strategic <span className="text-blue-600 underline decoration-blue-500/30">Free Zones</span> Database</>
+                  )}
+                </h1>
+                <p className="text-md text-slate-600 max-w-2xl mx-auto">
+                  {language === 'Arabic' ? 'استكشف المناطق الاستراتيجية (الدقم، صحار، صلالة) لتحديد الموقع المثالي والدعم الحكومي المتوفر.' : "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location."}
+                </p>
+              </div>
+            </section>
+            <section className="max-w-6xl mx-auto px-4 py-12 bg-white">
+              <OmanFreeZones language={language} />
+            </section>
+          </div>
         )}
-      </main>
+          <Footer />
+          
+          {/* Global Legal Disclaimer Footer */}
+          <footer className="bg-slate-950 text-slate-400 py-6 text-center text-xs border-t border-slate-800 flex-shrink-0 z-50 mt-auto">
+            <div className="max-w-5xl mx-auto px-6">
+              <p className="mb-2 font-bold text-slate-300 text-sm flex justify-center items-center">
+                <i className="fas fa-shield-alt mr-2 rtl:ml-2 rtl:mr-0 text-slate-500"></i>
+                {language === 'Arabic' ? 'إخلاء مسؤولية قانوني (Disclaimer)' : 'Legal Disclaimer'}
+              </p>
+              <p className="max-w-4xl mx-auto leading-relaxed text-[10px] md:text-xs">
+                {language === 'Arabic'
+                  ? 'النتائج والتوقعات المالية والتقييمات المتولدة عبر هذا النظام المدعوم بالذكاء الاصطناعي هي لأغراض العصف الذهني والتقييم الأولي فقط. النظام مصمم لنمذجة المشاريع الخضراء والطاقة المتجددة ולא يشكل استشارة هندسية أو مالية معتمدة. يجب على المستخدمين التحقق من كافة الأرقام عبر خبراء معتمدين ومكاتب استشارية قبل أخذ أي قرار استثماري، ومطورو النظام لا يتحملون أي تبعات أو مسؤولية قانونية عن صحة ودقة هذه المخرجات.'
+                  : 'The results, financial projections, and assessments generated by this AI system are for brainstorming and preliminary evaluation purposes only. The system is designed to model green tech and renewable energy projects and does not constitute certified engineering or financial advice. Users must verify all figures with accredited experts before making any investment decisions. The developers assume no legal liability for the accuracy or consequences of these outputs.'}
+              </p>
+            </div>
+          </footer>
+          </div>
+        </main>
+      </div>
 
-      <Footer />
-      
       <UnifiedHistorySidebar 
         projects={unifiedProjects}
         isOpen={isSidebarOpen}

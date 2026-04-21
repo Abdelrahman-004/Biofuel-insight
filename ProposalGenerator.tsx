@@ -136,7 +136,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{inputs.language === 'Arabic' ? 'نوع الوقود' : 'Biofuel Type'}</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{inputs.language === 'Arabic' ? 'نوع المشروع/الوقود' : 'Project / Energy Type'}</label>
                 <select 
                   name="biofuelType" 
                   value={inputs.biofuelType} 
@@ -144,9 +144,11 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                   dir={inputs.language === 'Arabic' ? 'rtl' : 'ltr'}
                 >
+                  <option value="Solar Farm">{inputs.language === 'Arabic' ? 'محطة طاقة شمسية' : 'Solar Farm'}</option>
+                  <option value="Green Hydrogen">{inputs.language === 'Arabic' ? 'هيدروجين أخضر (التحليل الكهربائي)' : 'Green Hydrogen Electrolysis'}</option>
                   <option value="Biodiesel">{inputs.language === 'Arabic' ? 'الديزل الحيوي' : 'Biodiesel'}</option>
-                  <option value="Bioethanol">{inputs.language === 'Arabic' ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
                   <option value="SAF">{inputs.language === 'Arabic' ? 'وقود الطيران المستدام (SAF)' : 'SAF'}</option>
+                  <option value="Waste-to-Energy">{inputs.language === 'Arabic' ? 'تحويل النفايات إلى طاقة' : 'Waste-to-Energy'}</option>
                   <option value="Biogas">{inputs.language === 'Arabic' ? 'الغاز الحيوي' : 'Biogas'}</option>
                 </select>
               </div>
@@ -280,8 +282,22 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 </button>
               </div>
 
-              <div id="proposal-report" className="bg-white p-10 rounded-3xl shadow-sm border border-slate-200 prose prose-slate max-w-none">
-                <div className="text-center mb-10 border-b border-slate-200 pb-8">
+              <div id="proposal-report" className="bg-white p-10 rounded-3xl shadow-sm border border-slate-200 prose prose-slate max-w-none relative">
+                {/* PDF BRANDING HEADER */}
+                <div className="absolute top-8 left-8 right-8 flex justify-between items-start opacity-30 select-none pointer-events-none">
+                  <div className="flex items-center space-x-2 grayscale">
+                    <i className="fas fa-leaf text-2xl"></i>
+                    <span className="text-xl font-black tracking-tighter text-slate-800">
+                      OMAN <span className="text-emerald-700">ECOSYNC</span>
+                    </span>
+                  </div>
+                  <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right">
+                    {inputs.language === 'Arabic' ? 'نموذج مقترح معتمد آلياً' : 'Automated Certified Proposal'} <br/>
+                    {result.timestamp}
+                  </div>
+                </div>
+
+                <div className="text-center mb-10 border-b border-slate-200 pb-8 mt-12">
                   <h1 className="text-3xl font-black text-slate-900 mb-4">{result.title}</h1>
                   <p className="text-sm font-bold text-emerald-600 uppercase tracking-widest">
                     {inputs.language === 'Arabic' ? 'أُعد خصيصاً لـ: ' : 'Prepared for: '} <span className="text-slate-800">{inputs.targetAudience}</span>

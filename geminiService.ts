@@ -1473,3 +1473,45 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
   }
 }
 
+export async function fetchLiveNews(): Promise<{en: string; ar: string; time: string}[]> {
+  try {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) throw new Error("Gemini API key is required");
+
+    const ai = new GoogleGenAI({ apiKey });
+
+    const prompt = `Use Google Search to find the 5 most recent and significant reliable news headlines for today, April 20, 2026, related to EXACTLY THESE KEYWORDS: 'Oman Energy', 'Green Hydrogen', 'Biofuels', and 'Decarbonization'.
+Do not return old news. Use your search tool to get the current events.
+
+RETURN PURE JSON strictly matching this array of objects format (do not include markdown blocks like \`\`\`json):
+[
+  {
+    "en": "English headline summarizing the news",
+    "ar": "Arabic translation of the headline accurately",
+    "time": "Relative time (e.g., 2 hours ago, 10 mins ago)"
+  }
+]`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      contents: prompt,
+      config: {
+         systemInstruction: "You are a live news fetching agent. Always reply with raw JSON only. Do not wrap with markdown.",
+         temperature: 0.1,
+         tools: [{ googleSearch: {} }]
+      }
+    });
+
+    if (!response || !response.text) {
+      throw new Error("Failed to generate response");
+    }
+
+    const text = response.text;
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJson);
+  } catch (error) {
+    console.error("News fetch error:", error);
+    throw error;
+  }
+}
+

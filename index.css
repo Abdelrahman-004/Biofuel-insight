@@ -8,8 +8,39 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans;
+    @apply bg-slate-950 text-slate-200 font-sans;
   }
+}
+
+/* Custom Leaflet Map Dark Theme Overrides */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+.leaflet-container {
+  background: #0a0a0a !important;
+  font-family: inherit !important;
+}
+.custom-leaflet-icon {
+  background: transparent;
+  border: none;
+}
+.custom-map-tooltip {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+  color: white !important;
+  font-weight: 800 !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+.custom-map-tooltip::before {
+  display: none !important; /* Hide the little directional triangle arrow */
 }
 
 @layer components {

@@ -10,7 +10,8 @@ export const LOCATIONS = [
 
 export const TECHNOLOGY_CATEGORIES = [
   "Biofuel",
-  "Renewable Energy"
+  "Renewable Energy",
+  "Green Hydrogen"
 ];
 
 export const BIOFUEL_FEEDSTOCKS = [
@@ -26,7 +27,9 @@ export const BIOFUEL_FEEDSTOCKS = [
 export const RENEWABLE_ENERGY_TYPES = [
   "Solar PV",
   "Wind",
-  "Waste-to-Energy"
+  "Waste-to-Energy",
+  "Green Hydrogen Electrolysis",
+  "Carbon Capture (Direct Air Capture)"
 ];
 
 export const translateTerm = (term: string): string => {
@@ -39,7 +42,8 @@ export const translateTerm = (term: string): string => {
     "Nizwa - Industrial Estate": "نزوى - مدينة نزوى الصناعية",
     "Buraimi - Industrial Estate": "البريمي - المدينة الصناعية",
     "Biofuel": "الوقود الحيوي",
-    "Renewable Energy": "الطاقة المتجددة",
+    "Renewable Energy": "الطاقة المتجددة والخضراء",
+    "Green Hydrogen": "الهيدروجين الأخضر",
     "Algae": "الطحالب الدقيقة",
     "Date Seeds": "نوى التمر",
     "Waste Cooking Oil": "زيوت الطبخ المستعملة",
@@ -47,9 +51,11 @@ export const translateTerm = (term: string): string => {
     "Agricultural Residue": "المخلفات الزراعية",
     "Biogas": "الغاز الحيوي",
     "Bioethanol": "الإيثانول الحيوي",
-    "Solar PV": "الطاقة الشمسية الكهروضوئية",
+    "Solar PV": "الطاقة الشمسية (PV)",
     "Wind": "طاقة الرياح",
-    "Waste-to-Energy": "تحويل النفايات إلى طاقة"
+    "Waste-to-Energy": "تحويل النفايات إلى طاقة",
+    "Green Hydrogen Electrolysis": "التحليل الكهربائي (الهيدروجين الأخضر)",
+    "Carbon Capture (Direct Air Capture)": "التقاط المباشر للكربون (DAC)"
   };
   return dictionary[term] || term;
 };

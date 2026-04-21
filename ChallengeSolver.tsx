@@ -119,20 +119,20 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-            <div className="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
-            <div className="bg-blue-600/10 px-8 py-6 border-b border-slate-800 flex justify-between items-center">
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div className="bg-blue-50 px-8 py-6 border-b border-slate-200 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
-                <h2 className="text-2xl font-black text-white flex items-center tracking-tight">
-                  <i className="fas fa-microscope mr-3 text-blue-400"></i>
+                <h2 className="text-2xl font-black text-slate-900 flex items-center tracking-tight">
+                  <i className="fas fa-microscope mr-3 text-blue-600"></i>
                   {isArabic ? 'الذكاء الاصطناعي لحل تحديات الوقود الحيوي' : 'Oman Biofuel Challenge Solver AI'}
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تحديد وحل العقبات العلمية في أبحاث الوقود الحيوي' : 'Identify and solve scientific bottlenecks in Oman\'s biofuel research.'}</p>
+                <p className="text-slate-600 text-sm mt-1">{isArabic ? 'تحديد وحل العقبات العلمية في أبحاث الوقود الحيوي' : 'Identify and solve scientific bottlenecks in Oman\'s biofuel research.'}</p>
               </div>
               
               <select 
                 value={localLanguage}
                 onChange={(e) => setLocalLanguage(e.target.value)}
-                className="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-1.5 text-blue-400 outline-none"
+                className="bg-white text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-blue-600 outline-none shadow-sm"
               >
                 <option value="Arabic">العربية (Arabic)</option>
                 <option value="English">English</option>
@@ -152,7 +152,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     key={i}
                     type="button"
                     onClick={() => setTopic(ex)}
-                    className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-blue-400 hover:border-blue-500/50 transition-all"
+                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-white hover:text-blue-600 hover:border-blue-300 transition-all shadow-sm"
                   >
                     {ex}
                   </button>
@@ -164,13 +164,13 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder={isArabic ? 'مثال: تحمل الطحالب للملوحة العالية، كفاءة استخلاص الزيت...' : "e.g., Algae cultivation in high salinity, Date seed oil extraction efficiency..."}
-                  className="flex-grow px-6 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none transition placeholder:text-slate-500"
+                  className="flex-grow px-6 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition placeholder:text-slate-400"
                   dir={isArabic ? 'rtl' : 'ltr'}
                 />
                 <button 
                   disabled={isLoading || !topic.trim()}
                   className={`px-8 py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-lg ${
-                    isLoading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
+                    isLoading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
                   }`}
                 >
                   {isLoading ? (
@@ -190,7 +190,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
           </div>
 
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center">
               <i className="fas fa-exclamation-circle mr-2"></i>
               {error}
             </div>
