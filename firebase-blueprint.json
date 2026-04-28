@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile containing role and verification status.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["RESEARCHER", "INVESTOR"] },
+        "name": { "type": "string" },
+        "institution": { "type": "string" },
+        "fundingCapacity": { "type": "number" },
+        "isVerified": { "type": "boolean" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["email", "role", "name", "createdAt"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Biofuel project submitted by an researcher.",
+      "type": "object",
+      "properties": {
+        "titleEn": { "type": "string" },
+        "titleAr": { "type": "string" },
+        "type": { "type": "string" },
+        "location": { "type": "string" },
+        "fundingRequired": { "type": "number" },
+        "trl": { "type": "number" },
+        "roi": { "type": "number" },
+        "payback": { "type": "number" },
+        "matchScore": { "type": "number" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "institution": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Verified", "Active", "Funded"] },
+        "risk": { "type": "string" },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["titleEn", "titleAr", "type", "location", "fundingRequired", "trl", "authorId", "authorName", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles."
+    },
+    "projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Stores project details."
+    }
+  }
+}

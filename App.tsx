@@ -4,14 +4,16 @@ import { Home } from './Home';
 import { InputForm } from './InputForm';
 import { StandardsChecker } from './StandardsChecker';
 import { ProposalGenerator } from './ProposalGenerator';
-import { LiveMarketsDashboard } from './LiveMarketsDashboard';
+import { Marketplace } from './Marketplace';
 import { GisMap } from './GisMap';
 
 interface NavbarProps {
   activeTab: string;
-  onTabChange: (tab: 'HOME' | 'LIVE_MARKETS' | 'GIS_MAP' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
+  onTabChange: (tab: 'HOME' | 'MARKETPLACE' | 'GIS_MAP' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES') => void;
   language: 'English' | 'Arabic';
   onLanguageChange: (lang: 'English' | 'Arabic') => void;
+  theme: 'dark' | 'light';
+  onThemeChange: (theme: 'dark' | 'light') => void;
 }
 
 const BiofuelOmanLogo = () => (
@@ -61,10 +63,10 @@ const BiofuelOmanLogo = () => (
   </svg>
 );
 
-const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, onLanguageChange }) => {
+const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, onLanguageChange, theme, onThemeChange }) => {
   const isArabic = language === 'Arabic';
   return (
-    <nav className="bg-slate-950/90 backdrop-blur-2xl text-white border-b border-white/5 sticky top-0 z-50 transition-all shadow-sm">
+    <nav className="bg-[var(--nav-bg)] backdrop-blur-2xl text-[var(--text-primary)] sticky top-0 z-50 transition-all border-b border-[var(--border-glow)] shadow-none">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
@@ -74,14 +76,14 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
               onClick={() => onTabChange('HOME')}
             >
               <BiofuelOmanLogo />
-              <span className="text-xl font-black tracking-tighter text-white group-hover:text-emerald-400 transition-colors mx-3">
-                OMAN <span className="text-emerald-500">ECOSYNC</span>
+              <span className="text-xl font-black tracking-tighter text-[var(--text-primary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors mx-3">
+                {language === "Arabic" ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
               </span>
             </div>
             
             <div className="hidden lg:flex items-center space-x-4 rtl:space-x-reverse">
               {[
-                { id: 'LIVE_MARKETS', label: isArabic ? 'مؤشرات السوق' : 'Live Markets', icon: 'fa-chart-pie' },
+                { id: 'MARKETPLACE', label: isArabic ? 'منصة الاستثمار الذكية' : 'Smart Marketplace', icon: 'fa-handshake' },
                 { id: 'GIS_MAP', label: isArabic ? 'خريطة GIS' : 'GIS Map', icon: 'fa-map-marked-alt' },
               ].map(item => (
                 <button 
@@ -89,8 +91,8 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
                   onClick={() => onTabChange(item.id as any)}
                   className={`px-5 py-2.5 rounded-full transition-all text-xs font-black uppercase tracking-widest border flex items-center ${
                     activeTab === item.id 
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
-                      : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30 text-[var(--accent-emerald)] shadow-[0_0_15px_var(--border-glow)]' 
+                      : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
                   }`}
                 >
                   <i className={`fas ${item.icon} mr-2 flex-shrink-0 rtl:ml-2 rtl:mr-0`}></i>
@@ -102,14 +104,21 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
 
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
             <button
-              onClick={() => onLanguageChange(isArabic ? 'English' : 'Arabic')}
-              className="px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700 text-white rounded-full border border-slate-700 transition flex items-center text-xs font-bold"
+              onClick={() => onThemeChange(theme === 'dark' ? 'light' : 'dark')}
+              className="px-3 py-2.5 bg-[var(--card-bg)] hover:bg-[var(--border-glow)] text-[var(--text-primary)] rounded-full border border-[var(--border-glow)] transition flex items-center text-xs font-bold shadow-sm"
+              title="Toggle Theme"
             >
-              <i className="fas fa-globe mx-2 text-emerald-400"></i>
+              <i className={`fas ${theme === 'dark' ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-400'}`}></i>
+            </button>
+            <button
+              onClick={() => onLanguageChange(isArabic ? 'English' : 'Arabic')}
+              className="px-4 py-2.5 bg-[var(--card-bg)] hover:bg-[var(--border-glow)] text-[var(--text-primary)] rounded-full border border-[var(--border-glow)] transition flex items-center text-xs font-bold shadow-sm"
+            >
+              <i className="fas fa-globe mx-2 text-[var(--accent-emerald)]"></i>
               {isArabic ? 'EN' : 'AR'}
             </button>
-            <div className="w-px h-6 bg-slate-700 mx-2 hidden md:block"></div>
-            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:border-emerald-500 transition-colors text-slate-300 hover:text-white">
+            <div className="w-px h-6 bg-[var(--border-glow)] mx-2 hidden md:block"></div>
+            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--card-bg)] border border-[var(--border-glow)] hover:border-[var(--accent-emerald)] shadow-sm transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                <i className="fas fa-user-circle text-xl"></i>
             </button>
           </div>
@@ -128,11 +137,11 @@ interface SidebarProps {
 }
 
 const SIDEBAR_ITEMS = [
-  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-emerald-500' },
+  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-[var(--accent-emerald)]' },
   { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-500' },
   { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-500' },
-  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-emerald-400' },
-  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-slate-200' },
+  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
+  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-[var(--text-secondary)] ' },
   { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature', color: '#8B5CF6', colorClass: 'text-violet-500' },
   { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map', color: '#D97706', colorClass: 'text-amber-600' }
 ];
@@ -140,13 +149,12 @@ const SIDEBAR_ITEMS = [
 const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language, isOpen, onToggle }) => {
   const isArabic = language === 'Arabic';
   return (
-    <aside className={`bg-[#05080A]/90 backdrop-blur-2xl border-white/5 transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0
-      ${isArabic ? 'border-l shadow-[-4px_0_24px_rgba(0,0,0,0.5)]' : 'border-r shadow-[4px_0_24px_rgba(0,0,0,0.5)]'}
+    <aside className={`bg-[var(--nav-bg)] backdrop-blur-2xl transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0 shadow-none border-t-0
       ${isOpen ? 'w-72' : 'w-20'}
     `}>
       <button 
         onClick={onToggle}
-        className={`mx-4 mb-8 flex items-center justify-center w-10 h-10 rounded-xl bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 transition ${isOpen ? 'self-end' : 'mx-auto'}`}
+        className={`mx-4 mb-8 flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--bg-main)] hover:bg-[var(--border-glow)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition border border-[var(--border-glow)] ${isOpen ? 'self-end' : 'mx-auto'}`}
       >
          <i className={`fas fa-chevron-${isOpen ? (isArabic ? 'right' : 'left') : (isArabic ? 'left' : 'right')}`}></i>
       </button>
@@ -161,20 +169,20 @@ const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language,
                  onClick={() => onTabChange(item.id)}
                  className={`relative flex items-center p-3 rounded-lg transition-all group mb-1 justify-start overflow-hidden ${
                    isActive 
-                     ? 'bg-transparent text-white' 
-                     : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'
+                     ? 'bg-transparent text-[var(--text-primary)]' 
+                     : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glow)]'
                  }`}
                  title={isArabic ? item.labelAr : item.labelEn}
                >
                  {isActive && (
                    <div 
-                     className={`absolute ${isArabic ? 'right-0' : 'left-0'} top-0 bottom-0 w-1 rounded-full`} 
+                     className={`absolute ${isArabic ? 'right-0' : 'left-0'} top-0 bottom-0 w-1 rounded-full dark:opacity-100 opacity-80`} 
                      style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}` }}
                    />
                  )}
                  <i 
-                   className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'} transition-all`}
-                   style={isActive ? { color: item.color, textShadow: `0 0 15px ${item.color}` } : {}}
+                   className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'} transition-all group-hover:bg-black/5 dark:group-hover:bg-transparent p-1.5 rounded-lg`}
+                   style={isActive ? { color: item.color, textShadow: document.documentElement.classList.contains('dark') ? `0 0 15px ${item.color}` : 'none' } : {}}
                  ></i>
                  <span 
                    className="text-xs font-black uppercase tracking-wider whitespace-nowrap text-left rtl:text-right transition-all"
@@ -191,15 +199,15 @@ const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language,
   );
 };
 
-const Footer: React.FC = () => {
+const Footer: React.FC<{ language: string }> = ({ language }) => {
   return (
-    <footer className="bg-black text-slate-500 py-20 border-t border-white/5">
+    <footer className="bg-[var(--card-bg)] shadow-card text-[var(--text-secondary)] py-20 border-t border-[var(--border-glow)]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-16 items-start">
           <div className="text-center md:text-left">
             <div className="flex items-center space-x-2 mb-4 opacity-50 grayscale hover:grayscale-0 transition-all">
               <BiofuelOmanLogo />
-              <span className="text-xs font-black tracking-tighter text-white">
+              <span className="text-xs font-black tracking-tighter text-[var(--text-primary)]">
                 OMAN ECOSYNC
               </span>
             </div>
@@ -209,26 +217,26 @@ const Footer: React.FC = () => {
           </div>
           <div className="flex flex-col items-center space-y-6">
             <div className="flex space-x-12">
-              <a href="#" className="hover:text-green-500 transition text-[10px] font-black uppercase tracking-[0.3em]">Terms</a>
-              <a href="#" className="hover:text-green-500 transition text-[10px] font-black uppercase tracking-[0.3em]">Policy</a>
-              <a href="#" className="hover:text-green-500 transition text-[10px] font-black uppercase tracking-[0.3em]">Contact</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Terms</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Policy</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Contact</a>
             </div>
             <div className="flex space-x-8">
-              <i className="fab fa-linkedin hover:text-green-500 cursor-pointer transition text-xl"></i>
-              <i className="fab fa-twitter hover:text-green-500 cursor-pointer transition text-xl"></i>
-              <i className="fab fa-instagram hover:text-green-500 cursor-pointer transition text-xl"></i>
-              <i className="fas fa-envelope hover:text-green-500 cursor-pointer transition text-xl"></i>
+              <i className="fab fa-linkedin hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
+              <i className="fab fa-twitter hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
+              <i className="fab fa-instagram hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
+              <i className="fas fa-envelope hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
             </div>
           </div>
           <div className="text-center md:text-right">
-            <h4 className="text-white font-black uppercase tracking-widest text-[10px] mb-4">Strategic Partners</h4>
+            <h4 className="text-[var(--text-primary)] font-black uppercase tracking-widest text-[10px] mb-4">{language === 'Arabic' ? "شركاء استراتيجيون" : "Strategic Partners"}</h4>
             <p className="text-[10px] leading-relaxed opacity-50 font-bold uppercase tracking-widest">
               Sohar Free Zone • SEZAD • Salalah Port • ASYAD
             </p>
           </div>
         </div>
-        <div className="mt-20 pt-10 border-t border-white/5 text-center">
-          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-slate-600">
+        <div className="mt-20 pt-10 border-t border-[var(--border-glow)] text-center">
+          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-[var(--text-secondary)]">
             © 2026 OMAN ECOSYNC. PROPELLED BY ADVANCED INTELLIGENCE.
           </p>
         </div>
@@ -259,7 +267,7 @@ const ACTIVE_TAB_KEY = 'biofuel_insight_active_tab';
 const CURRENT_ANALYSIS_KEY = 'biofuel_insight_current_analysis';
 const CURRENT_RESEARCH_KEY = 'biofuel_insight_current_research';
 
-type MainTab = 'HOME' | 'LIVE_MARKETS' | 'GIS_MAP' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
+type MainTab = 'HOME' | 'MARKETPLACE' | 'GIS_MAP' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
 type FeasibilityView = 'ANALYZE' | 'HISTORY' | 'COMPARE';
 type ResearchView = 'ANALYZE' | 'HISTORY';
 
@@ -268,6 +276,7 @@ export default function App() {
   const [feasibilityView, setFeasibilityView] = React.useState<FeasibilityView>('ANALYZE');
   const [researchView, setResearchView] = React.useState<ResearchView>('ANALYZE');
   const [language, setLanguage] = React.useState<'English' | 'Arabic'>('Arabic'); // Start with Arabic mostly because user requested Arabic translation first
+  const [theme, setTheme] = React.useState<'dark' | 'light'>('dark');
   const [status, setStatus] = React.useState<AnalysisStatus>('IDLE');
   const [analysis, setAnalysis] = React.useState<BioFuelAnalysis | null>(null);
   const [researchAnalysis, setResearchAnalysis] = React.useState<ResearchImplementationAnalysis | null>(null);
@@ -331,6 +340,11 @@ export default function App() {
     const savedTab = localStorage.getItem(ACTIVE_TAB_KEY);
     if (savedTab) setActiveMainTab(savedTab as MainTab);
 
+    const savedTheme = localStorage.getItem('omaneocs_theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      setTheme(savedTheme);
+    }
+
     const savedAnalysis = localStorage.getItem(CURRENT_ANALYSIS_KEY);
     if (savedAnalysis) {
       try { 
@@ -381,6 +395,15 @@ export default function App() {
     if (researchAnalysis) localStorage.setItem(CURRENT_RESEARCH_KEY, JSON.stringify(researchAnalysis));
     else localStorage.removeItem(CURRENT_RESEARCH_KEY);
   }, [researchAnalysis]);
+
+  React.useEffect(() => {
+    localStorage.setItem('omaneocs_theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   const saveToUnifiedHistory = (project: Omit<UnifiedProject, 'id' | 'createdAt'>) => {
     const newProject: UnifiedProject = {
@@ -567,7 +590,7 @@ export default function App() {
               key={tab.id}
               onClick={() => setFeasibilityView(tab.id as FeasibilityView)}
               className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                feasibilityView === tab.id ? 'bg-emerald-500 text-white shadow-lg translate-y-[-2px]' : 'text-emerald-400 hover:text-white'
+                feasibilityView === tab.id ? 'bg-[var(--accent-emerald)] text-[var(--text-primary)] shadow-card translate-y-[-2px]' : 'text-[var(--accent-emerald)] dark:text-emerald-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
               }`}
             >
               <i className={`fas ${tab.icon} mr-2`}></i> {tab.label}
@@ -582,23 +605,23 @@ export default function App() {
       </div>
 
       {feasibilityView === 'ANALYZE' && (
-        <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-          <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+        <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+          <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                 {language === 'Arabic' ? (
-                  <>أداة <span className="text-emerald-500 underline decoration-emerald-500/30 glow-text-emerald">تحليل الجدوى الاستثمارية</span></>
+                  <>أداة <span className="text-[var(--accent-emerald)] underline decoration-emerald-500/30 glow-text-emerald">تحليل الجدوى الاستثمارية</span></>
                 ) : (
-                  <>Investor <span className="text-emerald-500 underline decoration-emerald-500/30 glow-text-emerald">Feasibility</span> Tool</>
+                  <>Investor <span className="text-[var(--accent-emerald)] underline decoration-emerald-500/30 glow-text-emerald">Feasibility</span> Tool</>
                 )}
               </h1>
-              <p className="text-md text-slate-400 max-w-2xl mx-auto">
+              <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                 {language === 'Arabic' ? 'قم بتقييم الجدوى الاقتصادية والتقنية لمسارات الوقود الحيوي والطاقة ضمن المناطق الاستراتيجية في عُمان.' : "Evaluate technical and economic viability for Biofuel, Hydrogen, and Carbon pathways across Oman's strategic zones."}
               </p>
             </div>
           </section>
 
-          <section className="max-w-5xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
+          <section className="max-w-5xl mx-auto px-4 py-8 relative z-10 bg-[var(--bg-main)]">
             <InputForm 
               onAnalyze={handleAnalyze} 
               isLoading={status === 'ANALYZING'} 
@@ -614,13 +637,13 @@ export default function App() {
                 <div className="flex space-x-2">
                   {[0, 1, 2].map(i => <div key={i} className="w-3 h-3 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }}></div>)}
                 </div>
-                <p className="text-slate-500 font-black uppercase tracking-widest text-xs">AI Assessment Engine Computing Regional Benchmarks...</p>
+                <p className="text-[var(--text-secondary)] font-black uppercase tracking-widest text-xs">AI Assessment Engine Computing Regional Benchmarks...</p>
               </div>
             </section>
           )}
 
           {status === 'COMPLETED' && analysis && (
-            <section id="dashboard-view" className="max-w-7xl mx-auto px-4 pb-20 bg-[#05080A]">
+            <section id="dashboard-view" className="max-w-7xl mx-auto px-4 pb-20 bg-[var(--bg-main)]">
               <Dashboard data={analysis} language={language} />
             </section>
           )}
@@ -628,7 +651,7 @@ export default function App() {
       )}
 
       {feasibilityView === 'HISTORY' && (
-        <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
+        <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[var(--bg-main)]">
           <ProjectHistory 
             history={history} 
             onSelect={handleSelectFromHistory} 
@@ -639,14 +662,14 @@ export default function App() {
       )}
 
       {feasibilityView === 'COMPARE' && (
-        <section className="max-w-7xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
+        <section className="max-w-7xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[var(--bg-main)]">
           <CompareProjects entries={comparisonItems} onBack={() => setFeasibilityView('HISTORY')} />
         </section>
       )}
     </>
   );
   return (
-    <div className="h-screen flex flex-col bg-slate-950 font-sans selection:bg-emerald-100/30 selection:text-emerald-400 transition-colors duration-500 overflow-hidden text-slate-200" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
+    <div className="h-screen flex flex-col font-sans bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--accent-emerald)]/30 selection:text-[var(--accent-emerald)] transition-colors duration-500 overflow-hidden" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
       <TopNavbar 
         activeTab={activeMainTab} 
         onTabChange={(tab) => {
@@ -655,6 +678,8 @@ export default function App() {
         }} 
         language={language}
         onLanguageChange={setLanguage}
+        theme={theme}
+        onThemeChange={setTheme}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -672,14 +697,14 @@ export default function App() {
         <main className="flex-1 overflow-y-auto">
           <div className="min-h-full flex flex-col">
             {activeMainTab === 'HOME' && <Home onStart={(tab) => setActiveMainTab(tab)} language={language} />}
-            {activeMainTab === 'LIVE_MARKETS' && (
+            {activeMainTab === 'MARKETPLACE' && (
               <section className="max-w-7xl mx-auto px-4 py-8 flex-1">
-                <LiveMarketsDashboard language={language} />
+                <Marketplace language={language} />
               </section>
             )}
             {activeMainTab === 'GIS_MAP' && (
               <section className="max-w-7xl mx-auto px-4 py-8 flex-1">
-                <GisMap language={language} />
+                <GisMap language={language} theme={theme} />
               </section>
             )}
         {(activeMainTab === 'INVESTOR_FEASIBILITY' || activeMainTab === 'FEASIBILITY') && renderFeasibilityTool()}
@@ -695,7 +720,7 @@ export default function App() {
                     key={tab.id}
                     onClick={() => setResearchView(tab.id as ResearchView)}
                     className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                      researchView === tab.id ? 'bg-blue-500 text-white shadow-lg translate-y-[-2px]' : 'text-blue-400 hover:text-white'
+                      researchView === tab.id ? 'bg-blue-500 text-white shadow-card translate-y-[-2px]' : 'text-blue-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <i className={`fas ${tab.icon} mr-2`}></i> {tab.label}
@@ -710,8 +735,8 @@ export default function App() {
             </div>
 
             {researchView === 'ANALYZE' && (
-              <div className="bg-[#05080A] min-h-screen">
-                <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+              <div className="bg-[var(--bg-main)] min-h-screen">
+                <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
                   <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                       {language === 'Arabic' ? (
@@ -720,13 +745,13 @@ export default function App() {
                         <>Research Implementation <span className="text-blue-500 underline decoration-blue-500/30">Analyzer</span></>
                       )}
                     </h1>
-                    <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                    <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                       {language === 'Arabic' ? 'قم بسد الفجوة بين الأبحاث المخبرية والإنتاج التجريبي. تقييم علمي دقيق مخصص للباحثين.' : 'Bridge the gap between laboratory yields and pilot-scale production. Purely scientific assessment for researchers.'}
                     </p>
                   </div>
                 </section>
 
-                <section className="max-w-5xl mx-auto px-4 py-8 mb-16 relative z-10 bg-[#05080A]">
+                <section className="max-w-5xl mx-auto px-4 py-8 mb-16 relative z-10 bg-[var(--bg-main)]">
                   <ResearchInputForm 
                     onAnalyze={handleResearchAnalyze} 
                     isLoading={status === 'ANALYZING'} 
@@ -742,13 +767,13 @@ export default function App() {
                       <div className="flex space-x-2">
                         {[0, 1, 2].map(i => <div key={i} className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }}></div>)}
                       </div>
-                      <p className="text-slate-500 font-black uppercase tracking-widest text-xs">AI Scaling Engine Computing Scientific Benchmarks...</p>
+                      <p className="text-[var(--text-secondary)] font-black uppercase tracking-widest text-xs">AI Scaling Engine Computing Scientific Benchmarks...</p>
                     </div>
                   </section>
                 )}
 
                 {status === 'COMPLETED' && researchAnalysis && (
-                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20 bg-[#05080A]">
+                  <section id="research-dashboard" className="max-w-7xl mx-auto px-4 pb-20 bg-[var(--bg-main)]">
                     <ResearchDashboard data={researchAnalysis} language={language} />
                   </section>
                 )}
@@ -756,7 +781,7 @@ export default function App() {
             )}
 
             {researchView === 'HISTORY' && (
-              <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[#05080A]">
+              <section className="max-w-5xl mx-auto px-4 py-12 animate-in fade-in duration-500 bg-[var(--bg-main)]">
                 <ResearchHistory 
                   history={researchHistory} 
                   onSelect={handleSelectFromResearchHistory}
@@ -767,8 +792,8 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'SOLVER' && (
-          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+            <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
@@ -777,12 +802,12 @@ export default function App() {
                     <>Scientific <span className="text-amber-500 underline decoration-amber-500/30">Challenge</span> Solver</>
                   )}
                 </h1>
-                <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'حل الاختناقات التقنية في قطاع الوقود الحيوي في عُمان باستخدام وكلاء الذكاء الاصطناعي.' : "Solving technical bottlenecks in Oman's biofuel ecosystem through multi-agent scientific reasoning."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[var(--bg-main)]">
               <ChallengeSolver 
                 history={challengeHistory} 
                 initialInputs={initialChallengeInputs}
@@ -803,22 +828,22 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'OPTIMIZER' && (
-          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+            <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>التحسين <span className="text-emerald-400 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
+                    <>التحسين <span className="text-[var(--accent-emerald)] dark:text-emerald-400 underline decoration-emerald-500/30">المالي والانبعاثات</span></>
                   ) : (
-                    <>Profit & <span className="text-emerald-400 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
+                    <>Profit & <span className="text-[var(--accent-emerald)] dark:text-emerald-400 underline decoration-emerald-500/30">Carbon</span> Optimizer</>
                   )}
                 </h1>
-                <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'ذكاء اصطناعي لتعظيم الإيرادات وتقليل الانبعاثات الكربونية لمشاريع الوقود الحيوي.' : 'Strategic multi-agent AI to maximize revenue and minimize emissions for biofuel projects.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[#05080A]">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 bg-[var(--bg-main)]">
               <OptimizerTool 
                 history={optimizerHistory}
                 initialInputs={initialOptimizerInputs}
@@ -840,29 +865,29 @@ export default function App() {
           </div>
         )}
         {activeMainTab === 'STANDARDS' && (
-          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+            <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-slate-200 underline decoration-slate-200/30">الامتثال والمعايير</span></>
+                    <>أداة <span className="text-[var(--text-secondary)]  underline decoration-slate-200/30">الامتثال والمعايير</span></>
                   ) : (
-                    <>Standards <span className="text-slate-200 underline decoration-slate-200/30">Compliance</span> Checker</>
+                    <>Standards <span className="text-[var(--text-secondary)]  underline decoration-slate-200/30">Compliance</span> Checker</>
                   )}
                 </h1>
-                <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'التحقق من نتائج المعامل المختبرية للوقود الحيوي واعتماديتها حسب المواصفات (ASTM/EN).' : 'Verify your biofuel lab results against international standards (ASTM/EN) for commercial viability in Oman.'}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[#05080A]">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[var(--bg-main)]">
               <StandardsChecker language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'PROPOSAL' && (
-          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+            <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
@@ -871,19 +896,19 @@ export default function App() {
                     <>Automated <span className="text-violet-500 underline decoration-violet-500/30">Proposal</span> Generator</>
                   )}
                 </h1>
-                <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'إصدار مقترحات احترافية تستند إلى البيانات الموثوقة والمخصصة لمنظومة التمويل في عُمان.' : "Generate professional, data-driven grant and investment proposals tailored for Oman's funding ecosystem."}
                 </p>
               </div>
             </section>
-            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[#05080A]">
+            <section className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-20 bg-[var(--bg-main)]">
               <ProposalGenerator language={language} />
             </section>
           </div>
         )}
         {activeMainTab === 'ZONES' && (
-          <div className="animate-in fade-in duration-500 bg-[#05080A] min-h-screen">
-            <section className="bg-[#05080A] text-white border-b border-white/10 py-12 px-4">
+          <div className="animate-in fade-in duration-500 bg-[var(--bg-main)] min-h-screen">
+            <section className="bg-[var(--bg-main)] text-[var(--text-primary)] border-b border-[var(--border-glow)] py-12 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
@@ -892,23 +917,23 @@ export default function App() {
                     <>Strategic <span className="text-amber-600 underline decoration-amber-600/30">Free Zones</span> Database</>
                   )}
                 </h1>
-                <p className="text-md text-slate-400 max-w-2xl mx-auto">
+                <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
                   {language === 'Arabic' ? 'استكشف المناطق الاستراتيجية (الدقم، صحار، صلالة) لتحديد الموقع المثالي والدعم الحكومي المتوفر.' : "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location."}
                 </p>
               </div>
             </section>
-            <section className="max-w-6xl mx-auto px-4 py-12 bg-[#05080A]">
+            <section className="max-w-6xl mx-auto px-4 py-12 bg-[var(--bg-main)]">
               <OmanFreeZones language={language} />
             </section>
           </div>
         )}
-          <Footer />
+          <Footer language={language} />
           
           {/* Global Legal Disclaimer Footer */}
-          <footer className="bg-slate-950 text-slate-400 py-6 text-center text-xs border-t border-slate-800 flex-shrink-0 z-50 mt-auto">
+          <footer className="bg-[var(--bg-main)] text-[var(--text-secondary)] py-6 text-center text-xs border-t border-[var(--border-glow)] flex-shrink-0 z-50 mt-auto">
             <div className="max-w-5xl mx-auto px-6">
-              <p className="mb-2 font-bold text-slate-300 text-sm flex justify-center items-center">
-                <i className="fas fa-shield-alt mr-2 rtl:ml-2 rtl:mr-0 text-slate-500"></i>
+              <p className="mb-2 font-bold text-[var(--text-secondary)] text-sm flex justify-center items-center">
+                <i className="fas fa-shield-alt mr-2 rtl:ml-2 rtl:mr-0 text-[var(--text-secondary)]"></i>
                 {language === 'Arabic' ? 'إخلاء مسؤولية قانوني (Disclaimer)' : 'Legal Disclaimer'}
               </p>
               <p className="max-w-4xl mx-auto leading-relaxed text-[10px] md:text-xs">
@@ -930,6 +955,7 @@ export default function App() {
         onEdit={handleEditProject}
         onDelete={handleDeleteProject}
         onExport={handleExportReport}
+        language={language}
       />
     </div>
   );

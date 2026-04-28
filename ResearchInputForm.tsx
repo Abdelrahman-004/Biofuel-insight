@@ -64,11 +64,11 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-white/10 bg-[#0F172A] text-white focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-none transition placeholder:text-slate-500";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-[var(--border-glow)] bg-[var(--bg-main)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-none transition placeholder:text-[var(--text-secondary)]";
 
   return (
-    <div className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#3B82F6]/50 transition-all duration-300 overflow-hidden">
-      <div className="bg-[#3B82F6]/10 px-6 py-4 border-b border-white/5 flex justify-between items-center">
+    <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-2xl  border border-[var(--border-glow)] hover:border-[#3B82F6]/50 transition-all duration-300 overflow-hidden">
+      <div className="bg-[#3B82F6]/10 px-6 py-4 border-b border-[var(--border-glow)] flex justify-between items-center">
         <h2 className="text-[#3B82F6] font-bold flex items-center drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
           <i className="fas fa-microscope mr-2 text-[#3B82F6]"></i>
           {isArabic ? 'معايير البحث (من المختبر إلى النطاق التجريبي)' : 'Research Parameters (Lab to Pilot-Scale)'}
@@ -76,17 +76,17 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
         
         <select 
           value={localLanguage}
-          onChange={(e) => setLocalLanguage(e.target.value)}
-          className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#3B82F6] outline-none shadow-sm"
+          onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
+          className="bg-[var(--card-bg)] shadow-card text-sm border border-[var(--border-glow)] rounded-lg px-3 py-1.5 text-[#3B82F6] outline-none shadow-sm"
         >
-          <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
-          <option value="English" className="bg-[#0D141A] text-white">English</option>
+          <option value="Arabic" className="bg-[var(--card-bg)] text-[var(--text-primary)]">العربية (Arabic)</option>
+          <option value="English" className="bg-[var(--card-bg)] text-[var(--text-primary)]">English</option>
         </select>
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
             <select 
               value={inputs.biofuelType}
               onChange={(e) => setInputs({...inputs, biofuelType: e.target.value})}
@@ -105,12 +105,12 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
                   };
                   text = dict[t] || t;
                 }
-                return <option key={t} value={t} className="bg-slate-800 text-white">{text}</option>;
+                return <option key={t} value={t} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{text}</option>;
               })}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'نوع المادة الخام' : 'Feedstock Type'}</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'نوع المادة الخام' : 'Feedstock Type'}</label>
             <input 
               type="text" 
               value={inputs.feedstockType}
@@ -124,7 +124,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'مسار التحويل' : 'Conversion Pathway'}</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'مسار التحويل' : 'Conversion Pathway'}</label>
             <select 
               value={inputs.conversionPathway}
               onChange={(e) => setInputs({...inputs, conversionPathway: e.target.value})}
@@ -141,12 +141,12 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
                   };
                   text = dict[p] || p;
                 }
-                return <option key={p} value={p} className="bg-slate-800 text-white">{text}</option>;
+                return <option key={p} value={p} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{text}</option>;
               })}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'عائد المختبر' : 'Lab Yield'} (L/kg or m3/ton)</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'عائد المختبر' : 'Lab Yield'} (L/kg or m3/ton)</label>
             <input 
               type="text" 
               value={inputs.labYield}
@@ -160,7 +160,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'الكفاءة' : 'Efficiency'} (%)</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'الكفاءة' : 'Efficiency'} (%)</label>
             <input 
               type="number" 
               value={inputs.efficiency}
@@ -169,7 +169,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'مستوى النضج التكنولوجي' : 'TRL'} (1-9)</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'مستوى النضج التكنولوجي' : 'TRL'} (1-9)</label>
             <input 
               type="number" 
               min="1" max="9"
@@ -179,7 +179,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">{isArabic ? 'النطاق التجريبي المستهدف' : 'Target Pilot Scale'}</label>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1 tracking-wider">{isArabic ? 'النطاق التجريبي المستهدف' : 'Target Pilot Scale'}</label>
             <input 
               type="text" 
               value={inputs.scale}
@@ -193,8 +193,8 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
 
         <button 
           disabled={isLoading}
-          className={`w-full py-4 rounded-lg font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${
-            isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+          className={`w-full py-4 rounded-lg font-bold text-[var(--text-primary)] flex items-center justify-center space-x-2 transition-all  ${
+            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
           }`}
         >
           {isLoading ? (

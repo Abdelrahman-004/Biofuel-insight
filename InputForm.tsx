@@ -117,22 +117,22 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
     });
   };
 
-  const inputClasses = "w-full px-4 py-2 rounded-lg border border-white/10 bg-[#0F172A] text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-slate-500";
+  const inputClasses = "w-full px-4 py-2 rounded-lg border border-[var(--border-glow)] bg-[var(--bg-main)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-[var(--text-secondary)]";
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#10B981]/50 transition-all duration-300 overflow-hidden"
+      className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-2xl  border border-[var(--border-glow)] hover:border-[#10B981]/50 transition-all duration-300 overflow-hidden"
     >
-      <div className="bg-[#10B981]/10 px-6 py-4 border-b border-white/5 flex justify-between items-center">
+      <div className="bg-[#10B981]/10 px-6 py-4 border-b border-[var(--border-glow)] flex justify-between items-center">
         <h2 className="text-[#10B981] font-bold flex items-center text-lg drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
           <i className="fas fa-sliders mr-3"></i>
           {isArabic ? 'معايير تحليل الجدوى' : 'Investment-Grade Analysis Parameters'}
         </h2>
       </div>
       <div className="px-6 pt-4 flex flex-wrap gap-2">
-        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
+        <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
         {[
           { name: "Duqm Algae Bio-Hub", loc: "Duqm", cat: "Biofuel", fs: "Algae", prod: 5000, bud: 25000000 },
           { name: "Salalah Wind Phase 2", loc: "Salalah", cat: "Renewable Energy", fs: "Wind", prod: 150000, bud: 45000000 },
@@ -149,7 +149,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               setProduction(ex.prod);
               setBudget(ex.bud);
             }}
-            className="px-3 py-1.5 bg-[#0F172A] border border-white/10 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:border-[#10B981] hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all"
+            className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#10B981] hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all"
           >
             {ex.name}
           </button>
@@ -163,7 +163,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             transition={{ delay: 0.1 }}
             className="md:col-span-2"
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
             <input 
               type="text" 
               value={projectName}
@@ -178,14 +178,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الموقع الاستراتيجي' : 'Strategic Location'}</label>
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الموقع الاستراتيجي' : 'Strategic Location'}</label>
             <select 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-slate-900 text-white">{isArabic ? translateTerm(loc) : loc}</option>)}
+              {LOCATIONS.map(loc => <option key={loc} value={loc} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? translateTerm(loc) : loc}</option>)}
             </select>
           </motion.div>
         </div>
@@ -196,14 +196,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'نوع التكنولوجيا' : 'Technology Category'}</label>
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'نوع التكنولوجيا' : 'Technology Category'}</label>
             <select 
               value={category}
               onChange={(e) => setCategory(e.target.value as any)}
               className={inputClasses}
               dir={isArabic ? "rtl" : "ltr"}
             >
-              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-slate-900 text-white">{isArabic ? translateTerm(cat) : cat}</option>)}
+              {TECHNOLOGY_CATEGORIES.map(cat => <option key={cat} value={cat} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? translateTerm(cat) : cat}</option>)}
             </select>
           </motion.div>
           <motion.div 
@@ -211,7 +211,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
               {category === 'Biofuel' ? (isArabic ? 'المادة الخام الأساسية' : 'Primary Feedstock') : (isArabic ? 'نوع الطاقة' : 'Energy Type')}
             </label>
             <select 
@@ -221,7 +221,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               dir={isArabic ? "rtl" : "ltr"}
             >
               {(category === 'Biofuel' ? BIOFUEL_FEEDSTOCKS : RENEWABLE_ENERGY_TYPES).map(fs => (
-                <option key={fs} value={fs} className="bg-slate-900 text-white">{isArabic ? translateTerm(fs) : fs}</option>
+                <option key={fs} value={fs} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? translateTerm(fs) : fs}</option>
               ))}
             </select>
           </motion.div>
@@ -234,7 +234,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             className="grid grid-cols-1 gap-6"
           >
             <div>
-              <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'مصدر ثاني أكسيد الكربون' : 'CO2 Source'}</label>
+              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'مصدر ثاني أكسيد الكربون' : 'CO2 Source'}</label>
               <select 
                 value={co2Source}
                 onChange={(e) => setCo2Source(e.target.value)}
@@ -247,7 +247,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                     if (src === 'Purchased CO2') text = 'شراء غاز ثاني أكسيد الكربون';
                     if (src === 'Not specified') text = 'غير محدد';
                   }
-                  return <option key={src} value={src} className="bg-slate-900 text-white">{text}</option>;
+                  return <option key={src} value={src} className="bg-[var(--card-bg)] text-[var(--text-primary)]">{text}</option>;
                 })}
               </select>
             </div>
@@ -260,7 +260,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
               {isArabic ? 'الإنتاج المستهدف' : 'Target Production'} ({category === 'Biofuel' ? (isArabic ? 'طن/سنة' : 'Tons/Year') : (isArabic ? 'ميجاوات/سنة' : 'MWh/Year')})
             </label>
             <input 
@@ -276,7 +276,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'ميزانية المستثمر' : 'Investor Budget'} (USD)</label>
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'ميزانية المستثمر' : 'Investor Budget'} (USD)</label>
             <input 
               type="number" 
               value={budget}
@@ -294,7 +294,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">
+              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
                 {isArabic ? 'سعر البيع' : 'Selling Price'} (USD/{isArabic ? 'طن' : 'ton'})
               </label>
               <input 
@@ -314,7 +314,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
               >
-                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
+                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
                 <input 
                   type="number" step="0.01"
                   value={electricityCost}
@@ -327,7 +327,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
               >
-                <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تكلفة العمالة/سنة' : 'Labor Cost/Yr'} (USD)</label>
+                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تكلفة العمالة/سنة' : 'Labor Cost/Yr'} (USD)</label>
                 <input 
                   type="number" 
                   value={laborCost}
@@ -343,8 +343,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           disabled={isLoading}
-          className={`w-full py-5 rounded-lg font-black text-white flex items-center justify-center space-x-3 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] uppercase tracking-widest text-xs ${
-            isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+          className={`w-full py-5 rounded-lg font-black text-[var(--text-primary)] flex items-center justify-center space-x-3 transition-all  uppercase tracking-widest text-xs ${
+            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
           }`}
         >
           {isLoading ? (

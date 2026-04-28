@@ -9,17 +9,18 @@ interface UnifiedHistorySidebarProps {
   onExport: (project: UnifiedProject) => void;
   isOpen: boolean;
   onToggle: () => void;
+  language: string;
 }
 
-const TYPE_CONFIG: Record<ProjectType, { icon: string; color: string; label: string }> = {
-  FEASIBILITY: { icon: 'fa-chart-pie', color: 'text-emerald-400', label: 'Feasibility' },
-  CHALLENGE: { icon: 'fa-lightbulb', color: 'text-blue-400', label: 'Challenge' },
-  OPTIMIZER: { icon: 'fa-rocket', color: 'text-purple-400', label: 'Optimizer' },
-  RESEARCH: { icon: 'fa-microscope', color: 'text-amber-400', label: 'Research' },
+const TYPE_CONFIG: Record<ProjectType, { icon: string; color: string; label: string, labelAr: string }> = {
+  FEASIBILITY: { icon: 'fa-chart-pie', color: 'text-[var(--accent-emerald)] dark:text-emerald-400', label: 'Feasibility', labelAr: 'الجدوى' },
+  CHALLENGE: { icon: 'fa-lightbulb', color: 'text-blue-400', label: 'Challenge', labelAr: 'تحدي' },
+  OPTIMIZER: { icon: 'fa-rocket', color: 'text-purple-400', label: 'Optimizer', labelAr: 'محسن' },
+  RESEARCH: { icon: 'fa-microscope', color: 'text-amber-400', label: 'Research', labelAr: 'بحث' },
 };
 
 export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({ 
-  projects, onSelect, onEdit, onDelete, onExport, isOpen, onToggle 
+  projects, onSelect, onEdit, onDelete, onExport, isOpen, onToggle, language
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -38,28 +39,28 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
         />
       )}
 
-      <aside className={`fixed top-0 right-0 h-full bg-slate-950/90 backdrop-blur-2xl border-l border-white/5 z-50 transition-all duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] flex flex-col ${
+      <aside className={`fixed top-0 right-0 h-full bg-[var(--sidebar-bg)]/95 backdrop-blur-2xl border-l border-[var(--border-dark)] z-50 transition-all duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] flex flex-col ${
         isOpen ? 'w-80' : 'w-0 overflow-hidden border-none'
       }`}>
         <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
-          <h2 className="text-white font-black text-lg flex items-center">
-            <i className="fas fa-folder-tree mr-3 text-emerald-500"></i>
-            Project History
+          <h2 className="text-[var(--text-primary)] font-black text-lg flex items-center">
+            <i className="fas fa-folder-tree mr-3 text-[var(--accent-emerald)] rtl:ml-3 rtl:mr-0"></i>
+            {language === 'Arabic' ? 'سجل المشاريع' : 'Project History'}
           </h2>
-          <button onClick={onToggle} className="text-slate-400 hover:text-white transition">
+          <button onClick={onToggle} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
             <i className="fas fa-times"></i>
           </button>
         </div>
 
         <div className="p-4 border-b border-slate-800 shrink-0">
           <div className="relative">
-            <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <i className="fas fa-search absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-xs"></i>
             <input 
               type="text"
-              placeholder="Search projects..."
+              placeholder={language === 'Arabic' ? "البحث في المشاريع..." : "Search projects..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 pl-9 pr-4 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none transition"
+              className="w-full bg-slate-800/50 border border-slate-700 rounded-lg py-2 pl-9 pr-4 rtl:pr-9 rtl:pl-4 text-xs text-[var(--text-primary)] focus:ring-1 focus:ring-emerald-500 outline-none transition"
             />
           </div>
         </div>
@@ -67,8 +68,8 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
         <div className="flex-grow overflow-y-auto p-4 space-y-3 custom-scrollbar">
           {filteredProjects.length === 0 ? (
             <div className="text-center py-12">
-              <i className="fas fa-ghost text-slate-700 text-4xl mb-3"></i>
-              <p className="text-slate-500 text-xs font-medium">No projects found</p>
+              <i className="fas fa-ghost text-[var(--text-secondary)] text-4xl mb-3"></i>
+              <p className="text-[var(--text-secondary)] text-xs font-medium">{language === 'Arabic' ? "لم يتم العثور على مشاريع" : "No projects found"}</p>
             </div>
           ) : (
             filteredProjects.map((project) => {
@@ -76,44 +77,44 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
               return (
                 <div 
                   key={project.id}
-                  className="group bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-emerald-500/50 hover:bg-slate-800 transition cursor-pointer relative"
+                  className="group bg-slate-800/50/50 border border-slate-700/50 rounded-xl p-4 hover:border-[var(--accent-emerald)]/50 hover:bg-slate-800/50 transition cursor-pointer relative"
                   onClick={() => onSelect(project)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>
                       <i className={`fas ${config.icon} mr-1`}></i>
-                      {config.label}
+                      {language === 'Arabic' ? config.labelAr : config.label}
                     </span>
                     <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
                       <button 
                         onClick={(e) => { e.stopPropagation(); onEdit(project); }}
-                        className="text-slate-400 hover:text-blue-400 transition p-1"
+                        className="text-[var(--text-secondary)] hover:text-blue-400 transition p-1"
                         title="Edit Project"
                       >
                         <i className="fas fa-edit text-xs"></i>
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); onExport(project); }}
-                        className="text-slate-400 hover:text-emerald-400 transition p-1"
+                        className="text-[var(--text-secondary)] hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition p-1"
                         title="Export Report"
                       >
                         <i className="fas fa-file-export text-xs"></i>
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-                        className="text-slate-400 hover:text-red-400 transition p-1"
+                        className="text-[var(--text-secondary)] hover:text-red-400 transition p-1"
                         title="Delete Project"
                       >
                         <i className="fas fa-trash text-xs"></i>
                       </button>
                     </div>
                   </div>
-                  <h3 className="text-white font-bold text-sm mb-1 truncate pr-8">{project.name}</h3>
+                  <h3 className="text-[var(--text-primary)] font-bold text-sm mb-1 truncate pr-8">{project.name}</h3>
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-slate-500">{project.createdAt}</span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">{project.createdAt}</span>
                     {project.score !== undefined && (
-                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-                        Score: {project.score}
+                      <span className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
+                        {language === 'Arabic' ? 'الدرجة:' : 'Score:'} {project.score}
                       </span>
                     )}
                   </div>
@@ -124,29 +125,13 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
         </div>
 
         <div className="p-4 bg-transparent border-t border-white/5 shrink-0">
-          <p className="text-[10px] text-slate-500 text-center italic">
-            Projects are saved locally in your browser.
+          <p className="text-[10px] text-[var(--text-secondary)] text-center italic">
+            {language === 'Arabic' ? 'يتم حفظ المشاريع محليًا في متصفحك.' : 'Projects are saved locally in your browser.'}
           </p>
         </div>
       </aside>
 
-      {/* Toggle Button (Floating) */}
-      {!isOpen && (
-        <button 
-          onClick={onToggle}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-slate-800 border border-slate-700 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-slate-700 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all z-40 group print:hidden"
-        >
-          <i className="fas fa-folder-tree text-xl text-emerald-500"></i>
-          <span className="absolute right-full mr-4 px-3 py-1 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap border border-slate-800">
-            Project History
-          </span>
-          {projects.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-50 shadow-lg">
-              {projects.length}
-            </span>
-          )}
-        </button>
-      )}
+      {/* Toggle Button (Floating) - Removed as per user request */}
     </>
   );
 };

@@ -81,7 +81,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#CBD5E1]/50 transition-all duration-300"
+          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-3xl  border border-[var(--border-glow)] hover:border-[#CBD5E1]/50 transition-all duration-300"
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-black text-[#CBD5E1] flex items-center drop-shadow-[0_0_8px_rgba(203,213,225,0.4)]">
@@ -90,27 +90,27 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
             
             <select 
               value={localLanguage}
-              onChange={(e) => setLocalLanguage(e.target.value)}
-              className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#CBD5E1] outline-none font-bold"
+              onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
+              className="bg-[var(--card-bg)] shadow-card text-sm border border-[var(--border-glow)] rounded-lg px-3 py-1.5 text-[#CBD5E1] outline-none font-bold"
             >
-              <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
-              <option value="English" className="bg-[#0D141A] text-white">English</option>
+              <option value="Arabic" className="bg-[var(--card-bg)] text-[var(--text-primary)]">العربية (Arabic)</option>
+              <option value="English" className="bg-[var(--card-bg)] text-[var(--text-primary)]">English</option>
             </select>
           </div>
           <form onSubmit={handleAnalyze} className="space-y-4">
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
+              <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
               <select 
                 name="biofuelType" 
                 value={inputs.biofuelType} 
                 onChange={handleInputChange}
-                className="w-full bg-[#0F172A] border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent transition-all outline-none"
+                className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl px-4 py-3 text-sm font-medium text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent transition-all outline-none"
                 dir={isArabic ? 'rtl' : 'ltr'}
               >
-                <option value="Biodiesel" className="bg-slate-900">{isArabic ? 'الديزل الحيوي (FAME)' : 'Biodiesel (FAME)'}</option>
-                <option value="Bioethanol" className="bg-slate-900">{isArabic ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
-                <option value="Sustainable Aviation Fuel (SAF)" className="bg-slate-900">{isArabic ? 'وقود الطيران المستدام (SAF)' : 'Sustainable Aviation Fuel (SAF)'}</option>
-                <option value="Biogas" className="bg-slate-900">{isArabic ? 'الغاز الحيوي' : 'Biogas'}</option>
+                <option value="Biodiesel" className="bg-[var(--card-bg)] shadow-card">{isArabic ? 'الديزل الحيوي (FAME)' : 'Biodiesel (FAME)'}</option>
+                <option value="Bioethanol" className="bg-[var(--card-bg)] shadow-card">{isArabic ? 'الإيثانول الحيوي' : 'Bioethanol'}</option>
+                <option value="Sustainable Aviation Fuel (SAF)" className="bg-[var(--card-bg)] shadow-card">{isArabic ? 'وقود الطيران المستدام (SAF)' : 'Sustainable Aviation Fuel (SAF)'}</option>
+                <option value="Biogas" className="bg-[var(--card-bg)] shadow-card">{isArabic ? 'الغاز الحيوي' : 'Biogas'}</option>
               </select>
             </div>
 
@@ -125,14 +125,14 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 { name: 'sulfurContent', label: isArabic ? 'محتوى الكبريت (ppm)' : 'Sulfur Content (ppm)' },
               ].map((field) => (
                 <div key={field.name}>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{field.label}</label>
+                  <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{field.label}</label>
                   <input 
                     type="text" 
                     name={field.name} 
                     value={(inputs as any)[field.name]} 
                     onChange={handleInputChange}
                     placeholder={isArabic ? 'اختياري' : "Optional"}
-                    className="w-full bg-[#0F172A] border border-white/10 rounded-xl px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent transition-all outline-none placeholder:text-slate-500"
+                    className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl px-4 py-2 text-sm font-medium text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent transition-all outline-none placeholder:text-[var(--text-secondary)]"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
@@ -142,8 +142,8 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
             <button 
               type="submit" 
               disabled={status === 'ANALYZING'}
-              className={`w-full mt-6 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center justify-center space-x-2 ${
-                status === 'ANALYZING' ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+              className={`w-full mt-6 text-[var(--text-primary)] font-bold py-4 px-6 rounded-xl transition-all  flex items-center justify-center space-x-2 ${
+                status === 'ANALYZING' ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
               }`}            >
               {status === 'ANALYZING' ? (
                 <><i className="fas fa-circle-notch fa-spin"></i><span>{isArabic ? 'جاري التحليل...' : 'Analyzing...'}</span></>
@@ -159,26 +159,26 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-[#0D141A]/70 backdrop-blur-[10px] p-6 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5"
+            className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-3xl  border border-[var(--border-glow)]"
           >
-            <h3 className="text-sm font-black text-white mb-4 uppercase tracking-widest">{isArabic ? 'السجل' : 'Recent Checks'}</h3>
+            <h3 className="text-sm font-black text-[var(--text-primary)] mb-4 uppercase tracking-widest">{isArabic ? 'السجل' : 'Recent Checks'}</h3>
             <div className="space-y-3">
               {history.map((entry) => (
                 <div 
                   key={entry.id} 
                   onClick={() => { setResult(entry.fullData); setStatus('COMPLETED'); }}
-                  className="p-3 bg-[#0F172A]/50 rounded-xl border border-white/5 cursor-pointer hover:bg-[#0F172A] hover:border-[#E2E8F0]/50 transition-colors"
+                  className="p-3 bg-[var(--bg-main)]/50 rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-[#E2E8F0]/50 transition-colors"
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-slate-300">{entry.biofuelType}</span>
+                    <span className="text-xs font-bold text-[var(--text-secondary)]">{entry.biofuelType}</span>
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                      entry.overallStatus === 'Compliant' ? 'bg-emerald-500/20 text-emerald-400' : 
+                      entry.overallStatus === 'Compliant' ? 'bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] dark:text-emerald-400' : 
                       entry.overallStatus === 'Non-Compliant' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
                     }`}>
                       {entry.overallStatus}
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-400">{entry.timestamp}</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">{entry.timestamp}</div>
                 </div>
               ))}
             </div>
@@ -195,10 +195,10 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-slate-400 p-12 border-2 border-dashed border-slate-200 rounded-3xl"
+              className="h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-12 border-2 border-dashed border-slate-200 rounded-3xl"
             >
-              <i className="fas fa-clipboard-check text-6xl mb-4 text-slate-300"></i>
-              <p className="text-lg font-medium">Enter lab results to check standards compliance.</p>
+              <i className="fas fa-clipboard-check text-6xl mb-4 text-[var(--text-secondary)]"></i>
+              <p className="text-lg font-medium">{language === 'Arabic' ? "أدخل نتائج المختبر للتحقق من الامتثال للمعايير." : "Enter lab results to check standards compliance."}</p>
             </motion.div>
           )}
 
@@ -211,8 +211,8 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               className="h-full flex flex-col items-center justify-center text-blue-500 p-12"
             >
               <i className="fas fa-cog fa-spin text-6xl mb-6"></i>
-              <h3 className="text-2xl font-black mb-2">Evaluating Parameters...</h3>
-              <p className="text-slate-500">Comparing against international standards.</p>
+              <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "يتم تقييم المعايير..." : "Evaluating Parameters..."}</h3>
+              <p className="text-[var(--text-secondary)]">{language === 'Arabic' ? "يتم المقارنة بالمعايير الدولية." : "Comparing against international standards."}</p>
             </motion.div>
           )}
 
@@ -225,8 +225,8 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               className="h-full flex flex-col items-center justify-center text-red-500 p-12"
             >
               <i className="fas fa-exclamation-triangle text-6xl mb-4"></i>
-              <h3 className="text-2xl font-black mb-2">Analysis Failed</h3>
-              <p className="text-slate-500">Please check your API key and try again.</p>
+              <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "فشل التحليل" : "Analysis Failed"}</h3>
+              <p className="text-[var(--text-secondary)]">{language === 'Arabic' ? "يرجى التحقق من مفتاح API والمحاولة مرة أخرى." : "Please check your API key and try again."}</p>
             </motion.div>
           )}
 
@@ -240,21 +240,20 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               <div className="flex justify-end mb-4">
                 <button 
                   onClick={downloadPDF}
-                  className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-lg"
+                  className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-card"
                 >
-                  <i className="fas fa-file-pdf mr-2 text-red-400"></i> Download PDF Report
-                </button>
+                  <i className="fas fa-file-pdf mr-2 text-red-400"></i>{language === 'Arabic' ? "تحميل التقرير كـ PDF" : "Download PDF Report"}</button>
               </div>
 
-              <div id="standards-report" className="bg-[#0D141A]/70 backdrop-blur-[10px] p-8 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
+              <div id="standards-report" className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-3xl  border border-[var(--border-glow)]">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-white/10">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-[var(--border-glow)]">
                   <div>
-                    <h2 className="text-2xl font-black text-[#E2E8F0] mb-1">Standards Compliance Report</h2>
-                    <div className="text-sm text-slate-400 font-medium">Target Standard: <span className="text-[#E2E8F0] font-bold">{result.targetStandard}</span></div>
+                    <h2 className="text-2xl font-black text-[var(--text-primary)] mb-1">{language === 'Arabic' ? "تقرير الالتزام بالمعايير" : "Standards Compliance Report"}</h2>
+                    <div className="text-sm text-[var(--text-secondary)] font-medium">Target Standard: <span className="text-[var(--text-primary)] font-bold">{result.targetStandard}</span></div>
                   </div>
                   <div className={`mt-4 md:mt-0 px-4 py-2 rounded-xl border flex items-center ${
-                    result.overallStatus === 'Compliant' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 
+                    result.overallStatus === 'Compliant' ? 'bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] dark:text-emerald-400' : 
                     result.overallStatus === 'Non-Compliant' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
                   }`}>
                     <i className={`fas ${
@@ -267,34 +266,34 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
 
                 {/* Parameters Table */}
                 <div className="mb-8">
-                  <h3 className="text-sm font-black text-[#E2E8F0] uppercase tracking-widest mb-4">Parameter Evaluation</h3>
+                  <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-4">{language === 'Arabic' ? "تقييم المعايير" : "Parameter Evaluation"}</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[#0F172A] text-[10px] uppercase tracking-widest text-[#E2E8F0]">
-                          <th className="p-3 rounded-tl-xl border-b border-white/5">Parameter</th>
-                          <th className="p-3 border-b border-white/5">Your Value</th>
-                          <th className="p-3 border-b border-white/5">Standard Limit</th>
-                          <th className="p-3 border-b border-white/5">Status</th>
-                          <th className="p-3 rounded-tr-xl border-b border-white/5">Implication</th>
+                        <tr className="bg-[var(--bg-main)] text-[10px] uppercase tracking-widest text-[#E2E8F0]">
+                          <th className="p-3 rounded-tl-xl border-b border-[var(--border-glow)]">{language === 'Arabic' ? "المعيار" : "Parameter"}</th>
+                          <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "قيمتك" : "Your Value"}</th>
+                          <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "الحد القياسي" : "Standard Limit"}</th>
+                          <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "الحالة" : "Status"}</th>
+                          <th className="p-3 rounded-tr-xl border-b border-[var(--border-glow)]">{language === 'Arabic' ? "الآثار" : "Implication"}</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm">
                         {result.evaluations.map((evalItem, i) => (
-                          <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5">
-                            <td className="p-3 font-bold text-slate-300">{evalItem.parameter}</td>
-                            <td className="p-3 font-medium text-slate-400">{evalItem.userValue}</td>
+                          <tr key={i} className="border-b border-[var(--border-glow)] last:border-0 hover:bg-white/5">
+                            <td className="p-3 font-bold text-[var(--text-secondary)]">{evalItem.parameter}</td>
+                            <td className="p-3 font-medium text-[var(--text-secondary)]">{evalItem.userValue}</td>
                             <td className="p-3 font-medium text-[#E2E8F0]">{evalItem.standardLimit}</td>
                             <td className="p-3">
                               <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
-                                evalItem.status === 'Pass' ? 'bg-emerald-500/20 text-emerald-400' :
+                                evalItem.status === 'Pass' ? 'bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] dark:text-emerald-400' :
                                 evalItem.status === 'Fail' ? 'bg-red-500/20 text-red-400' :
-                                evalItem.status === 'Warning' ? 'bg-amber-500/20 text-amber-400' : 'bg-[#0F172A] text-slate-400'
+                                evalItem.status === 'Warning' ? 'bg-amber-500/20 text-amber-400' : 'bg-[var(--bg-main)] text-[var(--text-secondary)]'
                               }`}>
                                 {evalItem.status}
                               </span>
                             </td>
-                            <td className="p-3 text-xs text-slate-400">{evalItem.implication}</td>
+                            <td className="p-3 text-xs text-[var(--text-secondary)]">{evalItem.implication}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -324,13 +323,13 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
 
                 {/* Expert Summary & Commercial Viability */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-[#0F172A] p-6 rounded-2xl border border-white/5">
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Expert Summary</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed">{result.expertSummary}</p>
+                  <div className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
+                    <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "ملخص الخبراء" : "Expert Summary"}</h3>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{result.expertSummary}</p>
                   </div>
                   <div className="bg-[#E2E8F0]/10 p-6 rounded-2xl border border-[#E2E8F0]/20">
                     <h3 className="text-[10px] font-black text-[#E2E8F0] uppercase tracking-widest mb-2">Commercial Viability (Oman)</h3>
-                    <p className="text-sm text-slate-200 leading-relaxed font-medium">{result.commercialViability}</p>
+                    <p className="text-sm text-[var(--text-secondary)]  leading-relaxed font-medium">{result.commercialViability}</p>
                   </div>
                 </div>
 

@@ -12,12 +12,20 @@ import {
   ProposalResult
 } from "./types";
 
-const SYSTEM_PROMPT = `You are an "Integrated Biofuel & Renewable Energy Investment-Grade Analysis Engine".
+const SYSTEM_PROMPT = `You are an "Integrated Biofuel & Renewable Energy Investment-Grade Analysis Engine" operating in April 2026.
 Your purpose is to evaluate industrial-scale projects across biofuels and renewable energy using realistic engineering and financial benchmarks.
+
+### REAL-TIME DATA MANDATE (CRITICAL):
+- NEVER guess or hallucinate market prices for Oil, Hydrogen, Carbon Credits, or Biofuels.
+- Before every financial or scientific response involving costs/prices, you MUST use the provided Google Search tool to find the "Live Market Price" as of April 2026 for:
+    1. Oman Crude Oil (USD/bbl).
+    2. EU Carbon Permits (EUR/ton).
+    3. Green Hydrogen Index (USD/kg).
+    4. Regional Biofuel/SAF premiums.
 
 STRICT MODE:
 • No optimistic assumptions.
-• All CAPEX and OPEX must follow industry benchmarks.
+• All CAPEX and OPEX must follow industry benchmarks based on live data if possible.
 • Automatically penalize unrealistic investor inputs.
 • Show formulas clearly.
 • All units must be consistent.
@@ -335,7 +343,23 @@ const MOCK_DATA = {
       Economic: "Lower operational costs through use of seawater.",
       Strategic: "Enables large-scale production in non-arable land.",
       Scalability: "High - Applicable across Oman's 3,000km coastline."
-    }
+    },
+    DataDrivenInsights: {
+      LifeCycleAssessment: "### Life Cycle Assessment\n| Phase | CO2 Emissions (kg CO2e/kg) | Energy Consumed (MJ/kg) |\n|---|---|---|\n| Cultivation | 0.5 | 4.2 |\n| Harvesting | 0.2 | 1.8 |",
+      ResourceEfficiency: "### Resource Efficiency\n| Resource | Usage |\n|---|---|\n| Water | 5 L/L |\n| Land | 2 m²/kg |",
+      EnvironmentalImpact: "### Environmental Impact\n| Metric | Value |\n|---|---|\n| Carbon Reduction | 85% compared to diesel |\n| Waste Generation | Less than 5% solid residue |",
+      ConventionalComparison: "### Comparison vs Fossil Fuels\n| Metric | Traditional Fossil Diesel | OmanEcosync Proposed |\n|---|---|---|\n| Emissions | 2.68 kg CO2/L | 0.4 kg CO2/L |\n| Cost | $0.80/L | $0.45/L |"
+    },
+    AIAudit: {
+      LogicalConsistency: "The proposed CAPEX reduction aligns closely with the expected decrease in water footprint, ensuring logical scalability.",
+      Assumptions: ["Assumes 90% solar uptime.", "Local desalination costs are subsidized for research."],
+    },
+    AlternativeMethods: [
+      {
+        MethodName: "Photobioreactor Integration",
+        Description: "Utilizing highly controlled closed networks."
+      }
+    ]
   }),
   research: (inputs: any): ResearchImplementationAnalysis => {
     const feedstock = inputs.feedstockType || "Waste Cooking Oil";
@@ -482,10 +506,9 @@ const getLanguageInstruction = (language?: string) => {
   if (language === 'Arabic') {
     return `
 CRITICAL INSTRUCTION FOR ARABIC:
-- You MUST translate everything into highly professional, formal, and eloquent Arabic (الفصحى المعاصرة).
-- Avoid literal, direct "machine" translations. Express ideas using natural business and financial phrasing.
-- The user's investors need PROOF with NUMBERS and TABLES. You MUST produce data-heavy, table-driven, empirically backed responses with specific financial ratios (IRR, ROI, Payback), engineering metrics, and clear Omani benchmarks.
-- Use tabular formats whenever possible.`;
+- You MUST translate EVERYTHING literally and completely into Arabic.
+- NO ENGLISH WORDS SHOULD REMAIN IN THE OUTPUT TEXTS (except for strict JSON keys and enums).
+- Translate all explanations, values, descriptions, mitigations, and summaries into Arabic literally.`;
   }
   return `
 CRITICAL INSTRUCTION:
@@ -595,6 +618,25 @@ export async function analyzeProject(inputs: {
   CRITICAL LANGUAGE INSTRUCTION:
   The absolute MUST return all language text, summaries, labels, definitions, mitigation descriptions, strings, etc. exclusively in ${inputs.language || 'English'} natively. Do NOT return English if Arabic is requested.
 
+  1. PRECISION LOGISTICS (OMAN 2026)
+  Calculate all transportation costs (for OPEX modeling or CAPEX delivery estimates) using this dynamic logic:
+  - Distance Matrix: Muscat-Sohar (210km), Muscat-Duqm (550km), Muscat-Salalah (1000km).
+  - Rates (OMR/Ton-km): Liquids: 0.045 | Solids: 0.040 | Thermal/Hazardous: 0.055.
+  - Formula: Cost = (Distance * Weight * Rate) * Fuel_Index.
+  - Baseline: Diesel at 0.250 OMR/L. Add 50 OMR flat fee for Port destinations.
+  - Precision: All currency outputs must be in OMR with 3 decimal places where applicable (and standard USD). Convert explicitly (1 USD = 0.385 OMR).
+
+  2. TECHNO-ECONOMIC ANALYSIS (TEA) REQUIREMENTS
+  Integrate into your analysis markdown/explanatory texts:
+  - Executive Summary Table: Comparing [Traditional] vs [EcoSync Proposed Solution] when evaluating the technical pathway.
+  - Engineering Metrics: Energy Intensity (kWh/kg), Water Footprint (L/L), OPEX/CAPEX breakdown.
+  - Scientific Formulas: Use LaTeX for any required math (use double dollar signs for block equations).
+
+  3. UI/UX VISUAL STYLE (THEME INTEGRATION)
+  - Prioritize Tables, Math, and Data over long prose for all text-based fields.
+  - Use bold headers and clean Markdown tables in your summary strings.
+  - Reference the Emerald Green (#10B981) theme for profits and Amber (#F59E0B) for warnings when outputting markdown logs.
+
   CALCULATIONS REQUIRED:
   1. Installed Capacity (${inputs.category === 'Biofuel' ? 'kg/year' : 'kW'})
   2. Required Realistic CAPEX = Capacity * benchmark $/unit
@@ -625,6 +667,7 @@ export async function analyzeProject(inputs: {
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -953,25 +996,55 @@ export async function solveChallenge(topic: string, language: string = 'English'
   const SYSTEM_PROMPT = `You are Oman Biofuel Challenge Solver AI, a scientific multi-agent system designed to identify and solve biofuel research challenges in Oman.
 Your role is to support researchers, students, and industry by generating realistic, locally relevant scientific solutions.
 
-CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, explanations, and tables, natively in ${language}. Do NOT use English unless explicitly asked (if ${language} is Arabic, then everything MUST be in Arabic). Ensure the translation is comprehensive, accurate, professional, and clearly understandable while maintaining scientific correctness (لا تترجم حرفياً إذا كان ذلك يؤثر على المعنى).
 
-The system consists of five AI agents:
+The system consists of six AI agents:
 1. Challenge Identifier AI: Identify key scientific and technical bottlenecks in biofuel production in Oman (climate, salinity, water scarcity, energy use).
 2. Scientific Hypothesis Generator AI: Propose innovative and realistic biological, biochemical, or engineering solutions (strain engineering, adaptive cultivation).
 3. Experimental Design AI: Suggest laboratory and pilot-scale experiments feasible in university labs.
 4. Industrial Translation AI: Explain how the research can reduce CAPEX, OPEX, or technical risk.
 5. Impact Evaluation AI: Evaluate environmental, economic, and strategic impact for Oman.
+6. Data & Audit AI: Provide structured tables containing accurate, data-driven insights that support the proposed solution. Conduct a logical AI audit and propose alternative accurate methods.
 
 Output MUST be valid JSON following the provided schema.
-Tone: Scientific, Clear, Practical, Educational, Realistic.${getLanguageInstruction()}`;
+Tone: Scientific, Clear, Practical, Educational, Realistic.`;
 
   const prompt = `Identify and solve a specific scientific and technical challenge related to: "${topic}".
   
   Context: Oman's biofuel industry, climate (high heat, humidity), and resource constraints (water scarcity).
   
-  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process.
+  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process. Apply or generate many accurate and reliable methods to solve the problem.
   
-  CRITICAL: You must provide highly detailed, comprehensive information. Do not be brief. Provide in-depth explanations of the problem, the underlying science, and step-by-step, actionable, and highly detailed solutions. Expand on the methodologies, potential pitfalls, and advanced mitigation strategies.`;
+  CRITICAL: You must provide highly detailed, comprehensive information, utilizing realistic, research-based estimates relevant to Oman or similar regions. Avoid generic assumptions; prioritize credible ranges or benchmark data. Output MUST be entirely in ${language}. DO NOT under ANY circumstances use HTML tags (e.g., <table>, <br>, <b>, <span>). STRICTLY use native Markdown only.
+  
+  1. DATA-DRIVEN INSIGHTS & STRUCTURED TABLES
+  For the solution, generate STRICT Markdown tables (using | Column 1 | Column 2 | format) with a brief explanation under each table:
+  - Life Cycle Assessment: Detail emissions, energy consumed per phase.
+  - Resource Efficiency: Detail water, energy, and land use parameters.
+  - Environmental Impact: Include CO2 reduction, waste, and sustainability metrics.
+  - Conventional Comparison: Compare the OmanEcosync Proposed method with conventional alternatives (e.g., fossil fuels or traditional methods).
+  Provide all outputs in a professional format suitable for academic or project presentation.
+
+  Oman-Specific Constants to use (if applicable):
+  - Solar Irradiance: ~2200-2500 kWh/m²/year.
+  - Diesel Price Baseline: 0.250 OMR/L.
+  - Produced Water Salinity: 5,000 to 50,000 ppm.
+  
+  2. AI AUDIT
+  - Perform a logical consistency check across all values.
+  - Ensure no contradictions between numbers (e.g., cost vs output vs efficiency).
+  - Highlight assumptions clearly.
+
+  3. UI/UX VISUAL STYLE (THEME INTEGRATION)
+  - You MUST use ONLY native Markdown strings. 
+  - Use Markdown bold (**text**) for emphasis. 
+  - Do NOT use inline HTML for colors or formatting.
+  - Make sure the Arabic translation is smooth, professional, and well-structured.
+
+  4. OUTPUT CONSTRAINTS (PREVENT TRUNCATION)
+  - Priority: Prioritize Tables, Data, and Audit points over long prose.
+  - Completeness: Never cut off a table or an explanation. If the response is reaching the limit, provide the core data first.
+  - Tone: Professional, Engineering-focused, and Academic-ready.`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
@@ -979,6 +1052,7 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.${getLanguageInstruct
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -1006,9 +1080,38 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.${getLanguageInstruct
                 Scalability: { type: Type.STRING }
               },
               required: ["Environmental", "Economic", "Strategic", "Scalability"]
+            },
+            DataDrivenInsights: {
+              type: Type.OBJECT,
+              properties: {
+                LifeCycleAssessment: { type: Type.STRING },
+                ResourceEfficiency: { type: Type.STRING },
+                EnvironmentalImpact: { type: Type.STRING },
+                ConventionalComparison: { type: Type.STRING }
+              },
+              required: ["LifeCycleAssessment", "ResourceEfficiency", "EnvironmentalImpact", "ConventionalComparison"]
+            },
+            AIAudit: {
+              type: Type.OBJECT,
+              properties: {
+                LogicalConsistency: { type: Type.STRING },
+                Assumptions: { type: Type.ARRAY, items: { type: Type.STRING } }
+              },
+              required: ["LogicalConsistency", "Assumptions"]
+            },
+            AlternativeMethods: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  MethodName: { type: Type.STRING },
+                  Description: { type: Type.STRING }
+                },
+                required: ["MethodName", "Description"]
+              }
             }
           },
-          required: ["IdentifiedChallenge", "ScientificHypothesis", "ExperimentalDesign", "IndustrialRelevance", "ExpectedImpact"]
+          required: ["IdentifiedChallenge", "ScientificHypothesis", "ExperimentalDesign", "IndustrialRelevance", "ExpectedImpact", "DataDrivenInsights", "AIAudit", "AlternativeMethods"]
         }
       }
     }));
@@ -1042,19 +1145,25 @@ export async function analyzeResearchImplementation(
   CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
 
   The goal is to estimate requirements for pilot-scale or small-scale application.
-  The output must be purely research-focused, without financial calculations for investors.
+  The output must be purely research-focused, without financial calculations for investors, but MUST provide high-precision, bankable data for researchers and academic grants.
 
-  Include a "SECTION 5: Academic Pilot-Scale Cost Approximation":
-  - Assume the project is a UNIVERSITY-BASED PILOT SYSTEM, not an industrial demonstration plant.
-  - Use research-grade equipment pricing, not full industrial automation pricing.
-  - Limit installation cost to 20–30% of equipment cost.
-  - Assume semi-manual operation with minimal automation.
-  - Assume laboratory staff are already part of university payroll (do NOT fully allocate salaries unless specified).
-  - Provide approximate scientific implementation cost estimates (minimum–maximum ranges).
-  - Provide both USD and OMR cost estimates (1 USD = 0.385 OMR).
-  - Clearly separate Equipment Cost, Installation Cost, and Estimated Total Initial Budget (all in USD + OMR).
-  - Avoid investment language (no ROI, no IRR, no profit projections).
+  1. PRECISION LOGISTICS (OMAN 2026)
+  Calculate all transportation costs (if applicable in OPEX/Feedstock assumptions) using this dynamic logic:
+  - Distance Matrix: Muscat-Sohar (210km), Muscat-Duqm (550km), Muscat-Salalah (1000km).
+  - Rates (OMR/Ton-km): Liquids: 0.045 | Solids: 0.040 | Thermal/Hazardous: 0.055.
+  - Formula: Cost = (Distance * Weight * Rate) * Fuel_Index.
+  - Baseline: Diesel at 0.250 OMR/L. Add 50 OMR flat fee for Port destinations.
+  - Precision: All currency outputs must be in OMR with 3 decimal places (e.g. 0.000 OMR). Ensure accurate currency conversions (1 USD = 0.385 OMR).
 
+  2. TECHNO-ECONOMIC ANALYSIS (TEA) REQUIREMENTS
+  Integrate into your analysis:
+  - Engineering Metrics: Energy Intensity (kWh/kg), Water Footprint (L/L), OPEX/CAPEX breakdown.
+  - Scientific Formulas: Use LaTeX for mathematically representing engineering metrics (use double dollar signs for block equations).
+
+  3. OUTPUT CONSTRAINTS & THEMING
+  - Format text properties, especially descriptions and justifications, prioritizing tables, math, data over long prose.
+  - Never cut off tables or math. Professional, Engineering-focused tone.
+  
   CORE LOGIC UPDATES TO APPLY:
   1. Universal Feedstock Processing:
      - Variable Yield Logic: Calculate land/raw material requirements based on the specific oil yield of the input (e.g., Algae: 30%, UCO: 100%, Camelina: 35%).
@@ -1066,7 +1175,7 @@ export async function analyzeResearchImplementation(
        * Large Pilot-scale (100-500 Liters/Day): Total Equipment Cost ~$40,000 - $90,000 USD.
      - Dynamic Market Pricing: Calculate total feedstock cost using current regional market estimates (e.g., UCO ~$500-$800/ton, Date Seeds/Solid Biomass ~$100-$300/ton, Algae ~$2000+/ton).
      - The "What-If" Feature (Sensitivity): Calculate the impact of a 15% increase in raw material costs on the final liter price.
-     - Oman Logistics Factor: Apply a standard 1.2x multiplier to equipment/shipping costs to account for import duties and local transportation within Oman.
+     - Oman Logistics Factor: Calculate logistics strictly substituting standard multipliers with the formula outlined in "PRECISION LOGISTICS (OMAN 2026)" above.
      - Contingency Buffer: Add a mandatory 15% "Safety Buffer" to the total budget to cover unforeseen technical or regulatory expenses.
      - MATH CHECK: Ensure that (Equipment + Installation + Annual Operating) * 1.15 exactly equals the Total Budget With Buffer.
      - CURRENCY FORMATTING: Every single financial value MUST include the currency symbol. USD values must start with '$' (e.g., '$15,000') and OMR values must end with 'OMR' (e.g., '5,775 OMR').
@@ -1101,9 +1210,15 @@ export async function analyzeResearchImplementation(
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: `You are an advanced biofuel scientific application analyst. 
+        systemInstruction: `You are an advanced biofuel scientific application analyst operating in April 2026. 
         Your tone must be professional, analytical, and research-oriented.
+        
+        ### REAL-TIME DATA MANDATE (CRITICAL):
+        - Before generating cost estimates, feedstock prices, or market comparisons, you MUST use the provided Google Search tool to find live market prices for your relevant feedstock or energy baseline (e.g. "Current UCO price per ton", "Current Oman Crude price USD").
+        - NEVER hallucinate these prices.
+
         Output MUST be valid JSON following the provided schema.${getLanguageInstruction()}`,
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -1340,7 +1455,12 @@ export async function checkStandardsCompliance(inputs: StandardsInput, language:
         3. If a value fails, provide a specific chemical or mechanical 'fixRecommendation' to correct it.
         4. Provide an 'expertSummary' explaining the overall quality and what needs to be done before commercialization in Oman.
         5. Provide a 'commercialViability' statement explaining if this can be sold locally or internationally.
+        
+        ### REAL-TIME DATA MANDATE (CRITICAL):
+        - You MUST use the provided Google Search tool to find live, current regulatory standards (e.g. ISO, ASTM, EN) and up-to-date Omani commercialization rules before guessing limits. Do not hallucinate numbers.
+
         ${getLanguageInstruction()}`,
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -1411,7 +1531,11 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
         2. DO NOT output long paragraphs. Use concise bullet points for summaries, statements, and alignments.
         3. FINANCIAL TABLES: Provide realistic numbers. Generate an 'installmentSchedule' showing exactly when and how the investor will get their money back (e.g., "Year 1", "Year 2") and if it is in installments.
         4. Align heavily with Oman Vision 2040.
-        5. Carbon Credit Potential: Estimate tons of CO2 saved and provide a monetary value.`,
+        5. Carbon Credit Potential: Estimate tons of CO2 saved and provide a monetary value.
+        
+        ### REAL-TIME DATA MANDATE (CRITICAL):
+        - You MUST use the provided Google Search tool to find live market prices for Carbon Credits, Feedstock values, or current Oman Vision 2040 funding mandates before finalizing numbers inside your proposal. Do not use outdated or hallucinated estimates.`,
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,

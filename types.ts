@@ -280,6 +280,20 @@ export interface ChallengeSolverResult {
     Strategic: string;
     Scalability: string;
   };
+  DataDrivenInsights: {
+    LifeCycleAssessment: string;
+    ResourceEfficiency: string;
+    EnvironmentalImpact: string;
+    ConventionalComparison: string;
+  };
+  AIAudit: {
+    LogicalConsistency: string;
+    Assumptions: string[];
+  };
+  AlternativeMethods: {
+    MethodName: string;
+    Description: string;
+  }[];
 }
 
 export interface ChallengeHistoryEntry {

@@ -3,6 +3,71 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OptimizerResult, OptimizerHistoryEntry } from './types';
 import { optimizeProject } from './geminiService';
 
+const autoDict: Record<string, string> = {
+  "N/A": "غير متوفر",
+  "Years": "سنوات",
+  "Tons": "طن",
+  "Applied": "مُطبقة",
+  "In USD": "بالدولار الأمريكي",
+  "Pass": "اجتياز",
+  "Needs Revision": "بحاجة لمراجعة",
+  "Critical Financial Issue": "مشكلة مالية حرجة",
+  "Moderate": "متوسط",
+  "Significant": "كبير",
+  "Critical": "حرج",
+  "Investment Grade": "درجة استثمارية",
+  "Conditionally Viable": "مجدي بشروط",
+  "Not Bankable": "غير قابل للتمويل",
+  "High": "عالي",
+  "Low": "منخفض",
+  "Scientific & Technical AI Analysis": "تحليل الذكاء الاصطناعي العلمي والتقني",
+  "Scientific & Technical Audit": "تحليل وتدقيق علمي وتقني",
+  "Identified Challenge:": "التحدي المحدد:",
+  "Scientific Hypothesis:": "الفرضية العلمية:",
+  "Experimental Design Protocol": "بروتوكول التصميم التجريبي",
+  "Variables:": "المتغيرات:",
+  "Control Conditions:": "ظروف التحكم:",
+  "Expected Outcomes:": "النتائج المتوقعة:",
+  "Industrial Relevance & Impact": "الأهمية والأثر الصناعي",
+  "Environmental:": "بيئياً:",
+  "Economic:": "اقتصادياً:",
+  "Strategic:": "استراتيجياً:",
+  "Data-Driven Insights": "رؤى مبنية على البيانات",
+  "Life Cycle Assessment": "تقييم دورة الحياة",
+  "Resource Efficiency": "كفاءة الموارد",
+  "Alternative Methods": "طرق بديلة",
+  "AI Technical Audit": "التدقيق التقني للذكاء الاصطناعي",
+  "Logical Consistency:": "الاتساق المنطقي:",
+  "Core Assumptions:": "الافتراضات الأساسية:",
+  "Smart Profit & Low-Carbon AI Optimizer": "محسن الذكاء الاصطناعي للربح الذكي وتقليل الكربون",
+  "Analyze your biofuel process": "تحليل عملية الوقود الحيوي الخاصة بك",
+  "Enter process name...": "أدخل اسم العملية...",
+  "Describe the process, feedstock, or challenge...": "صف العملية، أو المواد الخام، أو التحدي...",
+  "Generate Optimization Strategy": "توليد استراتيجية التحسين",
+  "Profit Optimization Strategies": "استراتيجيات تحسين الربح",
+  "Carbon Reduction Pathways": "مسارات تقليل الكربون",
+  "Net-Zero Roadmap": "خارطة طريق نحو صافي الانبعاثات الصفري",
+  "Carbon Intensity:": "كثافة الكربون:",
+  "Standards:": "المعايير:",
+  "Fossil Fuel Replacement Plan": "خطة استبدال الوقود الأحفوري",
+  "Logistics & Supply Chain Optimization": "تحسين الخدمات اللوجستية وسلسلة التوريد",
+  "Research Feasibility Report": "تقرير جدوى البحث",
+  "Scientific Summary:": "الملخص العلمي:",
+  "Cost Estimation (Oman Calibrated)": "تقدير التكلفة (مُعاير حسب عُمان)",
+  "Total Budget Component": "مكون الميزانية الإجمالية",
+  "Total Initial Budget:": "الميزانية الأولية الإجمالية:",
+  "Cost Assumptions:": "افتراضات التكلفة:",
+  "Implementation & Equipment": "التنفيذ والمعدات",
+  "Resource Requirements:": "متطلبات الموارد:",
+  "Production Output Estimate": "تقدير الإنتاج",
+  "Annual Fuel Output:": "إنتاج الوقود السنوي:",
+  "Energy Output:": "إنتاج الطاقة:",
+  "Technical Risk Assessment": "تقييم المخاطر الفنية",
+  "Scientific Challenges:": "التحديات العلمية:",
+  "Mitigation Strategies:": "استراتيجيات التخفيف:"
+};
+const tt = (key: string | undefined, lang: string) => { if(!key) return key; return lang === 'Arabic' ? (autoDict[key] || key) : key; };
+
 interface OptimizerToolProps {
   history: OptimizerHistoryEntry[];
   onSave: (entry: OptimizerHistoryEntry) => void;
@@ -97,11 +162,11 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
       className="max-w-5xl mx-auto space-y-8 pb-20"
     >
       <div className="flex justify-center mb-4">
-        <div className="bg-slate-900/50 p-1 rounded-xl border border-slate-800 flex space-x-1">
+        <div className="bg-[var(--card-bg)]/50 shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
           <button 
             onClick={() => setViewMode('OPTIMIZE')}
             className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-              viewMode === 'OPTIMIZE' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+              viewMode === 'OPTIMIZE' ? 'bg-emerald-600 text-white shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <i className="fas fa-chart-line mr-2"></i> {isArabic ? 'التحسين' : 'Optimize'}
@@ -109,7 +174,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
           <button 
             onClick={() => setViewMode('HISTORY')}
             className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-              viewMode === 'HISTORY' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+              viewMode === 'HISTORY' ? 'bg-emerald-600 text-white shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <i className="fas fa-history mr-2"></i> {isArabic ? 'السجل' : 'History'} ({history.length})
@@ -127,29 +192,29 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-            <div className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 hover:border-[#34D399]/50 transition-all duration-300 overflow-hidden">
-            <div className="bg-[#34D399]/10 px-8 py-6 border-b border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+            <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] hover:border-[#34D399]/50 transition-all duration-300 overflow-hidden">
+            <div className="bg-[#34D399]/10 px-8 py-6 border-b border-[var(--border-glow)] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
                 <h2 className="text-2xl font-black text-[#34D399] flex items-center tracking-tight drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
                   <i className="fas fa-leaf mr-3"></i>
                   {isArabic ? 'مُحسّن الأرباح وتقليل الكربون' : 'Smart Profit & Low-Carbon Optimizer'}
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">{isArabic ? 'تقصيد الأرباح وتخفيف الانبعاثات لمشاريعك' : 'Maximize profitability while reaching net-zero milestones.'}</p>
+                <p className="text-[var(--text-secondary)] text-sm mt-1">{isArabic ? 'تقصيد الأرباح وتخفيف الانبعاثات لمشاريعك' : 'Maximize profitability while reaching net-zero milestones.'}</p>
               </div>
 
               <select 
                 value={localLanguage}
-                onChange={(e) => setLocalLanguage(e.target.value)}
-                className="bg-[#0D141A] text-sm border border-white/10 rounded-lg px-3 py-1.5 text-[#34D399] outline-none shadow-sm"
+                onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
+                className="bg-[var(--card-bg)] shadow-card text-sm border border-[var(--border-glow)] rounded-lg px-3 py-1.5 text-[#34D399] outline-none shadow-sm"
               >
-                <option value="Arabic" className="bg-[#0D141A] text-white">العربية (Arabic)</option>
-                <option value="English" className="bg-[#0D141A] text-white">English</option>
+                <option value="Arabic" className="bg-[var(--card-bg)] text-[var(--text-primary)]">العربية (Arabic)</option>
+                <option value="English" className="bg-[var(--card-bg)] text-[var(--text-primary)]">English</option>
               </select>
             </div>
             
             <form onSubmit={handleOptimize} className="p-8 space-y-6">
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
+                <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
                 {[
                   { name: "Algae Biofuel Hub", desc: "Large-scale algae cultivation in Duqm using industrial CO2 and seawater." },
                   { name: "Date Seed Oil Pilot", desc: "Extracting oil from date seeds for biodiesel production in Nizwa." },
@@ -162,7 +227,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       setProjectName(ex.name);
                       setDescription(ex.desc);
                     }}
-                    className="px-3 py-1.5 bg-[#0F172A] border border-white/10 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:border-[#34D399] hover:shadow-[0_0_10px_rgba(52,211,153,0.3)] transition-all"
+                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#34D399] hover:shadow-[0_0_10px_rgba(52,211,153,0.3)] transition-all"
                   >
                     {ex.name}
                   </button>
@@ -170,31 +235,31 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
                   <input 
                     type="text"
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder={isArabic ? 'مثال: مزرعة الطحالب العمانية' : "e.g., Algae-to-Biofuel Hub Oman"}
-                    className="w-full px-6 py-4 rounded-xl bg-[#0F172A] border border-white/10 text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-slate-500"
+                    className="w-full px-6 py-4 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-[var(--text-secondary)]"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">{isArabic ? 'وصف المشروع والتفاصيل' : 'Project Description & Goals'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{isArabic ? 'وصف المشروع والتفاصيل' : 'Project Description & Goals'}</label>
                   <textarea 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={isArabic ? 'صف مشروعك والمواد الخام والأهداف...' : "Describe your project, current feedstock, and target production scale..."}
-                    className="w-full px-6 py-4 rounded-xl bg-[#0F172A] border border-white/10 text-white focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition min-h-[120px] placeholder:text-slate-500"
+                    className="w-full px-6 py-4 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition min-h-[120px] placeholder:text-[var(--text-secondary)]"
                     dir={isArabic ? 'rtl' : 'ltr'}
                   />
                 </div>
               </div>
               <button 
                 disabled={isLoading || !projectName.trim() || !description.trim()}
-                className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center space-x-2 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${
-                  isLoading ? 'bg-slate-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+                className={`w-full py-4 rounded-xl font-bold text-[var(--text-primary)] flex items-center justify-center space-x-2 transition-all  ${
+                  isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
                 }`}
               >
                 {isLoading ? (
@@ -231,19 +296,19 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
+                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
-                    <div className="bg-emerald-600/20 px-8 py-4 border-b border-white/5">
-                      <h3 className="text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
-                        <i className="fas fa-money-bill-trend-up mr-3 text-emerald-400"></i>
+                    <div className="bg-emerald-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
+                      <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
+                        <i className="fas fa-money-bill-trend-up mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
                         Profit Opportunities
                       </h3>
                     </div>
                     <div className="p-8">
                       <ul className="space-y-4">
                         {result.ProfitOpportunities.map((item, i) => (
-                          <li key={i} className="flex items-start text-slate-300">
-                            <i className="fas fa-circle-check text-emerald-500 mr-3 mt-1 shrink-0"></i>
+                          <li key={i} className="flex items-start text-[var(--text-secondary)]">
+                            <i className="fas fa-circle-check text-[var(--accent-emerald)] mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
                         ))}
@@ -255,9 +320,9 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
+                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
-                    <div className="bg-blue-600/20 px-8 py-4 border-b border-white/5">
+                    <div className="bg-blue-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-cloud-arrow-down mr-3 text-blue-400"></i>
                         Carbon Reduction Strategies
@@ -266,7 +331,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     <div className="p-8">
                       <ul className="space-y-4">
                         {result.CarbonReductionStrategies.map((item, i) => (
-                          <li key={i} className="flex items-start text-slate-300">
+                          <li key={i} className="flex items-start text-[var(--text-secondary)]">
                             <i className="fas fa-leaf text-blue-500 mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
@@ -279,16 +344,16 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-[#0F172A] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 p-8 text-white"
+                    className="bg-[var(--card-bg)] text-[var(--text-primary)]"
                   >
                     <h3 className="text-lg font-black mb-6 flex items-center">
-                      <i className="fas fa-truck-fast mr-3 text-emerald-400"></i>
+                      <i className="fas fa-truck-fast mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
                       Logistics Optimization
                     </h3>
                     <ul className="space-y-4">
                       {result.LogisticsOptimization.map((item, i) => (
-                        <li key={i} className="flex items-start text-slate-300 text-sm">
-                          <i className="fas fa-location-dot text-emerald-400 mr-3 mt-1 shrink-0"></i>
+                        <li key={i} className="flex items-start text-[var(--text-secondary)] text-sm">
+                          <i className="fas fa-location-dot text-[var(--accent-emerald)] dark:text-emerald-400 mr-3 mt-1 shrink-0"></i>
                           {item}
                         </li>
                       ))}
@@ -301,18 +366,16 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
+                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
-                    <div className="bg-amber-500/20 px-8 py-4 border-b border-white/5">
+                    <div className="bg-amber-500/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-amber-400 font-bold text-sm uppercase tracking-widest flex items-center">
-                        <i className="fas fa-bolt mr-3 text-amber-400"></i>
-                        Fossil Fuel Replacement Plan
-                      </h3>
+                        <i className="fas fa-bolt mr-3 text-amber-400"></i>{language === 'Arabic' ? "خطة استبدال الوقود الأحفوري" : "Fossil Fuel Replacement Plan"}</h3>
                     </div>
                     <div className="p-8">
                       <ul className="space-y-4">
                         {result.FossilFuelReplacementPlan.map((item, i) => (
-                          <li key={i} className="flex items-start text-slate-300">
+                          <li key={i} className="flex items-start text-[var(--text-secondary)]">
                             <i className="fas fa-plug-circle-bolt text-amber-500 mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
@@ -325,31 +388,29 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="bg-emerald-900 rounded-3xl shadow-xl overflow-hidden text-white"
+                    className="bg-[var(--card-bg)] text-[var(--text-primary)]"
                   >
                     <div className="bg-emerald-800 px-8 py-6 border-b border-emerald-700">
                       <h3 className="text-lg font-black flex items-center">
-                        <i className="fas fa-flag-checkered mr-3 text-emerald-400"></i>
-                        Net-Zero Roadmap
-                      </h3>
+                        <i className="fas fa-flag-checkered mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{language === 'Arabic' ? "خارطة طريق نحو صافي الانبعاثات الصفري" : "Net-Zero Roadmap"}</h3>
                     </div>
                     <div className="p-8 space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="p-4 bg-emerald-800/50 rounded-2xl border border-emerald-700">
-                          <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Carbon Intensity</p>
+                          <p className="text-[10px] font-black text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "كثافة الكربون" : "Carbon Intensity"}</p>
                           <p className="text-sm font-bold">{result.NetZeroRoadmap.CarbonIntensityEstimate}</p>
                         </div>
                         <div className="p-4 bg-emerald-800/50 rounded-2xl border border-emerald-700">
-                          <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Global Standards</p>
+                          <p className="text-[10px] font-black text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "المعايير العالمية" : "Global Standards"}</p>
                           <p className="text-sm font-bold">{result.NetZeroRoadmap.StandardsComparison}</p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4">Implementation Steps</p>
+                        <p className="text-[10px] font-black text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-4">{language === 'Arabic' ? "خطوات التنفيذ" : "Implementation Steps"}</p>
                         <div className="space-y-4">
                           {result.NetZeroRoadmap.RoadmapSteps.map((step, i) => (
                             <div key={i} className="flex items-start">
-                              <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] font-black mr-3 shrink-0">
+                              <div className="w-6 h-6 rounded-full bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] font-black mr-3 shrink-0">
                                 {i + 1}
                               </div>
                               <p className="text-sm text-emerald-100">{step}</p>
@@ -370,10 +431,10 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-[#0D141A]/70 backdrop-blur-[10px] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 overflow-hidden"
+            className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
           >
-            <div className="bg-[#0F172A] border-b border-white/5 px-8 py-6 flex justify-between items-center">
-            <h3 className="text-white font-bold text-lg">Optimization History</h3>
+            <div className="bg-[var(--bg-main)] border-b border-[var(--border-glow)] px-8 py-6 flex justify-between items-center">
+            <h3 className="text-[var(--text-primary)] font-bold text-lg">{language === 'Arabic' ? "سجل التحسينات" : "Optimization History"}</h3>
             <button 
               onClick={onClear}
               className="text-xs font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition"
@@ -384,8 +445,8 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
           <div className="p-8">
             {history.length === 0 ? (
               <div className="text-center py-12">
-                <i className="fas fa-folder-open text-slate-600 text-5xl mb-4"></i>
-                <p className="text-slate-500 font-medium">No history found. Start optimizing your project!</p>
+                <i className="fas fa-folder-open text-[var(--text-secondary)] text-5xl mb-4"></i>
+                <p className="text-[var(--text-secondary)] font-medium">No history found. Start optimizing your project!</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -393,14 +454,14 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   <div 
                     key={entry.id}
                     onClick={() => handleSelectFromHistory(entry)}
-                    className="p-6 rounded-2xl border border-white/5 bg-[#0F172A]/50 hover:bg-[#0F172A] hover:border-[#34D399]/50 transition cursor-pointer group"
+                    className="p-6 rounded-2xl border border-[var(--border-glow)] bg-[var(--bg-main)]/50 hover:bg-[var(--bg-main)] hover:border-[#34D399]/50 transition cursor-pointer group"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-bold text-white group-hover:text-[#34D399] transition">{entry.projectName}</h4>
-                        <p className="text-xs text-slate-500 mt-1">{entry.timestamp}</p>
+                        <h4 className="font-bold text-[var(--text-primary)] group-hover:text-[#34D399] transition">{entry.projectName}</h4>
+                        <p className="text-xs text-[var(--text-secondary)] mt-1">{entry.timestamp}</p>
                       </div>
-                      <i className="fas fa-chevron-right text-slate-600 group-hover:text-[#34D399] transition"></i>
+                      <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-[#34D399] transition"></i>
                     </div>
                   </div>
                 ))}

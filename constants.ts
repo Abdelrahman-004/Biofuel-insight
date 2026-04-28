@@ -21,7 +21,11 @@ export const BIOFUEL_FEEDSTOCKS = [
   "Animal Fat",
   "Agricultural Residue",
   "Biogas",
-  "Bioethanol"
+  "Bioethanol",
+  "Jatropha Seeds",
+  "Municipal Solid Waste",
+  "Sewage Sludge",
+  "Fish Oil"
 ];
 
 export const RENEWABLE_ENERGY_TYPES = [
@@ -51,6 +55,10 @@ export const translateTerm = (term: string): string => {
     "Agricultural Residue": "المخلفات الزراعية",
     "Biogas": "الغاز الحيوي",
     "Bioethanol": "الإيثانول الحيوي",
+    "Jatropha Seeds": "بذور الجاتروفا",
+    "Municipal Solid Waste": "النفايات البلدية الصلبة",
+    "Sewage Sludge": "حمأة الصرف الصحي",
+    "Fish Oil": "زيت السمك",
     "Solar PV": "الطاقة الشمسية (PV)",
     "Wind": "طاقة الرياح",
     "Waste-to-Energy": "تحويل النفايات إلى طاقة",

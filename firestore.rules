@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Phase 0.0: Global Catch-all Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitive Definition
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'role', 'name', 'createdAt'])
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 200
+        && data.role is string && (data.role == 'RESEARCHER' || data.role == 'INVESTOR')
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.createdAt == request.time
+        && data.keys().size() <= 7;
+    }
+
+    function isValidUserUpdate(data) {
+      return data.email is string && data.email.size() > 0 && data.email.size() <= 200
+        && data.role is string && (data.role == 'RESEARCHER' || data.role == 'INVESTOR')
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 200;
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['titleEn', 'titleAr', 'type', 'location', 'fundingRequired', 'trl', 'authorId', 'authorName', 'status', 'createdAt'])
+        && data.titleEn is string && data.titleEn.size() > 0 && data.titleEn.size() <= 200
+        && data.titleAr is string && data.titleAr.size() >= 0 && data.titleAr.size() <= 200
+        && data.type is string && data.type.size() > 0 && data.type.size() <= 100
+        && data.location is string && data.location.size() > 0 && data.location.size() <= 100
+        && data.fundingRequired is number
+        && data.trl is number
+        && data.authorId is string && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 200
+        && data.status is string && (data.status == 'Pending' || data.status == 'Verified' || data.status == 'Active' || data.status == 'Funded')
+        && (!data.keys().hasAny(['contactEmail']) || (data.contactEmail is string && data.contactEmail.size() <= 200))
+        && (!data.keys().hasAny(['contactPhone']) || (data.contactPhone is string && data.contactPhone.size() <= 50))
+        && data.createdAt == request.time;
+    }
+    
+    function isValidProjectUpdate(data) {
+      return data.titleEn is string && data.titleEn.size() > 0 && data.titleEn.size() <= 200
+        && data.titleAr is string && data.titleAr.size() >= 0 && data.titleAr.size() <= 200
+        && data.type is string && data.type.size() > 0 && data.type.size() <= 100
+        && data.location is string && data.location.size() > 0 && data.location.size() <= 100
+        && data.fundingRequired is number
+        && data.trl is number
+        && data.authorId is string && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 200
+        && data.status is string && (data.status == 'Pending' || data.status == 'Verified' || data.status == 'Active' || data.status == 'Funded')
+        && (!data.keys().hasAny(['contactEmail']) || (data.contactEmail is string && data.contactEmail.size() <= 200))
+        && (!data.keys().hasAny(['contactPhone']) || (data.contactPhone is string && data.contactPhone.size() <= 50));
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && isValidId(userId);
+      allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming());
+      // For updates, the action might be changing the role or profile.
+      allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUserUpdate(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'institution', 'fundingCapacity', 'isVerified', 'role'])
+      );
+      allow delete: if false; // Users shouldn't be deleted via client side normally
+    }
+
+    match /projects/{projectId} {
+      allow read: if isSignedIn() && isValidId(projectId);
+      allow list: if isSignedIn(); // All signed in users can view projects.
+      allow create: if isSignedIn() && isValidId(projectId) && isValidProject(incoming());
+      
+      // Researchers can update their own projects unless they're verified/funded.
+      // But for prototype, we might allow full updates by owner for simplicity, 
+      // or at least require owner.
+      allow update: if isSignedIn() && isValidId(projectId) && existing().authorId == request.auth.uid && isValidProjectUpdate(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['titleEn', 'titleAr', 'type', 'location', 'fundingRequired', 'trl', 'status', 'description', 'risk', 'image', 'roi', 'payback', 'matchScore', 'contactEmail', 'contactPhone'])
+        && incoming().authorId == existing().authorId // Author ID is immortal
+        && incoming().createdAt == existing().createdAt // Created At is immortal
+      );
+      
+      allow delete: if isSignedIn() && isValidId(projectId) && existing().authorId == request.auth.uid;
+    }
+  }
+}
