@@ -91,7 +91,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
     setLocalLanguage(language || 'Arabic');
   }, [language]);
 
-  const isArabic = localLanguage === 'Arabic';
+    const isArabic = language === 'Arabic';
   const [topic, setTopic] = React.useState('');
   const [result, setResult] = React.useState<ChallengeSolverResult | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);

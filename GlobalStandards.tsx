@@ -11,7 +11,7 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
   const handleSuggest = async () => {
     setLoading(true);
     try {
-      const proj = await suggestProject("Global Standards Compliance (Biofuels & Hydrogen)");
+      const proj = await suggestProject("Global Standards Compliance (Biofuels & Hydrogen)", language);
       setSuggestion(proj);
     } catch (e) {
       console.error(e);

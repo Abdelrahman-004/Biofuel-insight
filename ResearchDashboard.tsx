@@ -74,7 +74,7 @@ interface ResearchDashboardProps {
 }
 
 export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, language = 'English' }) => {
-  const isArabic = language === 'Arabic' || (typeof document !== 'undefined' && document.documentElement.dir === 'rtl');
+    const isArabic = language === 'Arabic';
   const t = (en: string, ar: string) => isArabic ? ar : en;
   const scoreColor = (score: number) => {
     if (score >= 80) return 'text-[var(--accent-emerald)]';

@@ -16,7 +16,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
     setLocalLanguage(language || 'Arabic');
   }, [language]);
 
-  const isArabic = localLanguage === 'Arabic';
+    const isArabic = language === 'Arabic';
   const [inputs, setInputs] = useState<StandardsInput>({
     biofuelType: 'Biodiesel',
     viscosity: '',

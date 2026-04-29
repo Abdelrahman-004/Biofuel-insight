@@ -86,7 +86,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
     setLocalLanguage(language || 'Arabic');
   }, [language]);
 
-  const isArabic = localLanguage === 'Arabic';
+    const isArabic = language === 'Arabic';
   const [projectName, setProjectName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [result, setResult] = React.useState<OptimizerResult | null>(null);
