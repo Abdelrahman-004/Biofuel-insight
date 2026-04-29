@@ -511,7 +511,9 @@ CRITICAL INSTRUCTION FOR ARABIC:
 - Translate all explanations, values, descriptions, mitigations, and summaries into Arabic literally.`;
   }
   return `
-CRITICAL INSTRUCTION:
+CRITICAL INSTRUCTION FOR ENGLISH:
+- You MUST output EVERYTHING in English natively.
+- NO ARABIC WORDS SHOULD APPEAR IN THE OUTPUT.
 - Present your findings with a heavy emphasis on NUMBERS, TABLES, and EMPIRICAL PROOF. Investors need hard data.
 - Ensure specific financial ratios (IRR, ROI, Payback) and engineering metrics are clearly tabulated.`;
 };
@@ -526,7 +528,7 @@ export async function optimizeProject(projectName: string, description: string, 
   const SYSTEM_PROMPT = `You are Smart Profit and Low-Carbon Optimizer AI, a multi-agent system designed to help biofuel projects become profitable while minimizing lifecycle greenhouse gas emissions.
 Your goal is to support both investors and researchers by providing realistic and actionable strategies.
 
-CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
 
 The system includes:
 1. Profit Strategy AI: Identify revenue streams, co-products (glycerol, biochar, fertilizers), carbon credits, and ESG financing.
@@ -538,7 +540,9 @@ The system includes:
 Tone: Clear, Practical, Scientific, Investor-friendly, Realistic.
 Output MUST be valid JSON following the provided schema.${getLanguageInstruction(language)}`;
 
-  const prompt = `Optimize the following biofuel project for profit and low-carbon impact:
+  const prompt = `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
+  
+  Optimize the following biofuel project for profit and low-carbon impact:
   Project Name: ${projectName}
   Description: ${description}
   
@@ -616,7 +620,7 @@ export async function analyzeProject(inputs: {
   - CO2 Source: ${inputs.co2Source || 'N/A'}
 
   CRITICAL LANGUAGE INSTRUCTION:
-  The absolute MUST return all language text, summaries, labels, definitions, mitigation descriptions, strings, etc. exclusively in ${inputs.language || 'English'} natively. Do NOT return English if Arabic is requested.
+  The absolute MUST return all language text, summaries, labels, definitions, mitigation descriptions, strings, etc. exclusively in ${inputs.language || 'English'} natively. ${getLanguageInstruction(inputs.language)}
 
   1. PRECISION LOGISTICS (OMAN 2026)
   Calculate all transportation costs (for OPEX modeling or CAPEX delivery estimates) using this dynamic logic:
@@ -996,7 +1000,7 @@ export async function solveChallenge(topic: string, language: string = 'English'
   const SYSTEM_PROMPT = `You are Oman Biofuel Challenge Solver AI, a scientific multi-agent system designed to identify and solve biofuel research challenges in Oman.
 Your role is to support researchers, students, and industry by generating realistic, locally relevant scientific solutions.
 
-CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, explanations, and tables, natively in ${language}. Do NOT use English unless explicitly asked (if ${language} is Arabic, then everything MUST be in Arabic). Ensure the translation is comprehensive, accurate, professional, and clearly understandable while maintaining scientific correctness (لا تترجم حرفياً إذا كان ذلك يؤثر على المعنى).
+CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, explanations, and tables, natively in ${language}. ${getLanguageInstruction(language)} Ensure the output is comprehensive, accurate, professional, and clearly understandable while maintaining scientific correctness.
 
 The system consists of six AI agents:
 1. Challenge Identifier AI: Identify key scientific and technical bottlenecks in biofuel production in Oman (climate, salinity, water scarcity, energy use).
@@ -1015,7 +1019,7 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.`;
   
   Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process. Apply or generate many accurate and reliable methods to solve the problem.
   
-  CRITICAL: You must provide highly detailed, comprehensive information, utilizing realistic, research-based estimates relevant to Oman or similar regions. Avoid generic assumptions; prioritize credible ranges or benchmark data. Output MUST be entirely in ${language}. DO NOT under ANY circumstances use HTML tags (e.g., <table>, <br>, <b>, <span>). STRICTLY use native Markdown only.
+  CRITICAL: You must provide highly detailed, comprehensive information, utilizing realistic, research-based estimates relevant to Oman or similar regions. Avoid generic assumptions; prioritize credible ranges or benchmark data. Output MUST be entirely in ${language}. ${getLanguageInstruction(language)} DO NOT under ANY circumstances use HTML tags (e.g., <table>, <br>, <b>, <span>). STRICTLY use native Markdown only.
   
   1. DATA-DRIVEN INSIGHTS & STRUCTURED TABLES
   For the solution, generate STRICT Markdown tables (using | Column 1 | Column 2 | format) with a brief explanation under each table:
@@ -1039,7 +1043,7 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.`;
   - You MUST use ONLY native Markdown strings. 
   - Use Markdown bold (**text**) for emphasis. 
   - Do NOT use inline HTML for colors or formatting.
-  - Make sure the Arabic translation is smooth, professional, and well-structured.
+  - Make sure the language output matches the requested language perfectly.
 
   4. OUTPUT CONSTRAINTS (PREVENT TRUNCATION)
   - Priority: Prioritize Tables, Data, and Audit points over long prose.
@@ -1142,7 +1146,7 @@ export async function analyzeResearchImplementation(
   - Technology Readiness Level (TRL): ${inputs.trl}
   - Desired Pilot Production Scale: ${inputs.scale}
 
-  CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+  CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
 
   The goal is to estimate requirements for pilot-scale or small-scale application.
   The output must be purely research-focused, without financial calculations for investors, but MUST provide high-precision, bankable data for researchers and academic grants.
@@ -1217,7 +1221,7 @@ export async function analyzeResearchImplementation(
         - Before generating cost estimates, feedstock prices, or market comparisons, you MUST use the provided Google Search tool to find live market prices for your relevant feedstock or energy baseline (e.g. "Current UCO price per ton", "Current Oman Crude price USD").
         - NEVER hallucinate these prices.
 
-        Output MUST be valid JSON following the provided schema.${getLanguageInstruction()}`,
+        Output MUST be valid JSON following the provided schema.${getLanguageInstruction(language)}`,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
@@ -1385,11 +1389,11 @@ export async function suggestProject(context: string, language: string = 'Englis
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
       Suggest a realistic, Oman-specific project concept for ${context}. Focus on feasibility and Vision 2040 alignment. 
       Include a list of specific Omani government incentives (tax breaks, land grants, subsidies) the project qualifies for based on its type and location.`,
       config: {
-        systemInstruction: `You are an industrial project developer for the energy transition in Oman. Provide innovative but pilot-scale realistic projects.${getLanguageInstruction()}`,
+        systemInstruction: `You are an industrial project developer for the energy transition in Oman. Provide innovative but pilot-scale realistic projects.${getLanguageInstruction(language)}`,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -1433,7 +1437,7 @@ export async function checkStandardsCompliance(inputs: StandardsInput, language:
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. Do NOT use English unless explicitly asked.
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
       
       Evaluate the following biofuel lab results against international standards.
       Biofuel Type: ${inputs.biofuelType}
@@ -1459,7 +1463,7 @@ export async function checkStandardsCompliance(inputs: StandardsInput, language:
         ### REAL-TIME DATA MANDATE (CRITICAL):
         - You MUST use the provided Google Search tool to find live, current regulatory standards (e.g. ISO, ASTM, EN) and up-to-date Omani commercialization rules before guessing limits. Do not hallucinate numbers.
 
-        ${getLanguageInstruction()}`,
+        ${getLanguageInstruction(language)}`,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
@@ -1513,7 +1517,9 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `Generate a professional grant/investment proposal.
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${inputs.language}. ${getLanguageInstruction(inputs.language)}
+      
+      Generate a professional grant/investment proposal.
       Project Name: ${inputs.projectName}
       Feedstock: ${inputs.feedstock}
       Biofuel Type: ${inputs.biofuelType}
@@ -1527,7 +1533,7 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
         Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI for academic grants, PDO/OQ for industrial investment, OTF for startups).
         
         RULES:
-        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. If Arabic is requested, use professional Arabic business terms.
+        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. ${getLanguageInstruction(inputs.language)}
         2. DO NOT output long paragraphs. Use concise bullet points for summaries, statements, and alignments.
         3. FINANCIAL TABLES: Provide realistic numbers. Generate an 'installmentSchedule' showing exactly when and how the investor will get their money back (e.g., "Year 1", "Year 2") and if it is in installments.
         4. Align heavily with Oman Vision 2040.

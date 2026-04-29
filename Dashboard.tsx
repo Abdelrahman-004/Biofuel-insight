@@ -79,7 +79,8 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English' }) => {
   const [showReport, setShowReport] = React.useState(false);
   
-  const isArabic = language === 'Arabic' || (typeof document !== 'undefined' && document.documentElement.dir === 'rtl');
+  
+  const isArabic = language === 'Arabic';
   const t = (en: string, ar: string) => isArabic ? ar : en;
 
   const costData = [
