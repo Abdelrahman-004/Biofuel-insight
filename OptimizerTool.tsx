@@ -301,7 +301,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     <div className="bg-emerald-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-money-bill-trend-up mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
-                        Profit Opportunities
+                        {isArabic ? 'فرص الربح' : 'Profit Opportunities'}
                       </h3>
                     </div>
                     <div className="p-8">
@@ -325,7 +325,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     <div className="bg-blue-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-cloud-arrow-down mr-3 text-blue-400"></i>
-                        Carbon Reduction Strategies
+                        {isArabic ? 'استراتيجيات تقليل الكربون' : 'Carbon Reduction Strategies'}
                       </h3>
                     </div>
                     <div className="p-8">
@@ -348,7 +348,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   >
                     <h3 className="text-lg font-black mb-6 flex items-center">
                       <i className="fas fa-truck-fast mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
-                      Logistics Optimization
+                      {isArabic ? 'تحسين الخدمات اللوجستية' : 'Logistics Optimization'}
                     </h3>
                     <ul className="space-y-4">
                       {result.LogisticsOptimization.map((item, i) => (

@@ -250,7 +250,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-[var(--border-glow)]">
                   <div>
                     <h2 className="text-2xl font-black text-[var(--text-primary)] mb-1">{language === 'Arabic' ? "تقرير الالتزام بالمعايير" : "Standards Compliance Report"}</h2>
-                    <div className="text-sm text-[var(--text-secondary)] font-medium">Target Standard: <span className="text-[var(--text-primary)] font-bold">{result.targetStandard}</span></div>
+                    <div className="text-sm text-[var(--text-secondary)] font-medium">{language === 'Arabic' ? "المعيار المستهدف:" : "Target Standard:"} <span className="text-[var(--text-primary)] font-bold">{result.targetStandard}</span></div>
                   </div>
                   <div className={`mt-4 md:mt-0 px-4 py-2 rounded-xl border flex items-center ${
                     result.overallStatus === 'Compliant' ? 'bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] dark:text-emerald-400' : 
@@ -305,7 +305,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 {result.evaluations.some(e => e.status === 'Fail' || e.status === 'Warning') && (
                   <div className="mb-8 bg-amber-500/10 p-6 rounded-2xl border border-amber-500/20">
                     <h3 className="text-sm font-black text-amber-400 uppercase tracking-widest mb-4 flex items-center">
-                      <i className="fas fa-wrench mr-2"></i> Required Adjustments
+                      <i className="fas fa-wrench mr-2"></i> {language === 'Arabic' ? "التعديلات المطلوبة" : "Required Adjustments"}
                     </h3>
                     <ul className="space-y-3">
                       {result.evaluations.filter(e => e.status === 'Fail' || e.status === 'Warning').map((evalItem, i) => (
@@ -328,7 +328,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{result.expertSummary}</p>
                   </div>
                   <div className="bg-[#E2E8F0]/10 p-6 rounded-2xl border border-[#E2E8F0]/20">
-                    <h3 className="text-[10px] font-black text-[#E2E8F0] uppercase tracking-widest mb-2">Commercial Viability (Oman)</h3>
+                    <h3 className="text-[10px] font-black text-[#E2E8F0] dark:text-[#E2E8F0] uppercase tracking-widest mb-2">{language === 'Arabic' ? "الجدوى التجارية (عُمان)" : "Commercial Viability (Oman)"}</h3>
                     <p className="text-sm text-[var(--text-secondary)]  leading-relaxed font-medium">{result.commercialViability}</p>
                   </div>
                 </div>

@@ -466,7 +466,7 @@ export default function App() {
       setError(err.message || "An error occurred during analysis. Check your connection or parameters.");
       setStatus('ERROR');
     }
-  }, []);
+  }, [language]);
 
   const handleSelectFromHistory = (entry: ProjectHistoryEntry) => {
     setAnalysis(entry.fullData);
@@ -506,7 +506,7 @@ export default function App() {
       setError(err.message || "An error occurred during research analysis.");
       setStatus('ERROR');
     }
-  }, []);
+  }, [language]);
 
   const handleSelectFromResearchHistory = (entry: ResearchImplementationAnalysis) => {
     setResearchAnalysis(entry);
