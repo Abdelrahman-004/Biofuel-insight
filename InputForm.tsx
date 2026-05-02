@@ -16,6 +16,7 @@ interface InputFormProps {
     laborCost?: number;
     co2Source?: string;
     language: string;
+    projectScale: string;
   }) => void;
   isLoading: boolean;
   initialInputs?: any;
@@ -39,6 +40,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   const [location, setLocation] = React.useState(LOCATIONS[0]);
   const [category, setCategory] = React.useState<'Biofuel' | 'Renewable Energy'>('Biofuel');
   const [feedstock, setFeedstock] = React.useState(BIOFUEL_FEEDSTOCKS[0]);
+  const [projectScale, setProjectScale] = React.useState<'Small' | 'Medium' | 'Large'>('Medium');
   const [production, setProduction] = React.useState<string | number>(1500);
   const [budget, setBudget] = React.useState<string | number>(15000000);
   const [sellingPrice, setSellingPrice] = React.useState<string | number>(1200);
@@ -72,6 +74,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
         if (draft.location) setLocation(draft.location);
         if (draft.category) setCategory(draft.category);
         if (draft.feedstock) setFeedstock(draft.feedstock);
+        if (draft.projectScale) setProjectScale(draft.projectScale);
         if (draft.production) setProduction(draft.production);
         if (draft.budget) setBudget(draft.budget);
         if (draft.sellingPrice) setSellingPrice(draft.sellingPrice);
@@ -85,11 +88,11 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   // Save draft on change
   React.useEffect(() => {
     const draft = {
-      projectName, location, category, feedstock,
+      projectName, location, category, feedstock, projectScale,
       production, budget, sellingPrice, electricityCost, laborCost, co2Source
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  }, [projectName, location, category, feedstock, production, budget, sellingPrice, electricityCost, laborCost, co2Source]);
+  }, [projectName, location, category, feedstock, projectScale, production, budget, sellingPrice, electricityCost, laborCost, co2Source]);
 
   // Update feedstock when category changes
   React.useEffect(() => {
@@ -107,6 +110,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
       location,
       category,
       feedstock,
+      projectScale,
       production: Number(production),
       budget: Number(budget),
       sellingPrice: category === 'Biofuel' ? Number(sellingPrice) : 0,
@@ -190,7 +194,24 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'حجم الاستثمار' : 'Project Scale'}</label>
+            <select 
+              value={projectScale}
+              onChange={(e) => setProjectScale(e.target.value as 'Small' | 'Medium' | 'Large')}
+              className={inputClasses}
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              <option value="Small" className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? 'صغير / تجريبي (للمؤسسات الصغيرة)' : 'Small / Pilot (SMEs)'}</option>
+              <option value="Medium" className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? 'متوسط / تجاري' : 'Medium / Commercial'}</option>
+              <option value="Large" className="bg-[var(--card-bg)] text-[var(--text-primary)]">{isArabic ? 'كبير / ضخم (شركات كبرى)' : 'Large / Mega Project'}</option>
+            </select>
+          </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
