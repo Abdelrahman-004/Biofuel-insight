@@ -133,7 +133,7 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
     <div className="w-full text-[var(--text-secondary)]  font-sans relative z-0" dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="mb-8 border-b border-[var(--border-glow)] pb-6 text-center md:text-start">
         <h2 className="text-3xl font-black text-[var(--text-primary)] flex justify-center md:justify-start items-center">
-          <i className="fas fa-map-marked-alt text-[var(--accent-emerald)] mx-3"></i>
+          <i className="fas fa-map-marked-alt text-[var(--accent-emerald)] dark:text-emerald-400 mx-3"></i>
           {isArabic ? 'خريطة عُمان الاستراتيجية (GIS)' : 'Oman Strategic GIS Map'}
         </h2>
         <p className="text-[var(--text-secondary)] text-sm mt-2 font-medium">
@@ -152,7 +152,7 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
         }>
           <button 
             onClick={() => setIsFullScreen(!isFullScreen)}
-            className="absolute top-4 right-4 z-[400] bg-[var(--card-bg)]/50 shadow-card p-3 rounded-lg border border-[var(--border-glow)] text-[var(--text-primary)] hover:bg-[var(--accent-emerald)]/20 transition-colors shadow-card"
+            className="absolute top-4 right-4 z-[400] bg-[var(--card-bg)] shadow-card p-3 rounded-lg border border-[var(--border-glow)] text-[var(--text-primary)] hover:bg-[var(--accent-emerald)]/20 transition-colors shadow-card"
             title={isArabic ? 'تكبير الخريطة' : 'Toggle Full Screen'}
           >
             <i className={isFullScreen ? 'fas fa-compress' : 'fas fa-expand'}></i>
@@ -177,7 +177,7 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
             {ZONES.map(z => (
               <Marker key={z.id} position={[z.lat, z.lng]} icon={createCustomIcon(z.color)}>
                 <Popup className="custom-popup">
-                  <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] shadow-card border border-[var(--border-glow)] p-3 rounded-lg text-center" dir={isArabic ? 'rtl' : 'ltr'}>
+                  <div className="bg-[var(--card-bg)] shadow-card  shadow-card border border-[var(--border-glow)] p-3 rounded-lg text-center" dir={isArabic ? 'rtl' : 'ltr'}>
                     <p className="text-sm font-black text-[var(--text-primary)] m-0">{isArabic ? z.nameAr : z.nameEn}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] m-0 mt-1 uppercase tracking-widest">{isArabic ? z.descAr : z.descEn}</p>
                   </div>
@@ -194,7 +194,7 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
         </div>
 
         <div className="w-full lg:w-1/2 flex flex-col space-y-6 relative z-10">
-          <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] shadow-card border border-[var(--border-glow)] p-6 rounded-2xl shadow-card">
+          <div className="bg-[var(--card-bg)] shadow-card  shadow-card border border-[var(--border-glow)] p-6 rounded-2xl shadow-card">
             <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 border-b border-[var(--border-glow)] pb-2">
               {isArabic ? 'إدخال بيانات الشحنة' : 'LOGISTIC PARAMETERS'}
             </h3>
@@ -253,13 +253,13 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
                />
                <div className="flex justify-between mt-1 text-[9px] font-black text-[var(--accent-emerald)] dark:text-emerald-400">
                  <span>{language === "Arabic" ? "0.200 ر.ع." : "0.200 OMR"}</span>
-                 <span className="bg-[var(--accent-emerald)]/10 px-1 rounded border border-[var(--accent-emerald)]/20">{dieselPrice.toFixed(3)} OMR</span>
+                 <span className="bg-[var(--accent-emerald)]/10 px-1 rounded border border-var(--accent-emerald)">{dieselPrice.toFixed(3)} OMR</span>
                  <span>{language === "Arabic" ? "0.400 ر.ع." : "0.400 OMR"}</span>
                </div>
             </div>
           </div>
 
-          <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] shadow-card border border-[var(--border-glow)] p-6 rounded-2xl flex-1 overflow-hidden">
+          <div className="bg-[var(--card-bg)] shadow-card  shadow-card border border-[var(--border-glow)] p-6 rounded-2xl flex-1 overflow-hidden">
             <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 border-b border-[var(--border-glow)] pb-2">
               {isArabic ? 'التقديرات اللوجستية المفصلة' : 'Detailed Logistics Output'}
             </h3>
@@ -285,32 +285,32 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
                 </div>
 
                 <div className="space-y-2 text-[11px]">
-                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-[var(--border-glow)]/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-var(--border-glow)">
                       <span className="text-[var(--text-secondary)]">* {isArabic ? 'تكلفة الشحن الأساسية:' : 'Base Freight:'}</span>
                       <span className="font-bold text-[var(--text-secondary)]">{results.baseFreight.toFixed(3)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
                    </div>
-                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-[var(--border-glow)]/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-var(--border-glow)">
                       <span className="text-[var(--text-secondary)]">* {isArabic ? 'رسوم الوقود (مؤشر 2026):' : 'Fuel Surcharge (2026 Index):'}</span>
                       <span className="font-bold text-rose-400">{results.fuelSurcharge.toFixed(3)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
                    </div>
-                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-[var(--border-glow)]/50">
+                   <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-var(--border-glow)">
                       <span className="text-[var(--text-secondary)]">* {isArabic ? `مناولة خاصة (${results.category.typeAr}):` : `Special Handling (${results.category.typeEn}):`}</span>
                       <span className="font-bold text-[var(--accent-emerald)] dark:text-emerald-400">{results.specialHandling.toFixed(3)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
                    </div>
                    {results.portFees > 0 && (
-                     <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-[var(--border-glow)]/50">
+                     <div className="flex justify-between p-2 rounded-lg bg-[var(--bg-main)]/40 border border-var(--border-glow)">
                         <span className="text-[var(--text-secondary)]">* {isArabic ? 'رسوم الموانئ العمانية:' : 'Oman Port Fees:'}</span>
                         <span className="font-bold text-blue-400">{results.portFees.toFixed(3)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
                      </div>
                    )}
                 </div>
 
-                <div className="p-4 bg-[var(--accent-emerald)]/5 rounded-xl border border-[var(--accent-emerald)]/20 flex justify-between items-center">
+                <div className="p-4 bg-[var(--accent-emerald)]/5 rounded-xl border border-var(--accent-emerald) flex justify-between items-center">
                    <span className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider">{isArabic ? 'إجمالي الميزانية اللوجستية:' : 'Total Logistic Budget:'}</span>
                    <span className="text-2xl font-black text-[var(--accent-emerald)] dark:text-emerald-400">{results.total.toFixed(3)} <span className="text-[10px]">{language === "Arabic" ? "ر.ع." : "OMR"}</span></span>
                 </div>
 
-                <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                <div className="p-3 bg-blue-500 dark:bg-blue-600/5 rounded-xl border border-blue-500 dark:border-blue-400/10">
                    <p className="text-[10px] font-black text-blue-400 uppercase mb-1">{isArabic ? 'نصيحة استراتيجية:' : 'STRATEGIC ADVICE:'}</p>
                    <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed italic">
                      {results.discountEligible 

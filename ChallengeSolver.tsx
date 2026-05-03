@@ -159,7 +159,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
       className="max-w-5xl mx-auto space-y-8 pb-20"
     >
       <div className="flex justify-center mb-4">
-        <div className="bg-[var(--card-bg)]/50 shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
+        <div className="bg-[var(--card-bg)] shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
           <button 
             onClick={() => setViewMode('SOLVE')}
             className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
@@ -189,10 +189,10 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-          <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] hover:border-[#F59E0B]/50 transition-all duration-300 overflow-hidden">
+          <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] hover:border-#F59E0B transition-all duration-300 overflow-hidden">
             <div className="bg-[#F59E0B]/10 px-8 py-6 border-b border-[var(--border-glow)] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
-                <h2 className="text-2xl font-black text-[#F59E0B] flex items-center tracking-tight drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">
+                <h2 className="text-2xl font-black text-[#F59E0B] flex items-center tracking-tight drop-shadow-md">
                   <i className="fas fa-lightbulb mr-3"></i>
                   {isArabic ? 'الذكاء الاصطناعي لحل تحديات الوقود الحيوي' : 'Oman Biofuel Challenge Solver AI'}
                 </h2>
@@ -222,7 +222,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     key={i}
                     type="button"
                     onClick={() => setTopic(ex)}
-                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.3)] transition-all"
+                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#F59E0B] hover:shadow-md transition-all"
                   >
                     {ex}
                   </button>
@@ -240,7 +240,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                 <button 
                   disabled={isLoading || !topic.trim()}
                   className={`px-8 py-4 rounded-xl font-bold text-[var(--text-primary)] flex items-center justify-center space-x-2 transition-all  ${
-                    isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+                    isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md active:scale-95'
                   }`}
                 >
                   {isLoading ? (
@@ -260,7 +260,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
           </div>
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center">
+            <div className="p-4 bg-[var(--bg-main)] border border-red-200 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-center">
               <i className="fas fa-exclamation-circle mr-2"></i>
               {error}
             </div>
@@ -279,7 +279,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-[var(--bg-main)] px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-[var(--text-primary)] font-bold text-sm uppercase tracking-widest flex items-center">
@@ -296,7 +296,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-blue-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
@@ -313,7 +313,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-emerald-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
@@ -333,7 +333,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                           <ul className="space-y-2">
                             {result.ExperimentalDesign.Variables.map((v, i) => (
                               <li key={i} className="text-sm text-[var(--text-secondary)] flex items-start">
-                                <i className="fas fa-check text-[var(--accent-emerald)] mr-2 mt-1 shrink-0"></i>
+                                <i className="fas fa-check text-[var(--accent-emerald)] dark:text-emerald-400 mr-2 mt-1 shrink-0"></i>
                                 {v}
                               </li>
                             ))}
@@ -344,7 +344,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                           <ul className="space-y-2">
                             {result.ExperimentalDesign.ControlConditions.map((c, i) => (
                               <li key={i} className="text-sm text-[var(--text-secondary)] flex items-start">
-                                <i className="fas fa-sliders text-blue-500 mr-2 mt-1 shrink-0"></i>
+                                <i className="fas fa-sliders text-blue-600 dark:text-blue-400 mr-2 mt-1 shrink-0"></i>
                                 {c}
                               </li>
                             ))}
@@ -387,7 +387,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-[var(--bg-main)] px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-[var(--text-primary)] font-bold text-sm uppercase tracking-widest flex items-center">
@@ -409,7 +409,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                         <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{result.ExpectedImpact.Strategic}</p>
                       </div>
                       <div className="pt-4 border-t border-[var(--border-glow)]">
-                        <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إمكانيات قابلية التوسع" : "Scalability Potential"}</p>
+                        <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إمكانيات قابلية التوسع" : "Scalability Potential"}</p>
                         <p className="text-sm font-black text-[var(--text-primary)]">{result.ExpectedImpact.Scalability}</p>
                       </div>
                     </div>
@@ -424,7 +424,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     className="lg:col-span-3 space-y-8"
                   >
                     {result.DataDrivenInsights && (
-                      <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
+                      <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
                         <div className="bg-[#10B981]/20 px-8 py-4 border-b border-[var(--border-glow)]">
                           <h3 className="text-[#10B981] font-bold text-sm uppercase tracking-widest flex items-center">
                             <i className="fas fa-chart-line mr-3 text-[#10B981]"></i>
@@ -440,7 +440,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                               ConventionalComparison: localLanguage === 'Arabic' ? 'المقارنة مع الطرق التقليدية' : 'Conventional Comparison'
                             };
                             return (
-                              <div key={key} className="bg-[var(--bg-main)]/50 p-6 rounded-2xl border border-[var(--border-glow)]">
+                              <div key={key} className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
                                  <h4 className="text-sm font-black text-[var(--text-primary)] mb-4 uppercase tracking-widest border-b border-[var(--border-glow)] pb-2">
                                    {insightLabels[key] || key.replace(/([A-Z])/g, ' $1').trim()}
                                  </h4>
@@ -455,7 +455,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     )}
                     
                     {result.AIAudit && (
-                      <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
+                      <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
                         <div className="bg-[#F59E0B]/20 px-8 py-4 border-b border-[var(--border-glow)]">
                           <h3 className="text-[#F59E0B] font-bold text-sm uppercase tracking-widest flex items-center">
                             <i className="fas fa-user-shield mr-3 text-[#F59E0B]"></i>
@@ -476,7 +476,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                                 <ul className="space-y-2">
                                   {result.AIAudit.Assumptions.map((assum, i) => (
                                     <li key={i} className="text-amber-400/90 text-sm flex items-start">
-                                      <i className="fas fa-exclamation-triangle mt-1 mr-2 text-amber-500/50"></i> {assum}
+                                      <i className="fas fa-exclamation-triangle mt-1 mr-2 text-amber-600 dark:text-amber-400/50"></i> {assum}
                                     </li>
                                   ))}
                                 </ul>
@@ -487,7 +487,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                     )}
 
                     {result.AlternativeMethods && result.AlternativeMethods.length > 0 && (
-                      <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
+                      <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
                         <div className="bg-blue-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                           <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
                             <i className="fas fa-flask mr-3 text-blue-400"></i>
@@ -496,7 +496,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                         </div>
                         <div className="p-8 grid grid-cols-1 gap-4">
                            {result.AlternativeMethods.map((m, i) => (
-                              <div key={i} className="bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
+                              <div key={i} className="bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-2xl p-6 hover:border-blue-500 dark:border-blue-400/30 transition-colors">
                                 <h4 className="font-bold text-[var(--text-primary)] mb-2">{m.MethodName}</h4>
                                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{m.Description}</p>
                               </div>
@@ -516,13 +516,13 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+            className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
           >
           <div className="bg-[var(--bg-main)] border-b border-[var(--border-glow)] px-8 py-6 flex justify-between items-center">
             <h3 className="text-[var(--text-primary)] font-bold text-lg">{language === 'Arabic' ? "سجل التحديات" : "Challenge History"}</h3>
             <button 
               onClick={onClear}
-              className="text-xs font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition"
+              className="text-xs font-black text-red-600 dark:text-red-400 uppercase tracking-widest hover:text-red-400 transition"
             >
               Clear All
             </button>
@@ -539,7 +539,7 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
                   <div 
                     key={entry.id}
                     onClick={() => handleSelectFromHistory(entry)}
-                    className="p-6 rounded-2xl border border-[var(--border-glow)] hover:border-blue-500/50 hover:bg-[var(--bg-main)] transition cursor-pointer group bg-[var(--bg-main)]/50"
+                    className="p-6 rounded-2xl border border-[var(--border-glow)] hover:border-blue-500 dark:border-blue-400/50 hover:bg-[var(--bg-main)] transition cursor-pointer group bg-[var(--bg-main)]"
                   >
                     <div className="flex justify-between items-start">
                       <div>

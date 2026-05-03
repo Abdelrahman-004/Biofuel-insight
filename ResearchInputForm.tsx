@@ -67,9 +67,9 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
   const inputClasses = "w-full px-4 py-2 rounded-lg border border-[var(--border-glow)] bg-[var(--bg-main)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-none transition placeholder:text-[var(--text-secondary)]";
 
   return (
-    <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-2xl  border border-[var(--border-glow)] hover:border-[#3B82F6]/50 transition-all duration-300 overflow-hidden">
+    <div className="bg-[var(--card-bg)] shadow-card  rounded-2xl  border border-[var(--border-glow)] hover:border-#3B82F6 transition-all duration-300 overflow-hidden">
       <div className="bg-[#3B82F6]/10 px-6 py-4 border-b border-[var(--border-glow)] flex justify-between items-center">
-        <h2 className="text-[#3B82F6] font-bold flex items-center drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+        <h2 className="text-[#3B82F6] font-bold flex items-center drop-shadow-md">
           <i className="fas fa-microscope mr-2 text-[#3B82F6]"></i>
           {isArabic ? 'معايير البحث (من المختبر إلى النطاق التجريبي)' : 'Research Parameters (Lab to Pilot-Scale)'}
         </h2>
@@ -194,7 +194,7 @@ export const ResearchInputForm: React.FC<ResearchInputFormProps> = ({ onAnalyze,
         <button 
           disabled={isLoading}
           className={`w-full py-4 rounded-lg font-bold text-[var(--text-primary)] flex items-center justify-center space-x-2 transition-all  ${
-            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md active:scale-95'
           }`}
         >
           {isLoading ? (

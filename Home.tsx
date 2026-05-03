@@ -152,13 +152,13 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
           >
             <button 
               onClick={() => onStart('INVESTOR_FEASIBILITY')}
-              className="bg-[var(--accent-emerald)] hover:bg-green-400 text-slate-950 px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_0_40px_rgba(34,197,94,0.2)] hover:shadow-[0_0_60px_rgba(34,197,94,0.4)] hover:-translate-y-1"
+              className="bg-[var(--accent-emerald)] hover:bg-green-400 text-slate-950 px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-md hover:shadow-md hover:-translate-y-1"
             >
               {isArabic ? 'بدء التحليل' : 'Launch Analysis'}
             </button>
             <button 
               onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-[var(--card-bg)]/50 shadow-card hover:bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all backdrop-blur-md"
+              className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all "
             >
               {isArabic ? 'اكتشف التقنية' : 'Explore Tech'}
             </button>
@@ -175,7 +175,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
           transition={{ duration: 1 }}
           className="relative py-12"
         >
-          <span className={`text-9xl font-serif text-[var(--accent-emerald)]/10 absolute -top-10 ${isArabic ? 'right-0' : 'left-0'} select-none`}>“</span>
+          <span className={`text-9xl font-serif text-[var(--accent-emerald)] dark:text-emerald-400/10 absolute -top-10 ${isArabic ? 'right-0' : 'left-0'} select-none`}>“</span>
           <blockquote className="relative z-10">
             <p className="text-2xl md:text-3xl font-light italic text-[var(--text-secondary)]  leading-relaxed mb-10 font-serif">
               {isArabic 
@@ -188,13 +188,13 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 <span className="block text-[var(--text-primary)] font-black uppercase tracking-[0.4em] text-sm mb-1">
                   {isArabic ? 'صاحب الجلالة السلطان هيثم بن طارق' : 'His Majesty Sultan Haitham bin Tariq'}
                 </span>
-                <span className="block text-[var(--accent-emerald)]/60 text-[10px] uppercase font-black tracking-[0.2em]">
+                <span className="block text-[var(--accent-emerald)] dark:text-emerald-400/60 text-[10px] uppercase font-black tracking-[0.2em]">
                   {isArabic ? 'سلطان عُمان' : 'Sultan of Oman'}
                 </span>
               </cite>
             </footer>
           </blockquote>
-          <span className={`text-9xl font-serif text-[var(--accent-emerald)]/10 absolute -bottom-20 ${isArabic ? 'left-0' : 'right-0'} select-none`}>”</span>
+          <span className={`text-9xl font-serif text-[var(--accent-emerald)] dark:text-emerald-400/10 absolute -bottom-20 ${isArabic ? 'left-0' : 'right-0'} select-none`}>”</span>
         </motion.div>
       </section>
 
@@ -209,7 +209,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
               viewport={{ once: true }}
               className="text-4xl md:text-6xl font-black text-[var(--text-primary)] mb-6 tracking-tighter"
             >
-              {isArabic ? <><span className="text-[var(--accent-emerald)]">استكشف</span> المنصة</> : <>EXPLORE THE <span className="text-[var(--accent-emerald)]">SUITE</span></>}
+              {isArabic ? <><span className="text-[var(--accent-emerald)] dark:text-emerald-400">استكشف</span> المنصة</> : <>EXPLORE THE <span className="text-[var(--accent-emerald)] dark:text-emerald-400">SUITE</span></>}
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0 }}
@@ -232,7 +232,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                 transition={{ delay: index * 0.1 }}
                 onClick={() => onStart(tool.id as any)}
                 className={`
-                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-[var(--border-glow)] bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 transition-all duration-500 hover:border-[var(--accent-emerald)] hover:shadow-card shadow-sm
+                  relative group cursor-pointer overflow-hidden rounded-[2rem] border border-[var(--border-glow)] bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) transition-all duration-500 hover:border-[var(--accent-emerald)] hover:shadow-card shadow-sm
                   ${tool.size === 'large' ? 'md:col-span-2' : 'md:col-span-1'}
                 `}
               >
@@ -253,7 +253,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
                       <span>{isArabic ? 'تشغيل الأداة' : 'Initialize Tool'}</span>
                       <ArrowRight size={12} className={isArabic ? 'mr-2 rotate-180' : 'ml-2'} />
                     </div>
-                    <div className="text-[var(--text-secondary)]  group-hover:text-[var(--accent-emerald)]/20 transition-colors">
+                    <div className="text-[var(--text-secondary)]  group-hover:text-[var(--accent-emerald)] dark:text-emerald-400/20 transition-colors">
                       <tool.icon size={48} strokeWidth={1} className="opacity-50 group-hover:opacity-100" />
                     </div>
                   </div>
@@ -269,7 +269,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
         <div className="relative">
           <div className={`absolute ${isArabic ? '-right-10' : '-left-10'} top-0 w-1 h-20 bg-[var(--accent-emerald)]`}></div>
           <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-8 tracking-tighter">
-            {isArabic ? <>الميزة <br /><span className="text-[var(--accent-emerald)]">التنافسية</span></> : <>OUR UNIQUE <br /><span className="text-[var(--accent-emerald)]">ADVANTAGE</span></>}
+            {isArabic ? <>الميزة <br /><span className="text-[var(--accent-emerald)] dark:text-emerald-400">التنافسية</span></> : <>OUR UNIQUE <br /><span className="text-[var(--accent-emerald)] dark:text-emerald-400">ADVANTAGE</span></>}
           </h2>
           <p className="text-[var(--text-secondary)] leading-relaxed mb-6 text-lg">
             {isArabic 
@@ -307,7 +307,7 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
           </div>
         </div>
         
-        <div className="bg-[var(--card-bg)]/50 shadow-card backdrop-blur-sm rounded-[2.5rem] p-12 border border-[var(--border-glow)] relative overflow-hidden">
+        <div className="bg-[var(--card-bg)] shadow-card backdrop-blur-sm rounded-[2.5rem] p-12 border border-[var(--border-glow)] relative overflow-hidden">
           <div className={`absolute top-0 ${isArabic ? 'left-0' : 'right-0'} w-32 h-32 bg-[var(--accent-emerald)]/10 blur-[50px] rounded-full`}></div>
           <h3 className="text-2xl font-black text-[var(--text-primary)] mb-6 uppercase tracking-widest">{isArabic ? 'دعم كافة قطاعات الطاقة' : 'All Clean Energy Sectors'}</h3>
           <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-10">
@@ -317,11 +317,11 @@ export const Home: React.FC<HomeProps> = ({ onStart, language = 'English' }) => 
           </p>
           <div className="grid grid-cols-2 gap-6">
             <div className="bg-black/5 dark:bg-black/40 text-[var(--text-primary)] p-6 rounded-3xl border border-[var(--border-glow)]">
-              <div className="text-3xl font-black text-[var(--accent-emerald)] mb-1">AI</div>
+              <div className="text-3xl font-black text-[var(--accent-emerald)] dark:text-emerald-400 mb-1">AI</div>
               <div className="text-[10px] uppercase font-black text-[var(--text-secondary)] tracking-widest">{isArabic ? 'وكلاء متخصصين' : 'Specialized Agents'}</div>
             </div>
             <div className="bg-black/5 dark:bg-black/40 text-[var(--text-primary)] p-6 rounded-3xl border border-[var(--border-glow)]">
-              <div className="text-3xl font-black text-[var(--accent-emerald)] mb-1">API</div>
+              <div className="text-3xl font-black text-[var(--accent-emerald)] dark:text-emerald-400 mb-1">API</div>
               <div className="text-[10px] uppercase font-black text-[var(--text-secondary)] tracking-widest">{isArabic ? 'تقارير مهيكلة' : 'Structured Data'}</div>
             </div>
           </div>

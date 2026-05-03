@@ -77,7 +77,7 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
             >
               <BiofuelOmanLogo />
               <span className="text-xl font-black tracking-tighter text-[var(--text-primary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors mx-3">
-                {language === "Arabic" ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
+                {language === "Arabic" ? <>عُمَان <span className="text-[var(--accent-emerald)] dark:text-emerald-400">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)] dark:text-emerald-400">ECOSYNC</span></>}
               </span>
             </div>
             
@@ -91,7 +91,7 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
                   onClick={() => onTabChange(item.id as any)}
                   className={`px-5 py-2.5 rounded-full transition-all text-xs font-black uppercase tracking-widest border flex items-center ${
                     activeTab === item.id 
-                      ? 'bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30 text-[var(--accent-emerald)] shadow-[0_0_15px_var(--border-glow)]' 
+                      ? 'bg-[var(--accent-emerald)]/10 border-var(--accent-emerald) text-[var(--accent-emerald)] dark:text-emerald-400 shadow-[0_0_15px_var(--border-glow)]' 
                       : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
                   }`}
                 >
@@ -114,7 +114,7 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
               onClick={() => onLanguageChange(isArabic ? 'English' : 'Arabic')}
               className="px-4 py-2.5 bg-[var(--card-bg)] hover:bg-[var(--border-glow)] text-[var(--text-primary)] rounded-full border border-[var(--border-glow)] transition flex items-center text-xs font-bold shadow-sm"
             >
-              <i className="fas fa-globe mx-2 text-[var(--accent-emerald)]"></i>
+              <i className="fas fa-globe mx-2 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
               {isArabic ? 'EN' : 'AR'}
             </button>
             <div className="w-px h-6 bg-[var(--border-glow)] mx-2 hidden md:block"></div>
@@ -137,13 +137,13 @@ interface SidebarProps {
 }
 
 const SIDEBAR_ITEMS = [
-  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-[var(--accent-emerald)]' },
-  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-500' },
-  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-500' },
+  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
+  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-600 dark:text-blue-400' },
+  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-600 dark:text-amber-400' },
   { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
   { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-[var(--text-secondary)] ' },
   { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature', color: '#8B5CF6', colorClass: 'text-violet-500' },
-  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map', color: '#D97706', colorClass: 'text-amber-600' }
+  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map', color: '#D97706', colorClass: 'text-amber-600 dark:text-amber-400' }
 ];
 
 const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language, isOpen, onToggle }) => {
@@ -217,15 +217,15 @@ const Footer: React.FC<{ language: string }> = ({ language }) => {
           </div>
           <div className="flex flex-col items-center space-y-6">
             <div className="flex space-x-12">
-              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Terms</a>
-              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Policy</a>
-              <a href="#" className="hover:text-[var(--accent-emerald)] transition text-[10px] font-black uppercase tracking-[0.3em]">Contact</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition text-[10px] font-black uppercase tracking-[0.3em]">Terms</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition text-[10px] font-black uppercase tracking-[0.3em]">Policy</a>
+              <a href="#" className="hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition text-[10px] font-black uppercase tracking-[0.3em]">Contact</a>
             </div>
             <div className="flex space-x-8">
-              <i className="fab fa-linkedin hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
-              <i className="fab fa-twitter hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
-              <i className="fab fa-instagram hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
-              <i className="fas fa-envelope hover:text-[var(--accent-emerald)] cursor-pointer transition text-xl"></i>
+              <i className="fab fa-linkedin hover:text-[var(--accent-emerald)] dark:text-emerald-400 cursor-pointer transition text-xl"></i>
+              <i className="fab fa-twitter hover:text-[var(--accent-emerald)] dark:text-emerald-400 cursor-pointer transition text-xl"></i>
+              <i className="fab fa-instagram hover:text-[var(--accent-emerald)] dark:text-emerald-400 cursor-pointer transition text-xl"></i>
+              <i className="fas fa-envelope hover:text-[var(--accent-emerald)] dark:text-emerald-400 cursor-pointer transition text-xl"></i>
             </div>
           </div>
           <div className="text-center md:text-right">
@@ -419,6 +419,7 @@ export default function App() {
     location: string;
     category: 'Biofuel' | 'Renewable Energy';
     feedstock: string;
+    projectScale: string;
     production: number;
     budget: number;
     sellingPrice: number;
@@ -590,7 +591,7 @@ export default function App() {
               key={tab.id}
               onClick={() => setFeasibilityView(tab.id as FeasibilityView)}
               className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                feasibilityView === tab.id ? 'bg-[var(--accent-emerald)] text-[var(--text-primary)] shadow-card translate-y-[-2px]' : 'text-[var(--accent-emerald)] dark:text-emerald-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
+                feasibilityView === tab.id ? 'bg-[var(--accent-emerald)] text-white shadow-card translate-y-[-2px]' : 'text-[var(--accent-emerald)] dark:text-emerald-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
               }`}
             >
               <i className={`fas ${tab.icon} mr-2`}></i> {tab.label}
@@ -610,9 +611,9 @@ export default function App() {
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                 {language === 'Arabic' ? (
-                  <>أداة <span className="text-[var(--accent-emerald)] underline decoration-emerald-500/30 glow-text-emerald">تحليل الجدوى الاستثمارية</span></>
+                  <>أداة <span className="text-[var(--accent-emerald)] dark:text-emerald-400 underline decoration-emerald-500/30 glow-text-emerald">تحليل الجدوى الاستثمارية</span></>
                 ) : (
-                  <>Investor <span className="text-[var(--accent-emerald)] underline decoration-emerald-500/30 glow-text-emerald">Feasibility</span> Tool</>
+                  <>Investor <span className="text-[var(--accent-emerald)] dark:text-emerald-400 underline decoration-emerald-500/30 glow-text-emerald">Feasibility</span> Tool</>
                 )}
               </h1>
               <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -628,7 +629,7 @@ export default function App() {
               initialInputs={initialFeasibilityInputs}
               language={language}
             />
-            {error && <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold text-center">{error}</div>}
+            {error && <div className="mt-6 p-4 bg-[var(--bg-main)] border border-red-200 text-red-700 rounded-xl text-xs font-bold text-center">{error}</div>}
           </section>
 
           {status === 'ANALYZING' && (
@@ -669,7 +670,7 @@ export default function App() {
     </>
   );
   return (
-    <div className="h-screen flex flex-col font-sans bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--accent-emerald)]/30 selection:text-[var(--accent-emerald)] transition-colors duration-500 overflow-hidden" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
+    <div className="h-screen flex flex-col font-sans bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--accent-emerald)]/30 selection:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors duration-500 overflow-hidden" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
       <TopNavbar 
         activeTab={activeMainTab} 
         onTabChange={(tab) => {
@@ -720,7 +721,7 @@ export default function App() {
                     key={tab.id}
                     onClick={() => setResearchView(tab.id as ResearchView)}
                     className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                      researchView === tab.id ? 'bg-blue-500 text-white shadow-card translate-y-[-2px]' : 'text-blue-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
+                      researchView === tab.id ? 'bg-blue-500 text-white dark:bg-blue-600 dark:text-white shadow-card translate-y-[-2px]' : 'text-blue-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <i className={`fas ${tab.icon} mr-2`}></i> {tab.label}
@@ -740,9 +741,9 @@ export default function App() {
                   <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                       {language === 'Arabic' ? (
-                        <>مُحَلِّل <span className="text-blue-500 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
+                        <>مُحَلِّل <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
                       ) : (
-                        <>Research Implementation <span className="text-blue-500 underline decoration-blue-500/30">Analyzer</span></>
+                        <>Research Implementation <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-500/30">Analyzer</span></>
                       )}
                     </h1>
                     <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -758,7 +759,7 @@ export default function App() {
                     initialInputs={initialResearchInputs}
                     language={language}
                   />
-                  {error && <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold text-center">{error}</div>}
+                  {error && <div className="mt-6 p-4 bg-[var(--bg-main)] border border-red-200 text-red-700 rounded-xl text-xs font-bold text-center">{error}</div>}
                 </section>
 
                 {status === 'ANALYZING' && (
@@ -797,9 +798,9 @@ export default function App() {
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-amber-500 underline decoration-amber-500/30">حل العوائق العلمية</span></>
+                    <>أداة <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-500/30">حل العوائق العلمية</span></>
                   ) : (
-                    <>Scientific <span className="text-amber-500 underline decoration-amber-500/30">Challenge</span> Solver</>
+                    <>Scientific <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-500/30">Challenge</span> Solver</>
                   )}
                 </h1>
                 <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -912,9 +913,9 @@ export default function App() {
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>قاعدة بيانات <span className="text-amber-600 underline decoration-amber-600/30">المناطق الحرة</span></>
+                    <>قاعدة بيانات <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-600/30">المناطق الحرة</span></>
                   ) : (
-                    <>Strategic <span className="text-amber-600 underline decoration-amber-600/30">Free Zones</span> Database</>
+                    <>Strategic <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-600/30">Free Zones</span> Database</>
                   )}
                 </h1>
                 <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">

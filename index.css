@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -10,9 +10,10 @@
   --color-nav-bg: var(--nav-bg);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --color-accent-emerald: var(--accent-emerald);
+  --color-border-subtle: var(--border-subtle);
   --color-border-glow: var(--border-glow);
-  --color-border-dark: var(--border-dark);
   --color-zebra-even: var(--zebra-even);
   --color-zebra-odd: var(--zebra-odd);
   --color-up: var(--color-up);
@@ -22,37 +23,41 @@
 
 @layer base {
   :root {
-    --bg-main: #F8FAFC;
+    --bg-main: #F9FAFB; /* Tailwind gray-50 */
     --card-bg: #FFFFFF;
     --sidebar-bg: #FFFFFF;
-    --nav-bg: #FFFFFF;
-    --text-primary: #0F172A;
-    --text-secondary: #334155;
-    --accent-emerald: #059669;
-    --border-glow: #E2E8F0;
-    --border-dark: #94A3B8;
-    --zebra-even: #F1F5F9;
+    --nav-bg: rgba(255, 255, 255, 0.85);
+    --text-primary: #111827; /* Tailwind gray-900 */
+    --text-secondary: #4B5563; /* Tailwind gray-600 */
+    --text-muted: #9CA3AF; /* Tailwind gray-400 */
+    --accent-emerald: #059669; /* Elegant dark green */
+    --border-subtle: #F3F4F6; /* Gray-100 */
+    --border-glow: #E5E7EB; /* Gray-200, no neon */
+    --border-dark: #D1D5DB; 
+    --zebra-even: #F9FAFB;
     --zebra-odd: #FFFFFF;
     --color-up: #059669; 
     --color-down: #DC2626; 
-    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 
   .dark {
-    --bg-main: #05080A;
-    --card-bg: rgba(13, 20, 26, 0.7);
-    --sidebar-bg: rgba(5, 8, 10, 0.9);
-    --nav-bg: rgba(5, 8, 10, 0.9);
-    --text-primary: #E2E8F0;
-    --text-secondary: #94A3B8;
-    --accent-emerald: #10B981;
-    --border-glow: rgba(16, 185, 129, 0.2);
-    --border-dark: rgba(16, 185, 129, 0.2);
-    --zebra-even: rgba(255, 255, 255, 0.02);
+    --bg-main: #0B0E14; /* Deep modern cool gray */
+    --card-bg: #151A23; /* Distinct card background */
+    --sidebar-bg: #0B0E14;
+    --nav-bg: rgba(11, 14, 20, 0.85);
+    --text-primary: #F1F5F9; /* Slate-100 */
+    --text-secondary: #94A3B8; /* Slate-400 */
+    --text-muted: #64748B; /* Slate-500 */
+    --accent-emerald: #10B981; /* Primary action color, not overly bright */
+    --border-subtle: #1E293B; /* Slate-800 */
+    --border-glow: #334155; /* Slate-700, solid border instead of glow */
+    --border-dark: #475569;
+    --zebra-even: #1E2431;
     --zebra-odd: transparent;
-    --color-up: #34d399; /* brighter green for dark mode */
-    --color-down: #f87171; /* brighter red for dark mode */
-    --card-shadow: 0 10px 30px rgba(0,0,0,0.5); /* dark mode shadow */
+    --color-up: #34D399; /* Emerald-400 */
+    --color-down: #F87171; /* Red-400 */
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
   }
 
   body {
@@ -73,7 +78,7 @@
   margin: 0 !important;
 }
 .leaflet-container {
-  background: #0a0a0a !important;
+  background: var(--bg-main) !important;
   font-family: inherit !important;
 }
 .custom-leaflet-icon {
@@ -81,31 +86,34 @@
   border: none;
 }
 .custom-map-tooltip {
-  background: rgba(15, 23, 42, 0.8) !important;
-  border: 1px solid rgba(59, 130, 246, 0.5) !important;
-  color: white !important;
-  font-weight: 800 !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-glow) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
   border-radius: 6px !important;
   padding: 4px 8px !important;
   backdrop-filter: blur(4px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: var(--card-shadow) !important;
 }
 .custom-map-tooltip::before {
-  display: none !important; /* Hide the little directional triangle arrow */
+  display: none !important;
 }
 
 @layer components {
   .markdown-body {
-    @apply text-slate-300 leading-relaxed;
+    @apply text-[var(--text-secondary)] leading-relaxed;
   }
-  .markdown-body h1 { @apply text-2xl font-bold mb-4 mt-6 text-white; }
-  .markdown-body h2 { @apply text-xl font-bold mb-3 mt-5 text-white; }
+  .markdown-body h1 { @apply text-2xl font-bold mb-4 mt-6 text-[var(--text-primary)]; }
+  .markdown-body h2 { @apply text-xl font-bold mb-3 mt-5 text-[var(--text-primary)]; }
+  .markdown-body h3 { @apply text-lg font-bold mb-3 mt-4 text-[var(--text-primary)]; }
   .markdown-body p { @apply mb-4; }
-  .markdown-body ul { @apply list-disc pl-6 mb-4; }
-  .markdown-body li { @apply mb-1; }
-  .markdown-body table { @apply w-full border-collapse mb-4 bg-[var(--card-bg)] rounded-lg overflow-hidden border border-[var(--border-glow)]; }
-  .markdown-body th { @apply border-b border-[var(--border-glow)] p-3 text-start font-bold text-[var(--text-primary)] bg-black/5 dark:bg-slate-800/80; }
-  .markdown-body td { @apply border-b border-[var(--border-glow)] p-3 text-start text-[var(--text-primary)]; }
+  .markdown-body ul { @apply list-disc pl-6 mb-4 space-y-1; }
+  .markdown-body ol { @apply list-decimal pl-6 mb-4 space-y-1; }
+  .markdown-body li { @apply text-[var(--text-secondary)]; }
+  .markdown-body strong { @apply font-bold text-[var(--text-primary)]; }
+  .markdown-body table { @apply w-full border-collapse mb-6 bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border-glow)]; }
+  .markdown-body th { @apply border-b border-[var(--border-glow)] p-4 text-start font-bold text-[var(--text-primary)] tracking-wide text-sm bg-[var(--bg-main)]; }
+  .markdown-body td { @apply border-b border-[var(--border-subtle)] p-4 text-start text-[var(--text-secondary)] text-sm; }
 
   table tbody tr:nth-child(even) {
     background-color: var(--zebra-even);

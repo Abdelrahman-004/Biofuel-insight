@@ -556,7 +556,7 @@ Output MUST be valid JSON following the provided schema.${getLanguageInstruction
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: `${SYSTEM_PROMPT}\n\nCRITICAL INSTRUCTION: Output EVERYTHING in ${language}. ${getLanguageInstruction(language)}`,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -592,6 +592,7 @@ export async function analyzeProject(inputs: {
   location: string;
   category: 'Biofuel' | 'Renewable Energy';
   feedstock: string;
+  projectScale: string;
   production: number;
   budget: number;
   sellingPrice: number;
@@ -607,11 +608,14 @@ export async function analyzeProject(inputs: {
   }
   const ai = new GoogleGenAI({ apiKey });
   
+  const LOCAL_SYSTEM_PROMPT = `${SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST process and output everything natively in ${inputs.language || 'English'}. ${getLanguageInstruction(inputs.language)}`;
+  
   const prompt = `Perform an Investment-Grade Feasibility Analysis for:
   - Project Name: ${inputs.projectName}
   - Location: ${inputs.location}
   - Category: ${inputs.category}
   - Feedstock/Energy Type: ${inputs.feedstock}
+  - Project Scale: ${inputs.projectScale} (Adjust feasibility scoring, CAPEX, OPEX, payback period, and recommendations strictly based on this scale. Small/Pilot means high risk per ton but lower total capital, Mega means economies of scale but huge upfront CAPEX.)
   - Target Production: ${inputs.production} ${inputs.category === 'Biofuel' ? 'tons/year' : 'MWh/year'}
   - Investor Budget: ${inputs.budget} USD
   - Selling Price: ${inputs.category === 'Biofuel' ? inputs.sellingPrice + ' USD/ton' : (inputs.sellingPrice || 'N/A (Calculate LCOE and Savings)') + ' USD/MWh'}
@@ -670,7 +674,7 @@ export async function analyzeProject(inputs: {
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: LOCAL_SYSTEM_PROMPT,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
@@ -1017,7 +1021,9 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.`;
   
   Context: Oman's biofuel industry, climate (high heat, humidity), and resource constraints (water scarcity).
   
-  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. If the topic is specific (e.g., "date seed oil extraction"), the solution must be specific to that feedstock and process. Apply or generate many accurate and reliable methods to solve the problem.
+  CRITICAL INSTRUCTION FOR TOPIC FOCUS: You MUST accurately analyze the specific stated problem ("${topic}"). Do NOT assume the feedstock is algae unless "algae" is explicitly mentioned in the topic. If the topic is about date seeds, used cooking oil, municipal solid waste, or any other feedstock, your entire analysis, hypothesis, and experimental design MUST focus solely on that specific feedstock and problem.
+  
+  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. Apply or generate many accurate and reliable methods to solve the stated problem accurately.
   
   CRITICAL: You must provide highly detailed, comprehensive information, utilizing realistic, research-based estimates relevant to Oman or similar regions. Avoid generic assumptions; prioritize credible ranges or benchmark data. Output MUST be entirely in ${language}. ${getLanguageInstruction(language)} DO NOT under ANY circumstances use HTML tags (e.g., <table>, <br>, <b>, <span>). STRICTLY use native Markdown only.
   
@@ -1055,7 +1061,7 @@ Tone: Scientific, Clear, Practical, Educational, Realistic.`;
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: `${SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST process and output everything natively in ${language || 'English'}. ${getLanguageInstruction(language)}`,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {

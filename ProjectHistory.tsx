@@ -22,8 +22,8 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
 
   if (history.length === 0) {
     return (
-      <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 rounded-2xl p-8 border border-[var(--border-glow)] text-center">
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl p-8 border border-[var(--border-glow)] text-center">
+        <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
           <i className="fas fa-history text-[var(--text-secondary)] text-2xl"></i>
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">{language === 'Arabic' ? "لا توجد سجلات تاريخية" : "No History Records"}</h3>
@@ -33,17 +33,17 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
   }
 
   return (
-    <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 rounded-2xl shadow-sm border border-[var(--border-glow)] overflow-hidden">
+    <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl shadow-sm border border-[var(--border-glow)] overflow-hidden">
       <div className="bg-[var(--card-bg)] shadow-card px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <h3 className="text-[var(--text-primary)] font-bold flex items-center">
-            <i className="fas fa-clock-rotate-left mr-2 text-[var(--accent-emerald)]"></i>
+            <i className="fas fa-clock-rotate-left mr-2 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
             Analysis History
           </h3>
           {selectedIds.length > 0 && (
             <button 
               onClick={() => onCompare(selectedIds)}
-              className="bg-emerald-600 hover:bg-[var(--accent-emerald)] text-[var(--text-primary)] text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
+              className="bg-emerald-600 hover:bg-[var(--accent-emerald)] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
             >
               Compare ({selectedIds.length}) Selected
             </button>
@@ -71,7 +71,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
             {history.slice().reverse().map((entry) => (
               <tr 
                 key={entry.id} 
-                className={`hover:bg-emerald-50/30 transition group cursor-pointer ${selectedIds.includes(entry.id) ? 'bg-emerald-50' : ''}`}
+                className={`hover:bg-[var(--bg-main)]/30 transition group cursor-pointer ${selectedIds.includes(entry.id) ? 'bg-[var(--bg-main)]' : ''}`}
                 onClick={() => onSelect(entry)}
               >
                 <td className="px-6 py-4 text-center">
@@ -80,7 +80,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
                     checked={selectedIds.includes(entry.id)}
                     onChange={() => {}} 
                     onClick={(e) => toggleSelection(entry.id, e)}
-                    className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                    className="w-4 h-4 rounded border-slate-300 text-emerald-700 dark:text-emerald-400 focus:ring-emerald-500"
                   />
                 </td>
                 <td className="px-6 py-4">
@@ -100,7 +100,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
                   <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">{entry.level}</div>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-[var(--accent-emerald)] group-hover:translate-x-1 transition-all"></i>
+                  <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
                 </td>
               </tr>
             ))}

@@ -150,7 +150,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ language }) => {
               }
             }
           }}
-          className="text-[var(--text-secondary)] hover:text-red-500 transition-colors p-2"
+          className="text-[var(--text-secondary)] hover:text-red-600 dark:text-red-400 transition-colors p-2"
           title={isArabic ? 'تسجيل الخروج' : 'Logout'}
         >
           <i className="fas fa-sign-out-alt text-xl"></i>
@@ -235,14 +235,14 @@ const AuthScreen = ({ language, onLoginSuccess }: { language: string, onLoginSuc
         <div className="flex rounded-xl bg-[var(--bg-main)] p-1.5 mb-8 border border-[var(--border-glow)] shadow-inner">
           <button
             onClick={() => setSelectedRole('INVESTOR')}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${selectedRole === 'INVESTOR' ? 'bg-[var(--card-bg)] text-[var(--accent-emerald)] shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${selectedRole === 'INVESTOR' ? 'bg-[var(--card-bg)] text-[var(--accent-emerald)] dark:text-emerald-400 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             <i className="fas fa-briefcase mr-2 rtl:ml-2 rtl:mr-0"></i>
             {isArabic ? 'مستثمر' : 'Investor'}
           </button>
           <button
             onClick={() => setSelectedRole('RESEARCHER')}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${selectedRole === 'RESEARCHER' ? 'bg-[var(--card-bg)] text-blue-500 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${selectedRole === 'RESEARCHER' ? 'bg-[var(--card-bg)] text-blue-600 dark:text-blue-400 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             <i className="fas fa-microscope mr-2 rtl:ml-2 rtl:mr-0"></i>
             {isArabic ? 'باحث / مبتكر' : 'Researcher'}
@@ -250,7 +250,7 @@ const AuthScreen = ({ language, onLoginSuccess }: { language: string, onLoginSuc
         </div>
 
         <div className="mb-6 p-4 rounded-xl bg-[var(--card-bg)] border border-[var(--border-glow)] flex space-x-3 rtl:space-x-reverse">
-          <i className="fas fa-info-circle text-blue-500 mt-0.5"></i>
+          <i className="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
           <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
             {isArabic 
               ? 'يرجى تسجيل الدخول باستخدام حساب جوجل للوصول إلى المنصة.'
@@ -336,11 +336,11 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
       <div className="grid md:grid-cols-4 gap-4">
         <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-glow)] shadow-sm">
           <p className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider mb-1">{isArabic ? 'مشاريع مقترحة لك' : 'Matched Projects'}</p>
-          <div className="text-3xl font-black text-[var(--accent-emerald)]">14</div>
+          <div className="text-3xl font-black text-[var(--accent-emerald)] dark:text-emerald-400">14</div>
         </div>
         <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-glow)] shadow-sm">
           <p className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider mb-1">{isArabic ? 'تحت الدراسة' : 'Under Review'}</p>
-          <div className="text-3xl font-black text-amber-500">3</div>
+          <div className="text-3xl font-black text-amber-600 dark:text-amber-400">3</div>
         </div>
         <div className="col-span-2 bg-gradient-to-r from-emerald-50 to-slate-50 dark:from-emerald-900/40 dark:to-slate-900/40 p-6 rounded-2xl border border-[var(--border-glow)] shadow-sm text-[var(--text-primary)] flex items-center justify-between">
             <div>
@@ -349,7 +349,7 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
                 {isArabic ? 'يتم مطابقة المشاريع مع معايير المخاطر والميزانية الخاصة بك.' : 'Projects are being filtered based on your risk appetite and budget of $10M.'}
               </p>
             </div>
-            <button className="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black text-xs px-4 py-2 rounded-lg transition-colors">
+            <button className="bg-[var(--bg-main)]0 hover:bg-emerald-400 text-emerald-950 font-black text-xs px-4 py-2 rounded-lg transition-colors">
               {isArabic ? 'تحديث المعايير' : 'Update Criteria'}
             </button>
         </div>
@@ -359,14 +359,14 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
         <div className="flex rounded-xl bg-[var(--bg-main)] p-1.5 border border-[var(--border-glow)] shadow-inner w-full max-w-md mx-auto mb-8">
           <button
             onClick={() => setActiveTab('AI')}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === 'AI' ? 'bg-[var(--card-bg)] text-[var(--accent-emerald)] shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === 'AI' ? 'bg-[var(--card-bg)] text-[var(--accent-emerald)] dark:text-emerald-400 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             <i className="fas fa-robot mr-2 rtl:ml-2 rtl:mr-0"></i>
             {isArabic ? 'مقترحات الذكاء الاصطناعي' : 'AI Proposed'}
           </button>
           <button
             onClick={() => setActiveTab('RESEARCHER')}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === 'RESEARCHER' ? 'bg-[var(--card-bg)] text-blue-500 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === 'RESEARCHER' ? 'bg-[var(--card-bg)] text-blue-600 dark:text-blue-400 shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             <i className="fas fa-user-graduate mr-2 rtl:ml-2 rtl:mr-0"></i>
             {isArabic ? 'مشاريع الباحثين' : 'Researcher Projects'}
@@ -399,26 +399,26 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
             </p>
           </div>
         ) : displayedProjects.map(project => (
-          <div key={project.id} onClick={() => setSelectedProject(project)} className="bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-3xl overflow-hidden hover:border-[var(--accent-emerald)]/50 transition-all cursor-pointer group shadow-sm hover:shadow-xl hover:shadow-emerald-500/5">
+          <div key={project.id} onClick={() => setSelectedProject(project)} className="bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-3xl overflow-hidden hover:border-var(--accent-emerald) transition-all cursor-pointer group shadow-sm hover:shadow-xl hover:shadow-emerald-500/5">
             <div className="h-48 relative overflow-hidden bg-[#F1F5F9] dark:bg-slate-800">
               <img src={project.image || 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1000&auto=format&fit=crop'} alt="Project" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
 
-              <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full">
+              <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-black/60  border border-white/10 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full">
                 {project.type}
               </div>
-              <div className="absolute top-4 left-4 rtl:right-4 rtl:left-auto bg-emerald-500 text-emerald-950 text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center">
+              <div className="absolute top-4 left-4 rtl:right-4 rtl:left-auto bg-[var(--bg-main)]0 text-emerald-950 text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center">
                 <i className="fas fa-bolt mr-1 rtl:ml-1 rtl:mr-0"></i> {project.matchScore}% {isArabic ? 'توافق' : 'Match'}
               </div>
             </div>
             
             <div className="p-6">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-[var(--text-primary)] text-lg leading-tight group-hover:text-[var(--accent-emerald)] transition-colors">
+                <h3 className="font-bold text-[var(--text-primary)] text-lg leading-tight group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors">
                   {isArabic ? project.titleAr : project.titleEn}
                 </h3>
               </div>
               <p className="text-xs font-medium text-[var(--text-secondary)] mb-4 flex items-center">
-                <i className="fas fa-map-marker-alt text-[var(--accent-emerald)] mr-1 rtl:ml-1 rtl:mr-0"></i> {project.location}, Oman
+                <i className="fas fa-map-marker-alt text-[var(--accent-emerald)] dark:text-emerald-400 mr-1 rtl:ml-1 rtl:mr-0"></i> {project.location}, Oman
               </p>
               
               <div className="grid grid-cols-2 gap-3 mb-6">
@@ -443,7 +443,7 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
                   </div>
                 </div>
                 {project.status === 'Verified' && (
-                  <i className="fas fa-check-circle text-blue-500 text-lg" title="Verified Project"></i>
+                  <i className="fas fa-check-circle text-blue-600 dark:text-blue-400 text-lg" title="Verified Project"></i>
                 )}
               </div>
             </div>
@@ -558,13 +558,13 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'عنوان المشروع' : 'Project Title'}
               </label>
-              <input type="text" value={title} onChange={e => setTitle(e.target.value)} required className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors" />
+              <input type="text" value={title} onChange={e => setTitle(e.target.value)} required className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors" />
             </div>
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Category'}
               </label>
-              <select value={type} onChange={e => setType(e.target.value)} className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors appearance-none">
+              <select value={type} onChange={e => setType(e.target.value)} className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors appearance-none">
                 <option value="Algae-to-SAF">{language === 'Arabic' ? "وقود الطيران المستدام من الطحالب" : "Algae-to-SAF"}</option>
                 <option value="Waste-to-BioDiesel">{language === 'Arabic' ? "الديزل الحيوي من النفايات" : "Waste-to-BioDiesel"}</option>
                 <option value="Green Hydrogen">{language === 'Arabic' ? "الهيدروجين الأخضر" : "Green Hydrogen"}</option>
@@ -576,14 +576,14 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'التمويل المطلوب (دولار)' : 'Required Funding (USD)'}
               </label>
-              <input type="number" value={funding} onChange={e => setFunding(e.target.value)} required placeholder="e.g. 5000000" className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors" />
+              <input type="number" value={funding} onChange={e => setFunding(e.target.value)} required placeholder="e.g. 5000000" className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors" />
             </div>
             
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'الموقع المقترح في عُمان' : 'Proposed Location'}
               </label>
-              <select value={location} onChange={e => setLocation(e.target.value)} className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors appearance-none">
+              <select value={location} onChange={e => setLocation(e.target.value)} className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors appearance-none">
                 <option value="Duqm SEZAD">{language === 'Arabic' ? "المنطقة الاقتصادية الخاصة بالدقم" : "Duqm SEZAD"}</option>
                 <option value="Sohar Freezone">{language === 'Arabic' ? "منطقة صحار الحرة" : "Sohar Freezone"}</option>
                 <option value="Salalah Port">{language === 'Arabic' ? "ميناء صلالة" : "Salalah Port"}</option>
@@ -608,14 +608,14 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'البريد الإلكتروني للتواصل' : 'Contact Email'}
               </label>
-              <input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} required className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors" />
+              <input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} required className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors" />
             </div>
 
             <div className="space-y-2 md:col-span-1">
               <label className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 {isArabic ? 'رقم هاتف التواصل' : 'Contact Phone'}
               </label>
-              <input type="tel" value={contactPhone} onChange={e => setContactPhone(e.target.value)} required placeholder="+968..." className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 focus:outline-none transition-colors" dir="ltr" />
+              <input type="tel" value={contactPhone} onChange={e => setContactPhone(e.target.value)} required placeholder="+968..." className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-xl focus:border-blue-500 dark:border-blue-400 focus:outline-none transition-colors" dir="ltr" />
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -635,7 +635,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
             <button type="button" onClick={() => setViewState('LIST')} className="px-6 py-3 font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors rounded-xl">
               {isArabic ? 'إلغاء' : 'Cancel'}
             </button>
-            <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50">
+            <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50">
               {isSubmitting ? (isArabic ? 'جاري الإرسال...' : 'Submitting...') : (isArabic ? 'إرسال وتحليل الجدوى' : 'Submit & Analyze')}
             </button>
           </div>
@@ -657,7 +657,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
         </div>
         <button 
           onClick={() => setViewState('NEW')}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center"
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center"
         >
           <i className="fas fa-plus mr-2 rtl:ml-2 rtl:mr-0"></i> {isArabic ? 'إضافة مشروع' : 'Add Project'}
         </button>
@@ -666,7 +666,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map(p => (
         <div key={p.id} className="bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-3xl p-6 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 dark:bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-500 dark:bg-blue-600/20 transition-all"></div>
           
           <div className="flex justify-between items-start mb-4">
             <div className={`px-3 py-1 ${p.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'} text-[10px] font-black uppercase tracking-widest rounded-full`}>
@@ -689,7 +689,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
             </div>
             <div className="flex justify-between items-center mb-3">
               <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">{language === 'Arabic' ? "طلبات الاجتماع" : "Meeting Requests"}</span>
-              <span className="font-black text-amber-500 flex items-center"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-2"></span> {p.isMock ? '3 New' : '0'}</span>
+              <span className="font-black text-amber-600 dark:text-amber-400 flex items-center"><span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-600 animate-pulse mr-2"></span> {p.isMock ? '3 New' : '0'}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">{language === 'Arabic' ? "درجة الجدوى (الذكاء الاصطناعي)" : "AI Viability Score"}</span>
@@ -720,17 +720,17 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
       </button>
 
       <div className="bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-3xl overflow-hidden shadow-sm mb-6">
-        <div className="h-64 relative bg-slate-900">
+        <div className="h-64 relative bg-[var(--card-bg)]">
           <img src={project.image} alt="Project Header" className="w-full h-full object-cover opacity-60" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           
           <div className="absolute bottom-6 px-8 w-full flex justify-between items-end">
             <div>
               <div className="flex items-center space-x-3 rtl:space-x-reverse mb-3">
-                <span className="bg-emerald-500 text-emerald-950 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full shadow-lg">
+                <span className="bg-[var(--bg-main)]0 text-emerald-950 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full shadow-lg">
                   {project.matchScore}% {isArabic ? 'توافق' : 'Match'}
                 </span>
-                <span className="bg-white/20 backdrop-blur-md text-white border border-white/20 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full">
+                <span className="bg-white/20  text-white border border-white/20 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full">
                   TRL {project.trl}
                 </span>
               </div>
@@ -741,12 +741,12 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
             
             <div className="flex space-x-3 rtl:space-x-reverse">
               {isGuest ? (
-                 <button onClick={() => alert(isArabic ? 'يتطلب حساب للتسجيل لمزيد من التفاصيل' : 'Account required to contact researchers')} className="h-12 px-6 rounded-full bg-slate-800/80 dark:bg-slate-800/80 backdrop-blur-md text-white border border-slate-600 dark:border-slate-600 flex items-center justify-center text-sm font-bold shadow-lg" title="Sign in required">
+                 <button onClick={() => alert(isArabic ? 'يتطلب حساب للتسجيل لمزيد من التفاصيل' : 'Account required to contact researchers')} className="h-12 px-6 rounded-full bg-slate-800/80 dark:bg-slate-800/80  text-white border border-slate-600 dark:border-slate-600 flex items-center justify-center text-sm font-bold shadow-lg" title="Sign in required">
                     <i className="fas fa-lock mr-2 rtl:ml-2 rtl:mr-0"></i> {isArabic ? 'التواصل (مقفول)' : 'Contact'}
                  </button>
               ) : (
                 <>
-                  <button className="w-12 h-12 rounded-full bg-white text-emerald-600 flex items-center justify-center text-xl shadow-lg hover:scale-105 transition-transform" title="Request Meeting">
+                  <button className="w-12 h-12 rounded-full bg-white text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl shadow-lg hover:scale-105 transition-transform" title="Request Meeting">
                     <i className="fas fa-calendar-check"></i>
                   </button>
                   <button className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl shadow-lg hover:scale-105 transition-transform" title="Chat with Researcher">
@@ -792,7 +792,7 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
                   </div>
                   <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-4 rounded-xl">
                     <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">{language === 'Arabic' ? "فترة الاسترداد" : "Payback Period"}</p>
-                    <p className="text-xl font-black text-amber-500">{project.payback} Yrs</p>
+                    <p className="text-xl font-black text-amber-600 dark:text-amber-400">{project.payback} Yrs</p>
                   </div>
                 </div>
 
@@ -819,7 +819,7 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
                   <div className="mb-4 space-y-2 text-xs font-medium text-[var(--text-secondary)] bg-[var(--card-bg)] p-3 rounded-xl border border-[var(--border-glow)]">
                     {project.contactEmail && (
                       <div className="flex items-center text-[var(--text-primary)]">
-                        <i className="fas fa-envelope mr-2 rtl:ml-2 rtl:mr-0 w-4 text-center text-blue-500"></i> {project.contactEmail}
+                        <i className="fas fa-envelope mr-2 rtl:ml-2 rtl:mr-0 w-4 text-center text-blue-600 dark:text-blue-400"></i> {project.contactEmail}
                       </div>
                     )}
                     {project.contactPhone && (
@@ -849,7 +849,7 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
                 </p>
                 <div className="relative">
                   <input type="text" placeholder={isArabic ? "مثال: ما هي المخاطر التقنية؟" : "E.g. What are the policy risks?"} className="w-full bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-xl py-2.5 px-4 text-xs focus:outline-none focus:border-emerald-500" />
-                  <button className="absolute right-2 rtl:left-2 rtl:right-auto top-2 w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center">
+                  <button className="absolute right-2 rtl:left-2 rtl:right-auto top-2 w-7 h-7 rounded-lg bg-[var(--bg-main)]0 text-white flex items-center justify-center">
                     <i className="fas fa-magic text-[10px]"></i>
                   </button>
                 </div>

@@ -127,10 +127,10 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-2xl  border border-[var(--border-glow)] hover:border-[#10B981]/50 transition-all duration-300 overflow-hidden"
+      className="bg-[var(--card-bg)] shadow-card  rounded-2xl  border border-[var(--border-glow)] hover:border-#10B981 transition-all duration-300 overflow-hidden"
     >
       <div className="bg-[#10B981]/10 px-6 py-4 border-b border-[var(--border-glow)] flex justify-between items-center">
-        <h2 className="text-[#10B981] font-bold flex items-center text-lg drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
+        <h2 className="text-[#10B981] font-bold flex items-center text-lg drop-shadow-md">
           <i className="fas fa-sliders mr-3"></i>
           {isArabic ? 'معايير تحليل الجدوى' : 'Investment-Grade Analysis Parameters'}
         </h2>
@@ -153,7 +153,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               setProduction(ex.prod);
               setBudget(ex.bud);
             }}
-            className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#10B981] hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all"
+            className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#10B981] hover:shadow-md transition-all"
           >
             {ex.name}
           </button>
@@ -365,7 +365,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
           whileTap={{ scale: 0.98 }}
           disabled={isLoading}
           className={`w-full py-5 rounded-lg font-black text-[var(--text-primary)] flex items-center justify-center space-x-3 transition-all  uppercase tracking-widest text-xs ${
-            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+            isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md'
           }`}
         >
           {isLoading ? (

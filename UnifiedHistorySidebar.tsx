@@ -44,7 +44,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
       }`}>
         <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
           <h2 className="text-[var(--text-primary)] font-black text-lg flex items-center">
-            <i className="fas fa-folder-tree mr-3 text-[var(--accent-emerald)] rtl:ml-3 rtl:mr-0"></i>
+            <i className="fas fa-folder-tree mr-3 text-[var(--accent-emerald)] dark:text-emerald-400 rtl:ml-3 rtl:mr-0"></i>
             {language === 'Arabic' ? 'سجل المشاريع' : 'Project History'}
           </h2>
           <button onClick={onToggle} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
@@ -77,7 +77,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
               return (
                 <div 
                   key={project.id}
-                  className="group bg-slate-800/50/50 border border-slate-700/50 rounded-xl p-4 hover:border-[var(--accent-emerald)]/50 hover:bg-slate-800/50 transition cursor-pointer relative"
+                  className="group bg-slate-800/50/50 border border-slate-700/50 rounded-xl p-4 hover:border-var(--accent-emerald) hover:bg-slate-800/50 transition cursor-pointer relative"
                   onClick={() => onSelect(project)}
                 >
                   <div className="flex justify-between items-start mb-2">

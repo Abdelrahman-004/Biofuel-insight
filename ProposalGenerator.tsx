@@ -139,9 +139,9 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-3xl  border border-[var(--border-glow)] hover:border-[#8B5CF6]/50 transition-all duration-300"
+          className="bg-[var(--card-bg)] shadow-card  p-6 rounded-3xl  border border-[var(--border-glow)] hover:border-#8B5CF6 transition-all duration-300"
         >
-          <h2 className="text-xl font-black text-[#8B5CF6] mb-6 flex items-center drop-shadow-[0_0_8px_rgba(139,92,246,0.5)]">
+          <h2 className="text-xl font-black text-[#8B5CF6] mb-6 flex items-center drop-shadow-md">
             <i className="fas fa-file-signature mx-3"></i> {language === 'Arabic' ? 'تفاصيل المقترح' : 'Proposal Details'}
           </h2>
           <form onSubmit={handleGenerate} className="space-y-4">
@@ -251,7 +251,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               type="submit" 
               disabled={status === 'GENERATING'}
               className={`w-full mt-6 text-[var(--text-primary)] font-bold py-4 px-6 rounded-xl transition-all  flex items-center justify-center space-x-2 ${
-                status === 'GENERATING' ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+                status === 'GENERATING' ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md active:scale-95'
               }`}
             >
               {status === 'GENERATING' ? (
@@ -268,7 +268,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-3xl  border border-[var(--border-glow)]"
+            className="bg-[var(--card-bg)] shadow-card  p-6 rounded-3xl  border border-[var(--border-glow)]"
           >
             <h3 className="text-sm font-black text-[var(--text-primary)] mb-4 uppercase tracking-widest">{language === 'Arabic' ? 'السجل' : 'Recent Proposals'}</h3>
             <div className="space-y-3">
@@ -276,7 +276,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 <div 
                   key={entry.id} 
                   onClick={() => { setResult(entry.fullData); setStatus('COMPLETED'); }}
-                  className="p-3 bg-[var(--bg-main)]/50 rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-[#8B5CF6]/50 transition-colors"
+                  className="p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-#8B5CF6 transition-colors"
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-[var(--text-secondary)] truncate pr-2">{entry.projectName}</span>
@@ -312,7 +312,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-[var(--accent-emerald)] p-12"
+              className="h-full flex flex-col items-center justify-center text-[var(--accent-emerald)] dark:text-emerald-400 p-12"
             >
               <i className="fas fa-pen-nib fa-bounce text-6xl mb-6"></i>
               <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? 'جاري كتابة المقترح...' : 'Drafting Proposal...'}</h3>
@@ -326,7 +326,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-red-500 p-12"
+              className="h-full flex flex-col items-center justify-center text-red-600 dark:text-red-400 p-12"
             >
               <i className="fas fa-exclamation-triangle text-6xl mb-4"></i>
               <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "فشل الإنشاء" : "Generation Failed"}</h3>
@@ -350,7 +350,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 </button>
               </div>
 
-              <div id="proposal-report" className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-10 rounded-3xl  border border-[var(--border-glow)] prose prose-invert max-w-none relative">
+              <div id="proposal-report" className="bg-[var(--card-bg)] shadow-card  p-10 rounded-3xl  border border-[var(--border-glow)] prose prose-invert max-w-none relative">
                 {/* PDF BRANDING HEADER */}
                 <div className="absolute top-8 left-8 right-8 flex justify-between items-start opacity-30 select-none pointer-events-none">
                   <div className="flex items-center space-x-2 grayscale">
@@ -392,7 +392,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                     </ul>
                   </section>
 
-                  <section className="bg-[#8B5CF6]/10 p-6 rounded-2xl border border-[#8B5CF6]/20">
+                  <section className="bg-[#8B5CF6]/10 p-6 rounded-2xl border border-#8B5CF6">
                     <h2 className="text-lg font-black text-[#8B5CF6] mb-3 flex items-center">
                       <i className="fas fa-bullseye mx-2"></i> {language === 'Arabic' ? 'التواؤم مع رؤية عُمان 2040' : 'Alignment with Oman Vision 2040'}
                     </h2>
@@ -440,7 +440,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                           </thead>
                           <tbody className="divide-y divide-slate-700/50">
                             {result.financials.installmentSchedule.map((inst, i) => (
-                              <tr key={i} className="hover:bg-[var(--bg-main)]/50 transition-colors">
+                              <tr key={i} className="hover:bg-[var(--bg-main)] transition-colors">
                                 <td className={`p-3 font-semibold text-[var(--accent-emerald)] dark:text-emerald-400 ${language === 'Arabic' ? 'text-right' : 'text-left'}`}>{inst.period}</td>
                                 <td className={`p-3 font-bold text-[var(--text-primary)] ${language === 'Arabic' ? 'text-right' : 'text-left'}`}>{inst.paymentAmount}</td>
                                 <td className={`p-3 text-[var(--text-secondary)] ${language === 'Arabic' ? 'text-right' : 'text-left'}`}>{inst.milestoneDescription}</td>
@@ -452,7 +452,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                     </div>
                   </section>
 
-                  <section className="bg-blue-900/20 p-6 rounded-2xl border border-blue-500/20">
+                  <section className="bg-blue-900/20 p-6 rounded-2xl border border-blue-500 dark:border-blue-400/20">
                     <h2 className="text-lg font-black text-blue-400 mb-4 flex items-center">
                       <i className="fas fa-leaf mx-2"></i> {language === 'Arabic' ? 'أرصدة الكربون وبيع الانبعاثات' : 'Carbon Credit Monetization'}
                     </h2>

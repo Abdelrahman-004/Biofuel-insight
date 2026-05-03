@@ -93,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
   if (isDataMissing) {
     return (
       <div className="p-8 text-center text-[var(--text-secondary)]">
-        <i className="fas fa-exclamation-triangle text-4xl mb-4 text-amber-500"></i>
+        <i className="fas fa-exclamation-triangle text-4xl mb-4 text-amber-600 dark:text-amber-400"></i>
         <p>{language === 'Arabic' ? "بيانات التحليل غير مكتملة. يرجى محاولة التحليل مرة أخرى." : "Incomplete analysis data. Please try analyzing again."}</p>
       </div>
     );
@@ -124,19 +124,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
   };
 
   const getScoreAssets = (score: number) => {
-    if (score >= 80) return { color: 'text-[var(--accent-emerald)]', bg: 'bg-[var(--accent-emerald)]', border: 'border-[var(--accent-emerald)]', label: language === 'Arabic' ? 'درجة استثمارية' : 'INVESTMENT GRADE', description: language === 'Arabic' ? 'توافق تقني ومالي قوي.' : 'Strong technical & financial alignment.' };
-    if (score >= 60) return { color: 'text-blue-500', bg: 'bg-blue-500', border: 'border-blue-500', label: language === 'Arabic' ? 'مجدي بشروط' : 'CONDITIONALLY VIABLE', description: language === 'Arabic' ? 'مخاطر معتدلة يمكن إدارتها عبر التخفيف.' : 'Moderate risks manageable via mitigation.' };
-    if (score >= 40) return { color: 'text-amber-500', bg: 'bg-amber-500', border: 'border-amber-500', label: language === 'Arabic' ? 'مخاطر عالية' : 'HIGH RISK', description: language === 'Arabic' ? 'يتطلب تعديل استراتيجي كبير.' : 'Requires significant strategic adjustment.' };
-    return { color: 'text-red-500', bg: 'bg-red-500', border: 'border-red-500', label: language === 'Arabic' ? 'غير قابل للتمويل' : 'NOT BANKABLE', description: language === 'Arabic' ? 'مقاييس غير مواتية على المستوى الحالي.' : 'Unfavorable metrics at current scale.' };
+    if (score >= 80) return { color: 'text-[var(--accent-emerald)] dark:text-emerald-400', bg: 'bg-[var(--accent-emerald)]', border: 'border-[var(--accent-emerald)]', label: language === 'Arabic' ? 'درجة استثمارية' : 'INVESTMENT GRADE', description: language === 'Arabic' ? 'توافق تقني ومالي قوي.' : 'Strong technical & financial alignment.' };
+    if (score >= 60) return { color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500 dark:bg-blue-600', border: 'border-blue-500 dark:border-blue-400', label: language === 'Arabic' ? 'مجدي بشروط' : 'CONDITIONALLY VIABLE', description: language === 'Arabic' ? 'مخاطر معتدلة يمكن إدارتها عبر التخفيف.' : 'Moderate risks manageable via mitigation.' };
+    if (score >= 40) return { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500 dark:bg-amber-600', border: 'border-amber-500', label: language === 'Arabic' ? 'مخاطر عالية' : 'HIGH RISK', description: language === 'Arabic' ? 'يتطلب تعديل استراتيجي كبير.' : 'Requires significant strategic adjustment.' };
+    return { color: 'text-red-600 dark:text-red-400', bg: 'bg-red-500 dark:bg-red-600', border: 'border-red-500 dark:border-red-600/30', label: language === 'Arabic' ? 'غير قابل للتمويل' : 'NOT BANKABLE', description: language === 'Arabic' ? 'مقاييس غير مواتية على المستوى الحالي.' : 'Unfavorable metrics at current scale.' };
   };
 
   const scoreAssets = getScoreAssets(data?.FinalFeasibilityScore || 0);
 
   const getRiskColor = (level: string) => {
-    if (!level) return 'text-[var(--text-secondary)] bg-[var(--bg-main)] border-[var(--border-glow)]';
-    if (level === 'Moderate') return 'text-[var(--accent-emerald)] bg-emerald-50 border-emerald-100';
-    if (level === 'Significant') return 'text-amber-500 bg-amber-50 border-amber-100';
-    return 'text-red-500 bg-red-50 border-red-100';
+    if (!level) return 'text-[var(--text-secondary)] bg-[var(--bg-main)] border-[var(--border-glow)] dark:bg-white/5 dark:border-white/10';
+    if (level === 'Moderate') return 'text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--bg-main)] border-emerald-100 dark:bg-emerald-900/30 dark:border-emerald-500/30 dark:text-[var(--accent-emerald)] font-medium';
+    if (level === 'Significant') return 'text-amber-600 dark:text-amber-400 bg-[var(--bg-main)] border-amber-100 dark:bg-amber-900/30 dark:border-amber-500/30 dark:text-amber-200 font-medium';
+    return 'text-red-600 dark:text-red-400 bg-[var(--bg-main)] border-red-100 dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30/30 dark:text-red-300 font-medium';
   };
 
   const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -159,12 +159,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl flex items-center mb-4 shadow-sm"
+            className="bg-[var(--bg-main)] border-l-4 border-red-500 dark:border-red-600/30 p-4 rounded-xl flex items-center mb-4 shadow-sm dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30"
           >
-            <i className="fas fa-exclamation-triangle text-red-500 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
+            <i className="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
             <div>
-              <p className="text-red-800 font-black text-sm uppercase">{language === 'Arabic' ? 'تم اكتشاف نقص شديد في التمويل' : 'Severe Underfunding Detected'}</p>
-              <p className="text-red-700 text-xs font-medium">
+              <p className="text-red-800 dark:text-red-300 font-black text-sm uppercase">{language === 'Arabic' ? 'تم اكتشاف نقص شديد في التمويل' : 'Severe Underfunding Detected'}</p>
+              <p className="text-red-700 dark:text-red-200/80 text-xs font-medium">
                 {language === 'Arabic' 
                  ? `ميزانية المستثمر تغطي ${(budgetAdequacyRatio * 100).toFixed(1)}% فقط من النفقات الرأسمالية المطلوبة، يرجى الاستثمار أو البحث عن حلول أخرى.`
                  : `The investor budget is only ${(budgetAdequacyRatio * 100).toFixed(1)}% of the required realistic CAPEX. Consider scaling down production or securing additional funding.`}
@@ -180,13 +180,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[var(--bg-main)]/90 backdrop-blur-md overflow-y-auto p-4 md:p-8"
+            className="fixed inset-0 z-50 bg-[var(--bg-main)]  overflow-y-auto p-4 md:p-8"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="max-w-5xl mx-auto bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  overflow-hidden border border-[var(--border-glow)]"
+              className="max-w-5xl mx-auto bg-[var(--card-bg)] shadow-card  rounded-3xl  overflow-hidden border border-[var(--border-glow)]"
             >
             {/* Header */}
             <div className="bg-[var(--card-bg)] shadow-card px-8 py-6 flex justify-between items-center border-b border-[var(--border-glow)]">
@@ -196,7 +196,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <button 
                 onClick={() => setShowReport(false)}
-                className="w-10 h-10 rounded-full bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/10 text-[var(--text-primary)] flex items-center justify-center hover:bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/20 transition"
+                className="w-10 h-10 rounded-full bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/10 text-[var(--text-primary)] flex items-center justify-center hover:bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/20 transition"
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -229,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                       <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("TRL Level", "مستوى الجاهزية التكنولوجية")}</p>
-                      <p className="text-sm font-black text-blue-600">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
+                      <p className="text-sm font-black text-blue-600 dark:text-blue-400">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -253,15 +253,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                       <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Payback Period", "فترة الاسترداد")}</p>
-                      <p className="text-sm font-black text-emerald-600">{data?.FinancialAI?.PaybackYears || 0} Years</p>
+                      <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.FinancialAI?.PaybackYears || 0} Years</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                       <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("IRR (Est.)", "معدل العائد الداخلي (تقديري)")}</p>
-                      <p className="text-sm font-black text-emerald-600">{data?.FinancialAI?.IRR_Simplified || 'N/A'}</p>
+                      <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.FinancialAI?.IRR_Simplified || 'N/A'}</p>
                     </div>
-                    <div className="col-span-2 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase mb-1">{t("LCOE / Unit Cost", "التكلفة المستوية للطاقة / تكلفة الوحدة")}</p>
-                      <p className="text-sm font-black text-emerald-800">{data?.FinancialAI?.LCOE_or_CostPerTon || 'N/A'}</p>
+                    <div className="col-span-2 p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
+                      <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase mb-1">{t("LCOE / Unit Cost", "التكلفة المستوية للطاقة / تكلفة الوحدة")}</p>
+                      <p className="text-sm font-black text-emerald-800 dark:text-emerald-300">{data?.FinancialAI?.LCOE_or_CostPerTon || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -278,8 +278,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[var(--text-secondary)]">{t("Audit Classification", "تصنيف التدقيق")}</span>
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                        data?.AuditorAI?.Classification === 'Pass' ? 'bg-[var(--accent-emerald)] text-[var(--text-primary)]' : 
-                        data?.AuditorAI?.Classification === 'Needs Revision' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
+                        data?.AuditorAI?.Classification === 'Pass' ? 'bg-[var(--accent-emerald)] text-white' : 
+                        data?.AuditorAI?.Classification === 'Needs Revision' ? 'bg-amber-500 text-black dark:text-amber-950 font-bold' : 'bg-red-500 text-white dark:bg-red-600 dark:text-white'
                       }`}>
                         {tt(data?.AuditorAI?.Classification || 'N/A', language || 'Arabic')}
                       </span>
@@ -326,15 +326,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Capital Adequacy", "كفاية رأس المال")}</p>
-                        <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-600' : 'text-red-600'}`}>
+                        <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                           {data?.RiskAI?.CapitalAdequacyRatio?.toFixed(2) || '0.00'}
                         </p>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Risk Level", "مستوى الخطر")}</p>
                         <p className={`text-sm font-black ${
-                          data?.RiskAI?.RiskClassification === 'Moderate' ? 'text-emerald-600' : 
-                          data?.RiskAI?.RiskClassification === 'Significant' ? 'text-amber-600' : 'text-red-600'
+                          data?.RiskAI?.RiskClassification === 'Moderate' ? 'text-emerald-700 dark:text-emerald-400' : 
+                          data?.RiskAI?.RiskClassification === 'Significant' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
                         }`}>
                           {tt(data?.RiskAI?.RiskClassification || 'N/A', language || 'Arabic')}
                         </p>
@@ -397,9 +397,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </span>
           </div>
           <div className="flex items-center space-x-3 text-sm text-[var(--text-secondary)] font-medium">
-            <span className="flex items-center"><i className="fas fa-location-dot mr-1.5 text-[var(--accent-emerald)] rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.Location || 'Oman'}</span>
+            <span className="flex items-center"><i className="fas fa-location-dot mr-1.5 text-[var(--accent-emerald)] dark:text-emerald-400 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.Location || 'Oman'}</span>
             <span>•</span>
-            <span className="flex items-center"><i className="fas fa-bolt mr-1.5 text-blue-500 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.TechnologyCategory || 'Energy'}</span>
+            <span className="flex items-center"><i className="fas fa-bolt mr-1.5 text-blue-600 dark:text-blue-400 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.TechnologyCategory || 'Energy'}</span>
           </div>
         </div>
         <div className="flex space-x-3">
@@ -422,7 +422,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 p-6 rounded-2xl border-2 border-[var(--border-glow)] shadow-card flex flex-col items-center justify-center relative overflow-hidden group hover:border-emerald-100 transition-all"
+          className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-6 rounded-2xl border-2 border-[var(--border-glow)] shadow-card flex flex-col items-center justify-center relative overflow-hidden group hover:border-[var(--border-glow)] transition-all"
         >
           <div className={`absolute top-0 right-0 p-2 text-[8px] font-black uppercase text-white ${scoreAssets.bg} px-3 rounded-bl-xl shadow-md`}>
             {scoreAssets.label}
@@ -438,12 +438,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
+          className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Investment Verdict", "قرار الاستثمار")}</div>
           <div className={`text-lg font-black leading-tight ${
-            data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-600' : 
-            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-600' : 'text-red-600'
+            data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-700 dark:text-emerald-400' : 
+            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
           }`}>
             {t("Rating:", "التقييم:")} {data.DynamicScores?.overallViabilityRating || 'N/A'}
           </div>
@@ -454,7 +454,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
+          className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Payback Period", "فترة الاسترداد")}</div>
           <div className="text-3xl font-black text-[var(--text-secondary)] ">{data.EconomicFeasibility.PaybackPeriodYears} <span className="text-sm font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? "سنوات" : "Years"}</span></div>
@@ -465,7 +465,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
+          className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Corporate Tax (Oman)", "ضريبة الشركات (عُمان)")}</div>
           <div className="text-2xl font-black text-[var(--text-secondary)] ">15% <span className="text-[10px] text-[var(--text-secondary)]">{t("Applied", "مُطبقة")}</span></div>
@@ -475,7 +475,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       {/* Dynamic Weighted Scoring & SWOT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-3xl  border border-[var(--border-glow)]">
+        <div className="lg:col-span-1 bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
            <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 flex items-center">
             <i className="fas fa-chart-pie mr-2 text-indigo-500"></i>{t("Dynamic AI Scoring", "التسجيل الديناميكي للذكاء الاصطناعي")}</h3>
            <div className="space-y-6">
@@ -489,7 +489,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                    <span className="font-bold text-[var(--text-secondary)]">{m.label} ({m.weight})</span>
                    <span className="font-black text-[var(--text-primary)]">{m.score}%</span>
                  </div>
-                 <div className="w-full bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 h-2 rounded-full overflow-hidden">
+                 <div className="w-full bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 h-2 rounded-full overflow-hidden">
                    <motion.div 
                      initial={{ width: 0 }}
                      animate={{ width: `${m.score}%` }}
@@ -508,25 +508,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <div>
               <h4 className="text-[10px] font-black text-[var(--accent-emerald)] dark:text-emerald-400 uppercase mb-2">{t("Strengths", "نقاط القوة")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-[var(--accent-emerald)]/50"></i> {s}</li>)}
+                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-[var(--accent-emerald)] dark:text-emerald-400/50"></i> {s}</li>)}
               </ul>
             </div>
             <div>
               <h4 className="text-[10px] font-black text-blue-400 uppercase mb-2">{t("Opportunities", "الفرص")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-500/50"></i> {o}</li>)}
+                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-600 dark:text-blue-400/50"></i> {o}</li>)}
               </ul>
             </div>
             <div>
               <h4 className="text-[10px] font-black text-amber-400 uppercase mb-2">{t("Weaknesses", "نقاط الضعف")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-500/50"></i> {w}</li>)}
+                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-600 dark:text-amber-400/50"></i> {w}</li>)}
               </ul>
             </div>
             <div>
               <h4 className="text-[10px] font-black text-red-400 uppercase mb-2">{t("Threats", "التهديدات")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-500/50"></i> {t}</li>)}
+                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-600 dark:text-red-400/50"></i> {t}</li>)}
               </ul>
             </div>
           </div>
@@ -535,9 +535,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Localization & Taxes */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-3xl  border border-[var(--border-glow)]">
+        <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
           <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 flex items-center">
-            <i className="fas fa-landmark mr-2 text-blue-600"></i>{t("Omani Localization Logic", "منطق التوطين العماني")}</h3>
+            <i className="fas fa-landmark mr-2 text-blue-600 dark:text-blue-400"></i>{t("Omani Localization Logic", "منطق التوطين العماني")}</h3>
           <div className="space-y-4">
             <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
               <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industry Tax (Oman)", "ضريبة الصناعة (عُمان)")}</p>
@@ -545,11 +545,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
             <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-bold text-blue-500 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
+                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
                 <p className="text-lg font-black text-blue-900">{data.OmanLogic?.omanizationCostEstimate.OMR} OMR / Year</p>
                 <p className="text-[10px] text-blue-400 italic">{t("35% Minimum Quota Applied", "الحد الأدنى مطبق بنسبة 35%")}</p>
               </div>
-              <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 p-3 rounded-xl shadow-sm text-center">
+              <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-3 rounded-xl shadow-sm text-center">
                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{t("In USD", "بالدولار الأمريكي")}</p>
                  <p className="text-xs font-black text-[var(--text-primary)]">{data.OmanLogic?.omanizationCostEstimate.USD}</p>
               </div>
@@ -562,26 +562,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         </div>
 
         {/* Legal Permit Roadmap */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
+        <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)] overflow-hidden">
           <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 flex items-center">
-            <i className="fas fa-file-signature mr-2 text-emerald-600"></i>{t("Legal & Permit Roadmap", "خارطة الطريق القانونية والتصاريح")}</h3>
+            <i className="fas fa-file-signature mr-2 text-emerald-700 dark:text-emerald-400"></i>{t("Legal & Permit Roadmap", "خارطة الطريق القانونية والتصاريح")}</h3>
           <div className="space-y-3 relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5"></div>
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5"></div>
             {data.LegalRoadmap?.requiredPermits.map((permit, i) => (
               <div key={i} className="relative flex items-start space-x-4 pl-10 pb-4">
                 <div className="absolute left-3 w-2.5 h-2.5 rounded-full bg-[var(--accent-emerald)] border-2 border-white"></div>
                 <div>
                   <h4 className="text-xs font-black text-[var(--text-secondary)] ">{permit.name}</h4>
                   <p className="text-[10px] text-[var(--text-secondary)] font-medium">{permit.description}</p>
-                  <p className="text-[10px] text-emerald-600 font-bold italic mt-1 flex items-center">
+                  <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold italic mt-1 flex items-center">
                     <i className="fas fa-clock mr-1"></i> {permit.estimatedTime}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-            <p className="text-[10px] font-bold text-emerald-800 uppercase italic">Primary Authority: {data.LegalRoadmap?.authority}</p>
+          <div className="mt-4 p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-center">
+            <p className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase italic">Primary Authority: {data.LegalRoadmap?.authority}</p>
           </div>
         </div>
       </div>
@@ -594,25 +594,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
            <p className="text-lg font-light leading-relaxed mb-6 italic text-indigo-900 dark:text-indigo-100">
              "{data.ExecutiveSummary}"
            </p>
-           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 p-3 rounded-xl border border-[var(--border-glow)] w-fit">
+           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-3 rounded-xl border border-[var(--border-glow)] w-fit">
               <i className="fas fa-flag text-sm"></i>
               <span>{t("Aligned with Oman Vision 2040 Economic Diversification", "متوافق مع التنويع الاقتصادي لرؤية عُمان 2040")}</span>
            </div>
         </div>
 
         {/* Enhanced Sensitivity */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 p-6 rounded-3xl border border-[var(--border-glow)] shadow-sm">
+        <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-6 rounded-3xl border border-[var(--border-glow)] shadow-sm">
            <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-4 flex items-center">
-            <i className="fas fa-robot mr-2 text-amber-500"></i>{t("Monte Carlo Summary", "ملخص مونت كارلو")}</h3>
+            <i className="fas fa-robot mr-2 text-amber-600 dark:text-amber-400"></i>{t("Monte Carlo Summary", "ملخص مونت كارلو")}</h3>
            <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
              {data.AdvancedSensitivity?.monteCarloSummary}
            </p>
-           <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+           <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)]">
              <p className="text-[9px] font-black text-amber-700 uppercase mb-2 tracking-widest">{t("Stress Test: 10% Market Price Drop", "اختبار الضغط: انخفاض سعر السوق بنسبة 10%")}</p>
              <div className="flex justify-between items-center">
                <div>
                  <p className="text-xs font-bold text-[var(--text-secondary)]">{t("New Payback", "استرداد جديد")}</p>
-                 <p className="text-lg font-black text-amber-600">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
+                 <p className="text-lg font-black text-amber-600 dark:text-amber-400">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
                </div>
                <div className="text-right">
                  <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase">{t("Viability", "الجدوى")}</p>
@@ -625,7 +625,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       {/* Detailed Financial Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 rounded-2xl border border-[var(--border-glow)] shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl border border-[var(--border-glow)] shadow-sm overflow-hidden">
           <div className="bg-[var(--card-bg)] shadow-card px-6 py-4 flex justify-between items-center">
             <h3 className="text-[var(--text-primary)] font-bold text-sm flex items-center">
               <i className="fas fa-file-invoice-dollar mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Financial Performance Metrics", "مقاييس الأداء المالي")}</h3>
@@ -643,7 +643,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Funding Gap", "فجوة التمويل")}</span>
-                <span className={`text-sm font-black ${data.EconomicFeasibility.FundingGapUSD > 0 ? 'text-red-500' : 'text-[var(--accent-emerald)]'}`}>
+                <span className={`text-sm font-black ${data.EconomicFeasibility.FundingGapUSD > 0 ? 'text-red-600 dark:text-red-400' : 'text-[var(--accent-emerald)] dark:text-emerald-400'}`}>
                   {formatCurrency(data.EconomicFeasibility.FundingGapUSD)} ({data.EconomicFeasibility.FundingGapPercentage.toFixed(1)}%)
                 </span>
               </div>
@@ -655,15 +655,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Annual Revenue", "الإيرادات السنوية")}</span>
-                <span className="text-sm font-black text-emerald-600">{formatCurrency(data.EconomicFeasibility.AnnualRevenue)}</span>
+                <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">{formatCurrency(data.EconomicFeasibility.AnnualRevenue)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</span>
-                <span className="text-sm font-black text-red-600">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
+                <span className="text-sm font-black text-red-600 dark:text-red-400">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Gross Profit", "إجمالي الربح")}</span>
-                <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                    {formatCurrency(data.EconomicFeasibility.GrossProfit)}
                 </span>
               </div>
@@ -677,14 +677,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           </div>
           <div className="bg-[var(--bg-main)] p-4 border-t border-[var(--border-glow)]">
             <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">
-              <i className="fas fa-info-circle mr-2 text-blue-500"></i>
+              <i className="fas fa-info-circle mr-2 text-blue-600 dark:text-blue-400"></i>
               {data.Rationale}
             </p>
           </div>
         </div>
 
         {/* Sensitivity Analysis */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 rounded-2xl border border-[var(--border-glow)] shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl border border-[var(--border-glow)] shadow-sm overflow-hidden flex flex-col">
           <div className="bg-[var(--bg-main)] px-6 py-4">
             <h3 className="text-[var(--text-primary)] font-bold text-sm flex items-center">
               <i className="fas fa-vial mr-3 text-amber-400"></i>{t("Sensitivity Stress Tests", "اختبارات تحمل الحساسية")}</h3>
@@ -762,7 +762,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.ExpertCounsel.map((counsel, index) => (
-                <div key={index} className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 border border-[var(--border-glow)] rounded-xl p-4 flex items-start group hover:bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/10 transition-colors">
+                <div key={index} className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 border border-[var(--border-glow)] rounded-xl p-4 flex items-start group hover:bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/10 transition-colors">
                   <div className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shrink-0 mr-4 group-hover:bg-indigo-500 group-hover:text-[var(--text-primary)] transition-colors">
                     {index + 1}
                   </div>
@@ -778,9 +778,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Economic Chart */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-2xl  border border-[var(--border-glow)]">
+        <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
           <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-            <i className="fas fa-coins mr-3 text-blue-500"></i>{t("Capital Expenditure Profile", "ملف النفقات الرأسمالية")}</h3>
+            <i className="fas fa-coins mr-3 text-blue-600 dark:text-blue-400"></i>{t("Capital Expenditure Profile", "ملف النفقات الرأسمالية")}</h3>
           <div className="h-64 mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={costData}>
@@ -821,11 +821,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <div className="space-y-6">
               <div>
                 <h4 className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Energy Diversification", "تنوع الطاقة")}</h4>
-                <p className="text-sm text-emerald-50/80 leading-relaxed">{data.Vision2040Alignment.DiversificationContribution}</p>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{data.Vision2040Alignment.DiversificationContribution}</p>
               </div>
               <div>
                 <h4 className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Industrial Development", "التنمية الصناعية")}</h4>
-                <p className="text-sm text-emerald-50/80 leading-relaxed">{data.Vision2040Alignment.IndustrialDevelopment}</p>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{data.Vision2040Alignment.IndustrialDevelopment}</p>
               </div>
             </div>
           </div>
@@ -833,9 +833,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       </div>
 
       {/* Investor Perspective AI */}
-      <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-2xl  border border-[var(--border-glow)]">
+      <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
         <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-          <i className="fas fa-briefcase mr-3 text-blue-600"></i>{t("Investor Perspective AI", "الذكاء الاصطناعي من منظور المستثمر")}</h3>
+          <i className="fas fa-briefcase mr-3 text-blue-600 dark:text-blue-400"></i>{t("Investor Perspective AI", "الذكاء الاصطناعي من منظور المستثمر")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
             <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Return Potential", "إمكانات العائد")}</p>
@@ -864,24 +864,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Risks */}
-        <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-2xl  border border-[var(--border-glow)]">
+        <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
           <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-            <i className="fas fa-shield-halved mr-3 text-amber-500"></i>{t("Critical Risk Matrix", "مصفوفة المخاطر الحرجة")}</h3>
+            <i className="fas fa-shield-halved mr-3 text-amber-600 dark:text-amber-400"></i>{t("Critical Risk Matrix", "مصفوفة المخاطر الحرجة")}</h3>
           <div className="space-y-4">
             {data.KeyRisks?.map((risk, i) => (
-              <div key={i} className="p-4 rounded-xl border border-[var(--border-glow)] hover:border-amber-200 hover:bg-amber-50/20 transition group">
+              <div key={i} className="p-4 rounded-xl border border-[var(--border-glow)] hover:border-amber-200 hover:bg-[var(--bg-main)]/20 transition group">
                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
                   risk.Type === 'Technical' ? 'bg-purple-100 text-purple-700' :
                   risk.Type === 'Financial' ? 'bg-blue-100 text-blue-700' :
                   risk.Type === 'Regulatory' ? 'bg-amber-100 text-amber-700' :
-                  'bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 text-[var(--text-secondary)]'
+                  'bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 text-[var(--text-secondary)]'
                 }`}>
                   {risk.Type} Risk
                 </span>
                 <h4 className="text-sm font-bold text-[var(--text-secondary)]  mb-2 mt-1">{risk.Description}</h4>
                 <div className="flex items-start text-xs text-[var(--text-secondary)]">
-                  <i className="fas fa-lightbulb text-[var(--accent-emerald)] mr-2 mt-0.5 shrink-0"></i>
-                  <p><span className="font-bold text-emerald-600 mr-1">{language === 'Arabic' ? "التخفيف:" : "Mitigation:"}</span> {risk.Mitigation}</p>
+                  <i className="fas fa-lightbulb text-[var(--accent-emerald)] dark:text-emerald-400 mr-2 mt-0.5 shrink-0"></i>
+                  <p><span className="font-bold text-emerald-700 dark:text-emerald-400 mr-1">{language === 'Arabic' ? "التخفيف:" : "Mitigation:"}</span> {risk.Mitigation}</p>
                 </div>
               </div>
             ))}
@@ -894,7 +894,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <h3 className="text-xl font-bold mb-6 flex items-center">
               <i className="fas fa-user-check mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Local Consistency Review", "مراجعة الاتساق المحلي")}</h3>
             <div className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase mb-6 ${
-              data.AuditAIReview.ConsistencyCheck === 'Passed' ? 'bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] dark:text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+              data.AuditAIReview.ConsistencyCheck === 'Passed' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-500 dark:bg-amber-600/20 text-amber-400'
             }`}>
               Consistency: {data.AuditAIReview.ConsistencyCheck}
             </div>
@@ -908,7 +908,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
           </div>
 
-          <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] p-8 rounded-2xl  border border-[var(--border-glow)]">
+          <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
             <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-4 flex items-center">
               <i className="fas fa-magnifying-glass mr-3 text-[var(--text-secondary)]"></i>{t("Model Assumptions & Transparency", "افتراضات النموذج والشفافية")}</h3>
             <div className="grid grid-cols-2 gap-4">

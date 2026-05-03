@@ -162,7 +162,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
       className="max-w-5xl mx-auto space-y-8 pb-20"
     >
       <div className="flex justify-center mb-4">
-        <div className="bg-[var(--card-bg)]/50 shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
+        <div className="bg-[var(--card-bg)] shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
           <button 
             onClick={() => setViewMode('OPTIMIZE')}
             className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
@@ -192,10 +192,10 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
-            <div className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] hover:border-[#34D399]/50 transition-all duration-300 overflow-hidden">
+            <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] hover:border-#34D399 transition-all duration-300 overflow-hidden">
             <div className="bg-[#34D399]/10 px-8 py-6 border-b border-[var(--border-glow)] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div>
-                <h2 className="text-2xl font-black text-[#34D399] flex items-center tracking-tight drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                <h2 className="text-2xl font-black text-[#34D399] flex items-center tracking-tight drop-shadow-md">
                   <i className="fas fa-leaf mr-3"></i>
                   {isArabic ? 'مُحسّن الأرباح وتقليل الكربون' : 'Smart Profit & Low-Carbon Optimizer'}
                 </h2>
@@ -227,7 +227,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       setProjectName(ex.name);
                       setDescription(ex.desc);
                     }}
-                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#34D399] hover:shadow-[0_0_10px_rgba(52,211,153,0.3)] transition-all"
+                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#34D399] hover:shadow-md transition-all"
                   >
                     {ex.name}
                   </button>
@@ -259,7 +259,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
               <button 
                 disabled={isLoading || !projectName.trim() || !description.trim()}
                 className={`w-full py-4 rounded-xl font-bold text-[var(--text-primary)] flex items-center justify-center space-x-2 transition-all  ${
-                  isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95'
+                  isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md active:scale-95'
                 }`}
               >
                 {isLoading ? (
@@ -278,7 +278,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
           </div>
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center">
+            <div className="p-4 bg-[var(--bg-main)] border border-red-200 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-center">
               <i className="fas fa-exclamation-circle mr-2"></i>
               {error}
             </div>
@@ -296,7 +296,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-emerald-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-sm uppercase tracking-widest flex items-center">
@@ -308,7 +308,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       <ul className="space-y-4">
                         {result.ProfitOpportunities.map((item, i) => (
                           <li key={i} className="flex items-start text-[var(--text-secondary)]">
-                            <i className="fas fa-circle-check text-[var(--accent-emerald)] mr-3 mt-1 shrink-0"></i>
+                            <i className="fas fa-circle-check text-[var(--accent-emerald)] dark:text-emerald-400 mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
                         ))}
@@ -320,7 +320,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
                     <div className="bg-blue-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-blue-400 font-bold text-sm uppercase tracking-widest flex items-center">
@@ -332,7 +332,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       <ul className="space-y-4">
                         {result.CarbonReductionStrategies.map((item, i) => (
                           <li key={i} className="flex items-start text-[var(--text-secondary)]">
-                            <i className="fas fa-leaf text-blue-500 mr-3 mt-1 shrink-0"></i>
+                            <i className="fas fa-leaf text-blue-600 dark:text-blue-400 mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
                         ))}
@@ -366,9 +366,9 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+                    className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
                   >
-                    <div className="bg-amber-500/20 px-8 py-4 border-b border-[var(--border-glow)]">
+                    <div className="bg-amber-500 dark:bg-amber-600/20 px-8 py-4 border-b border-[var(--border-glow)]">
                       <h3 className="text-amber-400 font-bold text-sm uppercase tracking-widest flex items-center">
                         <i className="fas fa-bolt mr-3 text-amber-400"></i>{language === 'Arabic' ? "خطة استبدال الوقود الأحفوري" : "Fossil Fuel Replacement Plan"}</h3>
                     </div>
@@ -376,7 +376,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       <ul className="space-y-4">
                         {result.FossilFuelReplacementPlan.map((item, i) => (
                           <li key={i} className="flex items-start text-[var(--text-secondary)]">
-                            <i className="fas fa-plug-circle-bolt text-amber-500 mr-3 mt-1 shrink-0"></i>
+                            <i className="fas fa-plug-circle-bolt text-amber-600 dark:text-amber-400 mr-3 mt-1 shrink-0"></i>
                             <span className="font-medium">{item}</span>
                           </li>
                         ))}
@@ -431,13 +431,13 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px] rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+            className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
           >
             <div className="bg-[var(--bg-main)] border-b border-[var(--border-glow)] px-8 py-6 flex justify-between items-center">
             <h3 className="text-[var(--text-primary)] font-bold text-lg">{language === 'Arabic' ? "سجل التحسينات" : "Optimization History"}</h3>
             <button 
               onClick={onClear}
-              className="text-xs font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition"
+              className="text-xs font-black text-red-600 dark:text-red-400 uppercase tracking-widest hover:text-red-400 transition"
             >
               Clear All
             </button>
@@ -454,7 +454,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   <div 
                     key={entry.id}
                     onClick={() => handleSelectFromHistory(entry)}
-                    className="p-6 rounded-2xl border border-[var(--border-glow)] bg-[var(--bg-main)]/50 hover:bg-[var(--bg-main)] hover:border-[#34D399]/50 transition cursor-pointer group"
+                    className="p-6 rounded-2xl border border-[var(--border-glow)] bg-[var(--bg-main)] hover:bg-[var(--bg-main)] hover:border-#34D399 transition cursor-pointer group"
                   >
                     <div className="flex justify-between items-start">
                       <div>

@@ -13,6 +13,12 @@
         body { background-color: white !important; font-size: 12pt; }
         .printable-area { border: none !important; box-shadow: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
       }
+      #error-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); color: red; font-family: monospace;
+        z-index: 999999; padding: 20px; box-sizing: border-box; overflow: auto;
+        display: none;
+      }
     </style>
     <script>
       (function() {
@@ -21,9 +27,21 @@
         document.cookie = "googtrans=; path=/; domain=" + window.location.hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=None; Secure";
         document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
       })();
+      
+      window.addEventListener('error', function(event) {
+        var overlay = document.getElementById('error-overlay');
+        overlay.style.display = 'block';
+        overlay.innerText += '\n[Window Error] ' + event.message + '\n  at ' + event.filename + ':' + event.lineno + ':' + event.colno + '\n' + (event.error ? event.error.stack : '');
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        var overlay = document.getElementById('error-overlay');
+        overlay.style.display = 'block';
+        overlay.innerText += '\n[Unhandled Promise Rejection] ' + (event.reason ? event.reason.stack || event.reason : 'Unknown reason');
+      });
     </script>
 </head>
   <body class="bg-slate-950 text-slate-200 font-sans">
+    <div id="error-overlay"></div>
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

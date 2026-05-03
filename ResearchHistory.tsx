@@ -77,7 +77,7 @@ interface ResearchHistoryProps {
 export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'English', history, onSelect, onClear }) => {
   if (history.length === 0) {
     return (
-      <div className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] rounded-3xl p-12 text-center shadow-card border border-[var(--border-glow)]">
+      <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl p-12 text-center shadow-card border border-[var(--border-glow)]">
         <div className="bg-[var(--bg-main)] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
           <i className="fas fa-microscope text-[var(--text-secondary)] text-3xl"></i>
         </div>
@@ -93,7 +93,7 @@ export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'En
         <h2 className="text-2xl font-black text-[var(--text-primary)]">{language === 'Arabic' ? "سجل الأبحاث" : "Research History"}</h2>
         <button 
           onClick={onClear}
-          className="text-xs font-bold text-red-500 hover:text-red-600 transition uppercase tracking-widest"
+          className="text-xs font-bold text-red-600 dark:text-red-400 hover:text-red-600 dark:text-red-400 transition uppercase tracking-widest"
         >
           Clear All
         </button>
@@ -104,14 +104,14 @@ export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'En
           <div 
             key={entry.id}
             onClick={() => onSelect(entry)}
-            className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] p-6 rounded-2xl shadow-card border border-[var(--border-glow)] hover:border-blue-300 hover:shadow-md transition cursor-pointer group"
+            className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl shadow-card border border-[var(--border-glow)] hover:border-blue-300 hover:shadow-md transition cursor-pointer group"
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h4 className="font-black text-[var(--text-primary)] group-hover:text-blue-600 transition">{entry.ResearchInputs.BiofuelType}</h4>
+                <h4 className="font-black text-[var(--text-primary)] group-hover:text-blue-600 dark:text-blue-400 transition">{entry.ResearchInputs.BiofuelType}</h4>
                 <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{entry.ResearchInputs.FeedstockType}</p>
               </div>
-              <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black">
+              <div className="bg-blue-50 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black">
                 Score: {entry.ReadinessScore.OverallScore}
               </div>
             </div>
@@ -129,7 +129,7 @@ export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'En
 
             <div className="flex justify-between items-center text-[10px] text-[var(--text-secondary)]">
               <span className="font-medium italic">{entry.timestamp}</span>
-              <span className="text-blue-500 font-bold group-hover:translate-x-1 transition-transform">View Details <i className="fas fa-arrow-right ml-1"></i></span>
+              <span className="text-blue-600 dark:text-blue-400 font-bold group-hover:translate-x-1 transition-transform">View Details <i className="fas fa-arrow-right ml-1"></i></span>
             </div>
           </div>
         ))}

@@ -68,7 +68,7 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] shadow-card border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50 rounded-2xl shadow-sm border border-[var(--border-glow)] p-8 text-center md:text-left"
+        className="bg-[var(--card-bg)] shadow-card  shadow-card border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl shadow-sm border border-[var(--border-glow)] p-8 text-center md:text-left"
       >
         <h2 className="text-3xl font-black text-[var(--text-primary)] mb-2">International Standards & Compliance</h2>
         <p className="text-[var(--text-secondary)] max-w-2xl">Education and strategy alignment for projects targeting global export markets and rigorous environmental benchmarks.</p>
@@ -117,11 +117,11 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] shadow-card border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 p-4 rounded-xl border border-[var(--border-glow)]">
+                <div className="bg-[var(--card-bg)] shadow-card  shadow-card border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-4 rounded-xl border border-[var(--border-glow)]">
                   <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "التكنولوجيا القياسية" : "Standard Technology"}</p>
                   <p className="text-sm">{suggestion.Technology}</p>
                 </div>
-                <div className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] shadow-card border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50/5 p-4 rounded-xl border border-[var(--border-glow)]">
+                <div className="bg-[var(--card-bg)] shadow-card  shadow-card border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-4 rounded-xl border border-[var(--border-glow)]">
                   <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "النطاق الإرشادي" : "Indicative Scale"}</p>
                   <p className="text-sm">{suggestion.EstimatedScale}</p>
                 </div>
@@ -138,12 +138,12 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] p-6 rounded-2xl shadow-card border border-[var(--border-glow)] hover:border-[var(--accent-emerald)] hover:shadow-md transition-all group"
+            className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl shadow-card border border-[var(--border-glow)] hover:border-[var(--accent-emerald)] hover:shadow-md transition-all group"
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-emerald-600 transition-colors">{s.title}</h3>
-                <p className="text-[10px] font-bold text-[var(--accent-emerald)] uppercase tracking-widest">{s.subtitle}</p>
+                <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-emerald-700 dark:text-emerald-400 transition-colors">{s.title}</h3>
+                <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{s.subtitle}</p>
               </div>
               <div className="bg-[var(--bg-main)] p-2 rounded-lg text-[var(--text-secondary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors">
                 <i className="fas fa-shield-check"></i>

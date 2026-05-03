@@ -79,21 +79,21 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
       <div className="flex items-center justify-between">
         <button 
           onClick={onBack}
-          className="flex items-center text-[var(--text-secondary)] hover:text-emerald-600 font-bold text-sm transition"
+          className="flex items-center text-[var(--text-secondary)] hover:text-emerald-700 dark:text-emerald-400 font-bold text-sm transition"
         >
           <i className="fas fa-arrow-left mr-2"></i> Back to History
         </button>
         <h2 className="text-2xl font-bold text-[var(--text-primary)]">{language === 'Arabic' ? "مقارنة المشاريع" : "Project Comparison"}</h2>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--border-glow)] shadow-sm bg-[var(--card-bg)]/90 shadow-card backdrop-blur-[10px]  border-[var(--border-glow)] hover:border-[var(--accent-emerald)]/50">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--border-glow)] shadow-sm bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[var(--bg-main)] border-b border-[var(--border-glow)]">
               <th className="p-6 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest border-r border-[var(--border-glow)] min-w-[200px]">{language === 'Arabic' ? "مقياس" : "Metric"}</th>
               {entries.map(entry => (
                 <th key={entry.id} className="p-6 text-center border-r border-[var(--border-glow)] min-w-[250px]">
-                  <div className="text-emerald-600 font-black text-lg">{entry.projectName}</div>
+                  <div className="text-emerald-700 dark:text-emerald-400 font-black text-lg">{entry.projectName}</div>
                   <div className="text-[10px] text-[var(--text-secondary)] uppercase font-bold tracking-tighter">{entry.timestamp}</div>
                 </th>
               ))}
@@ -101,18 +101,18 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
           </thead>
           <tbody className="divide-y divide-slate-100">
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "درجة الجدوى" : "Feasibility Score"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "درجة الجدوى" : "Feasibility Score"}</td>
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)]">
                   <div className="text-2xl font-black text-[var(--text-secondary)] ">{e.score}%</div>
-                  <div className={`text-[10px] font-bold uppercase ${e.score > 80 ? 'text-[var(--accent-emerald)]' : 'text-amber-500'}`}>
+                  <div className={`text-[10px] font-bold uppercase ${e.score > 80 ? 'text-[var(--accent-emerald)] dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                     {e.level}
                   </div>
                 </td>
               ))}
             </tr>
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "نوع المواد الخام" : "Feedstock Type"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "نوع المواد الخام" : "Feedstock Type"}</td>
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] text-sm font-medium text-[var(--text-secondary)]">
                   {e.feedstock}
@@ -120,7 +120,7 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
               ))}
             </tr>
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "الموقع" : "Location"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "الموقع" : "Location"}</td>
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] text-sm text-[var(--text-secondary)]">
                   {e.location}
@@ -128,7 +128,7 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
               ))}
             </tr>
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "النظرة الاقتصادية" : "Economic Outlook"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "النظرة الاقتصادية" : "Economic Outlook"}</td>
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] text-xs italic text-[var(--text-secondary)] px-6">
                   "{e.fullData.EconomicFeasibility.Assessment}"
@@ -136,7 +136,7 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
               ))}
             </tr>
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "فترة الاسترداد" : "Payback Period"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "فترة الاسترداد" : "Payback Period"}</td>
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] font-bold text-[var(--text-secondary)] ">
                   {e.fullData.EconomicFeasibility.PaybackPeriodYears} Years
@@ -144,9 +144,9 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
               ))}
             </tr>
             <tr>
-              <td className="p-4 bg-[var(--bg-main)]/50 font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "كثافة الكربون" : "Carbon Intensity"}</td>
+              <td className="p-4 bg-[var(--bg-main)] font-bold text-[var(--text-secondary)] text-xs border-r border-[var(--border-glow)]">{language === 'Arabic' ? "كثافة الكربون" : "Carbon Intensity"}</td>
               {entries.map(e => (
-                <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] text-sm font-bold text-emerald-600">
+                <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)] text-sm font-bold text-emerald-700 dark:text-emerald-400">
                   {e.fullData.EnvironmentalImpact.CarbonEmissions_kgCO2_per_liter} kg CO₂/L
                 </td>
               ))}

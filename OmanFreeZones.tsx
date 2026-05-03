@@ -65,10 +65,10 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] rounded-3xl shadow-card border border-[var(--border-glow)] hover:border-[#D97706]/50 p-8 transition-all duration-300"
+        className="bg-[var(--card-bg)] shadow-card  rounded-3xl shadow-card border border-[var(--border-glow)] hover:border-#D97706 p-8 transition-all duration-300"
       >
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-3xl font-black text-[#D97706] drop-shadow-[0_0_8px_rgba(217,119,6,0.5)]">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
+          <h2 className="text-3xl font-black text-[#D97706] drop-shadow-md">{isArabic ? 'المقترحات المكانية لإنشاء المشاريع' : 'Oman Free Zones Strategic Intelligence'}</h2>
           <select 
             value={localLanguage}
             onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
@@ -87,11 +87,11 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] text-[var(--text-primary)] rounded-3xl shadow-card border border-[#D97706]/30 p-8 transition-all duration-300"
+            className="bg-[var(--card-bg)] shadow-card  text-[var(--text-primary)] rounded-3xl shadow-card border border-#D97706 p-8 transition-all duration-300"
           >
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-xl font-bold flex items-center text-[var(--text-primary)]">
-                <i className="fas fa-location-arrow text-[#D97706] mx-3 drop-shadow-[0_0_5px_rgba(217,119,6,0.5)]"></i> {isArabic ? 'تصور المشروع في المنطقة' : 'Zone-Specific Concept'}
+                <i className="fas fa-location-arrow text-[#D97706] mx-3 drop-shadow-md"></i> {isArabic ? 'تصور المشروع في المنطقة' : 'Zone-Specific Concept'}
               </h3>
               <button onClick={() => setSuggestion(null)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
                 <i className="fas fa-times"></i>
@@ -139,11 +139,11 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 * idx }}
-                    className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-[var(--accent-emerald)]/20 hover:border-[var(--accent-emerald)]/50 transition group"
+                    className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-var(--accent-emerald) hover:border-var(--accent-emerald) transition group"
                   >
                     <div className="flex items-start justify-between mb-2">
                        <h5 className="text-xs font-black text-[var(--text-primary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition">{inc.title}</h5>
-                      <i className="fas fa-award text-[var(--accent-emerald)] text-[10px]"></i>
+                      <i className="fas fa-award text-[var(--accent-emerald)] dark:text-emerald-400 text-[10px]"></i>
                     </div>
                     <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed mb-3">{inc.description}</p>
                     <div className="flex items-center text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-tighter">
@@ -153,7 +153,7 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
                   </motion.div>
                 ))}
               </div>
-              <div className="mt-6 p-4 bg-[var(--accent-emerald)]/10 rounded-xl border border-[var(--accent-emerald)]/20 flex items-center">
+              <div className="mt-6 p-4 bg-[var(--accent-emerald)]/10 rounded-xl border border-var(--accent-emerald) flex items-center">
                 <i className="fas fa-info-circle text-[var(--accent-emerald)] dark:text-emerald-400 mx-3"></i>
                 <p className="text-[10px] text-emerald-800 dark:text-emerald-100 font-medium">
                   {isArabic ? 'تعتبر هذه الحوافز تقديرية وتستند إلى القوانين الحالية للمناطق الحرة، يجب التقدم رسمياً للحصول عليها.' : 'These incentives are estimated based on current Omani Free Zone regulations. Final eligibility requires formal application to the respective authorities.'}
@@ -171,7 +171,7 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-[var(--card-bg)] shadow-card backdrop-blur-[10px] rounded-3xl border border-[var(--border-glow)] overflow-hidden shadow-card hover:border-[#D97706]/50 transition-all duration-300"
+            className="bg-[var(--card-bg)] shadow-card  rounded-3xl border border-[var(--border-glow)] overflow-hidden shadow-card hover:border-#D97706 transition-all duration-300"
           >
             <div className="flex flex-col md:flex-row text-[var(--text-primary)]">
               <div className="p-8 md:w-2/3">
@@ -182,7 +182,7 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleSuggest(z.name)}
                     disabled={!!loading}
-                    className="px-4 py-2 bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] text-[var(--card-bg)] text-[10px] font-black uppercase rounded-lg transition disabled:opacity-50"
+                    className="px-4 py-2 bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md text-[var(--card-bg)] text-[10px] font-black uppercase rounded-lg transition disabled:opacity-50"
                   >
                     {loading === z.name ? <i className="fas fa-spinner fa-spin mx-2"></i> : <i className="fas fa-bolt mx-2 text-[var(--card-bg)]"></i>}
                     {isArabic ? `اقتراح مشروع لـ ${z.name.split(' ')[isArabic ? 1 : 0] || z.name}` : `Suggest Project for ${z.name.split(' ')[0]}`}
@@ -215,7 +215,7 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
               <div className="bg-[var(--bg-main)] p-8 md:w-1/3 flex flex-col justify-center border-t md:border-t-0 md:border-l border-[var(--border-glow)] rtl:border-l-0 rtl:border-r">
                 <h4 className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{isArabic ? 'رؤية استراتيجية' : 'Strategic Insight'}</h4>
                 <p className="text-sm text-[var(--text-secondary)] italic font-medium">"{z.note}"</p>
-                <div className="mt-6 flex items-center space-x-2 rtl:space-x-reverse text-[#D97706] font-bold text-xs drop-shadow-[0_0_5px_rgba(217,119,6,0.3)]">
+                <div className="mt-6 flex items-center space-x-2 rtl:space-x-reverse text-[#D97706] font-bold text-xs drop-shadow-md">
                   <i className={`fas fa-arrow-${isArabic ? 'left' : 'right'}-long`}></i>
                   <span>{isArabic ? 'متوافق مع رؤية عمان 2040' : 'Align with Vision 2040'}</span>
                 </div>
