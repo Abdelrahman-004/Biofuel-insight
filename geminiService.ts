@@ -56,15 +56,21 @@ STRICT MODE:
 BIOFUELS:
 - Algae (Open Pond) CAPEX: $8–12 per kg installed annual capacity.
 - Algae (PBR) CAPEX: $15–25 per kg installed annual capacity.
-- Date Seed/Waste Oil CAPEX: $1,200–2,500 per ton annual capacity.
+- Date Seed/Waste Oil/UCO CAPEX: $1,200–2,500 per ton annual capacity.
 - Biofuel OPEX: $600–1,400 per ton depending on technology.
 
 RENEWABLE ENERGY:
 - Solar PV CAPEX: $800–1,200 per kW installed.
 - Wind CAPEX: $1,300–1,800 per kW installed.
 - Waste-to-Energy CAPEX: $3,000–5,000 per kW installed.
-- Solar Capacity Factor (Oman): 25–30%.
+- Solar Capacity Factor (Oman): 20–25% (roughly 1750-2190 MWh/yr per 1000 kW).
 - Wind Capacity Factor (Oman): 35–45%.
+
+### REALISTIC ROIs & PAYBACK (CRITICAL INSTRUCTION):
+- Real industrial projects take time to become profitable.
+- You MUST provide strictly realistic financial metrics. ROI should naturally be between 10% to 35%. 
+- Payback periods should be 3 to 8 years. 
+- DO NOT invent 200% ROI or return periods under 2 years, this destroys trust and screams "AI-generated". Force your formulas to output scaled, realistic metrics.
 
 ### OMAN CONTEXT ADJUSTMENTS:
 - Corporate Tax: Apply 15% on Gross Profit. Formula: Net Profit = Gross Profit * 0.85.
@@ -508,7 +514,8 @@ const getLanguageInstruction = (language?: string) => {
 CRITICAL INSTRUCTION FOR ARABIC:
 - You MUST translate EVERYTHING literally and completely into Arabic.
 - NO ENGLISH WORDS SHOULD REMAIN IN THE OUTPUT TEXTS (except for strict JSON keys and enums).
-- Translate all explanations, values, descriptions, mitigations, and summaries into Arabic literally.`;
+- Translate all explanations, values, descriptions, mitigations, and summaries into Arabic literally.
+- Ensure proper spacing between Arabic words. NEVER return mashed together words (e.g., "3.5إلى5.0مممربعلكلثانية"). Every word and number must be appropriately separated by spaces.`;
   }
   return `
 CRITICAL INSTRUCTION FOR ENGLISH:
@@ -594,11 +601,13 @@ export async function analyzeProject(inputs: {
   feedstock: string;
   projectScale: string;
   production: number;
+  capacity?: number;
   budget: number;
   sellingPrice: number;
   electricityCost?: number;
   laborCost?: number;
   co2Source?: string;
+  advancedParams?: Record<string, number | string>;
   language?: string;
 }): Promise<BioFuelAnalysis> {
   const isArabic = inputs.language === 'Arabic';
@@ -610,6 +619,13 @@ export async function analyzeProject(inputs: {
   
   const LOCAL_SYSTEM_PROMPT = `${SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST process and output everything natively in ${inputs.language || 'English'}. ${getLanguageInstruction(inputs.language)}`;
   
+  const advancedParamsStr = inputs.advancedParams 
+    ? Object.entries(inputs.advancedParams)
+        .filter(([_, v]) => v !== undefined && v !== '')
+        .map(([k, v]) => `   - ${k}: ${v}`)
+        .join('\n')
+    : '';
+
   const prompt = `Perform an Investment-Grade Feasibility Analysis for:
   - Project Name: ${inputs.projectName}
   - Location: ${inputs.location}
@@ -617,12 +633,16 @@ export async function analyzeProject(inputs: {
   - Feedstock/Energy Type: ${inputs.feedstock}
   - Project Scale: ${inputs.projectScale} (Adjust feasibility scoring, CAPEX, OPEX, payback period, and recommendations strictly based on this scale. Small/Pilot means high risk per ton but lower total capital, Mega means economies of scale but huge upfront CAPEX.)
   - Target Production: ${inputs.production} ${inputs.category === 'Biofuel' ? 'tons/year' : 'MWh/year'}
+  ${inputs.category === 'Renewable Energy' && inputs.capacity ? `- Plant Capacity: ${inputs.capacity} kW` : ''}
   - Investor Budget: ${inputs.budget} USD
   - Selling Price: ${inputs.category === 'Biofuel' ? inputs.sellingPrice + ' USD/ton' : (inputs.sellingPrice || 'N/A (Calculate LCOE and Savings)') + ' USD/MWh'}
   - Electricity Cost: ${inputs.electricityCost || 'N/A'} USD/kWh
   - Labor Cost: ${inputs.laborCost || 'N/A'} USD/year
-  - CO2 Source: ${inputs.co2Source || 'N/A'}
+  - CO2 Source: ${inputs.co2Source || 'N/A'}${advancedParamsStr ? '\n   - Advanced Techno-Economic Parameters:\n' + advancedParamsStr : ''}
 
+  CRITICAL ACCURACY INSTRUCTION: Use all Advanced Techno-Economic Parameters provided to EXACTLY calculate payback period, CAPEX, OPEX, and generation yield. Do not guess parameters if they are provided. If standard parameters are missing, use industry norms for Oman. Do NOT deviate from standard physics and engineering calculations.
+  If this is a Renewable Energy project (Solar/Wind), use the provided Plant Capacity (kW) and Target Production (MWh/year) to calculate Capacity Factor, generate physics-compliant energy outputs, and use those outputs to determine revenue correctly. Typical Solar PV in Oman produces ~1700 to 2000 MWh/year per 1000 kW capacity.
+  
   CRITICAL LANGUAGE INSTRUCTION:
   The absolute MUST return all language text, summaries, labels, definitions, mitigation descriptions, strings, etc. exclusively in ${inputs.language || 'English'} natively. ${getLanguageInstruction(inputs.language)}
 
@@ -675,6 +695,7 @@ export async function analyzeProject(inputs: {
       contents: prompt,
       config: {
         systemInstruction: LOCAL_SYSTEM_PROMPT,
+        temperature: 0.0,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
@@ -1523,9 +1544,9 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
-      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${inputs.language}. ${getLanguageInstruction(inputs.language)}
+      contents: `CRITICAL INSTRUCTION: You must strictly output the entire JSON content natively in ${inputs.language}. ${getLanguageInstruction(inputs.language)}
       
-      Generate a professional grant/investment proposal.
+      Generate a professional, global-consulting-firm-grade investment proposal.
       Project Name: ${inputs.projectName}
       Feedstock: ${inputs.feedstock}
       Biofuel Type: ${inputs.biofuelType}
@@ -1533,20 +1554,24 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
       Estimated Budget: ${inputs.budget}
       Target Audience: ${inputs.targetAudience}
       Requested Output Language: ${inputs.language}
-      `,
+      
+      Ensure you output ALL 14 requested sections, plus the additional deliverables.
+      Provide high-quality mathematical equations in the technical and financial sections to justify your CAPEX/OPEX operations. 
+      Use accurate, real numbers for Oman's economy.`,
       config: {
-        systemInstruction: `You are an Expert Grant Writer and Investment Analyst specializing in Oman's energy sector.
-        Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI for academic grants, PDO/OQ for industrial investment, OTF for startups).
+        systemInstruction: `You are an Expert Industrial Investment Analyst working for a top-tier global consulting firm, specializing in Oman's energy sector.
+        Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI, PDO/OQ, OTF).
         
         RULES:
-        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. ${getLanguageInstruction(inputs.language)}
-        2. DO NOT output long paragraphs. Use concise bullet points for summaries, statements, and alignments.
-        3. FINANCIAL TABLES: Provide realistic numbers. Generate an 'installmentSchedule' showing exactly when and how the investor will get their money back (e.g., "Year 1", "Year 2") and if it is in installments.
-        4. Align heavily with Oman Vision 2040.
-        5. Carbon Credit Potential: Estimate tons of CO2 saved and provide a monetary value.
+        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. ${getLanguageInstruction(inputs.language)} Ensure proper spacing between words. NEVER return mashed together words in Arabic (e.g., "التزامسلطنةعمان"). Every word must be properly spaced.
+        2. TONE: Sound like it was prepared by a McKinsey or BCG consultant. Highly persuasive but realistic. Balance profitability with sustainability. Appeal to corporate investors, energy companies, and industrial decision-makers.
+        3. REALISTIC FINANCIALS: Industrial projects take time to become profitable. You MUST provide strictly realistic financial metrics. ROI should naturally be between 10% to 35%. Payback periods should be 3 to 8 years. DO NOT invent 200% ROI or 5-month return periods; this destroys investor trust because it screams "AI-generated". Ensure your CAPEX scaling makes sense compared to revenue. Let OPEX correctly reflect labor, energy, feedstock acquisition, and maintenance.
+        4. OMAN ACCURACY: Use real, accurate data specific to Oman (e.g., electricity cost per kWh, labor costs, land rates in free zones).
+        5. ADDITIONAL: You MUST provide the pitch deck outline, investor email template, one-page summary, funding recommendations, strategic partners, and scaling strategy.
+        6. SOLAR/WIND RENEWABLE CALCULATIONS: If the project involves Solar or Wind, accurately calculate capacity vs energy output. For example, 1,000 kW (1 MW) solar capacity produces roughly 1,700 to 2,000 MWh/year in Oman (based on a ~20-22% capacity factor). Use this realistic relationship, strictly showcase MWh/year or kWh/year production instead of confusing it with capacity, and correctly price electricity unit rates to logically justify total revenues.
         
         ### REAL-TIME DATA MANDATE (CRITICAL):
-        - You MUST use the provided Google Search tool to find live market prices for Carbon Credits, Feedstock values, or current Oman Vision 2040 funding mandates before finalizing numbers inside your proposal. Do not use outdated or hallucinated estimates.`,
+        - You MUST use the provided Google Search tool to find live market prices for Carbon Credits, Feedstock values, and Omani economic parameters before finalizing numbers. Do not hallucinate estimates.`,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
@@ -1555,9 +1580,13 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
             title: { type: Type.STRING },
             executiveSummary: { type: Type.ARRAY, items: { type: Type.STRING } },
             problemStatement: { type: Type.ARRAY, items: { type: Type.STRING } },
-            omanVision2040Alignment: { type: Type.ARRAY, items: { type: Type.STRING } },
-            methodology: { type: Type.STRING },
-            financials: {
+            marketOpportunity: { type: Type.ARRAY, items: { type: Type.STRING } },
+            competitiveAdvantage: { type: Type.ARRAY, items: { type: Type.STRING } },
+            businessModel: { type: Type.ARRAY, items: { type: Type.STRING } },
+            revenueStreams: { type: Type.ARRAY, items: { type: Type.STRING } },
+            technicalOverview: { type: Type.ARRAY, items: { type: Type.STRING } },
+            feedstockStrategy: { type: Type.ARRAY, items: { type: Type.STRING } },
+            financialModel: {
               type: Type.OBJECT,
               properties: {
                 totalCapex: { type: Type.STRING },
@@ -1565,22 +1594,33 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
                 expectedRevenue: { type: Type.STRING },
                 roiPercentage: { type: Type.STRING },
                 paybackPeriod: { type: Type.STRING },
-                fundingReturnStrategy: { type: Type.STRING },
                 installmentSchedule: {
                   type: Type.ARRAY,
                   items: {
                     type: Type.OBJECT,
                     properties: {
-                      period: { type: Type.STRING },
-                      paymentAmount: { type: Type.STRING },
-                      milestoneDescription: { type: Type.STRING }
+                      year: { type: Type.STRING },
+                      amount: { type: Type.STRING },
+                      description: { type: Type.STRING }
                     },
-                    required: ["period", "paymentAmount", "milestoneDescription"]
+                    required: ["year", "amount", "description"]
                   }
                 }
               },
-              required: ["totalCapex", "annualOpex", "expectedRevenue", "roiPercentage", "paybackPeriod", "fundingReturnStrategy", "installmentSchedule"]
+              required: ["totalCapex", "annualOpex", "expectedRevenue", "roiPercentage", "paybackPeriod", "installmentSchedule"]
             },
+            riskAnalysis: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  risk: { type: Type.STRING },
+                  mitigation: { type: Type.STRING }
+                },
+                required: ["risk", "mitigation"]
+              }
+            },
+            esgImpact: { type: Type.ARRAY, items: { type: Type.STRING } },
             carbonCreditPotential: {
               type: Type.OBJECT,
               properties: {
@@ -1590,9 +1630,56 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
               },
               required: ["estimatedTonsSaved", "monetaryValueRange", "explanation"]
             },
-            conclusion: { type: Type.STRING }
+            investmentProposal: {
+              type: Type.OBJECT,
+              properties: {
+                requestedAmount: { type: Type.STRING },
+                fundingUtilization: { type: Type.ARRAY, items: { type: Type.STRING } },
+                investorReturns: { type: Type.STRING },
+                equityStructure: { type: Type.STRING },
+                repaymentStrategy: { type: Type.STRING }
+              },
+              required: ["requestedAmount", "fundingUtilization", "investorReturns", "equityStructure", "repaymentStrategy"]
+            },
+            whyInvestorsShouldFund: { type: Type.ARRAY, items: { type: Type.STRING } },
+            pitchDeckOutline: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  slideNumber: { type: Type.NUMBER },
+                  title: { type: Type.STRING },
+                  content: { type: Type.STRING }
+                },
+                required: ["slideNumber", "title", "content"]
+              }
+            },
+            investorEmailTemplate: { type: Type.STRING },
+            onePageSummary: { type: Type.STRING },
+            fundingRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+            strategicPartners: { type: Type.ARRAY, items: { type: Type.STRING } },
+            phasedScalingStrategy: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  phase: { type: Type.STRING },
+                  duration: { type: Type.STRING },
+                  milestones: { type: Type.ARRAY, items: { type: Type.STRING } }
+                },
+                required: ["phase", "duration", "milestones"]
+              }
+            }
           },
-          required: ["title", "executiveSummary", "problemStatement", "omanVision2040Alignment", "methodology", "financials", "carbonCreditPotential", "conclusion"]
+          required: [
+            "title", "executiveSummary", "problemStatement", "marketOpportunity",
+            "competitiveAdvantage", "businessModel", "revenueStreams",
+            "technicalOverview", "feedstockStrategy", "financialModel",
+            "riskAnalysis", "esgImpact", "carbonCreditPotential",
+            "investmentProposal", "whyInvestorsShouldFund", "pitchDeckOutline",
+            "investorEmailTemplate", "onePageSummary", "fundingRecommendations",
+            "strategicPartners", "phasedScalingStrategy"
+          ]
         }
       }
     }));

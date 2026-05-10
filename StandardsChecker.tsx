@@ -32,6 +32,19 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
   const [result, setResult] = useState<StandardsResult | null>(null);
   const [history, setHistory] = useState<StandardsHistoryEntry[]>([]);
 
+  const STANDARDS_HISTORY_KEY = 'biofuel_insight_standards_history';
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem(STANDARDS_HISTORY_KEY);
+    if (saved) {
+      try { setHistory(JSON.parse(saved)); } catch(e) {}
+    }
+  }, []);
+
+  React.useEffect(() => {
+    localStorage.setItem(STANDARDS_HISTORY_KEY, JSON.stringify(history));
+  }, [history]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setInputs({ ...inputs, [e.target.name]: e.target.value });
   };
@@ -167,7 +180,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 <div 
                   key={entry.id} 
                   onClick={() => { setResult(entry.fullData); setStatus('COMPLETED'); }}
-                  className="p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-#E2E8F0 transition-colors"
+                  className="p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-[var(--accent-emerald)] transition-colors"
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-[var(--text-secondary)]">{entry.biofuelType}</span>
@@ -270,7 +283,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[var(--bg-main)] text-[10px] uppercase tracking-widest text-[#E2E8F0]">
+                        <tr className="bg-[var(--bg-main)] text-[10px] uppercase tracking-widest text-[var(--text-secondary)]">
                           <th className="p-3 rounded-tl-xl border-b border-[var(--border-glow)]">{language === 'Arabic' ? "المعيار" : "Parameter"}</th>
                           <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "قيمتك" : "Your Value"}</th>
                           <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "الحد القياسي" : "Standard Limit"}</th>
@@ -283,7 +296,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                           <tr key={i} className="border-b border-[var(--border-glow)] last:border-0 hover:bg-white/5">
                             <td className="p-3 font-bold text-[var(--text-secondary)]">{evalItem.parameter}</td>
                             <td className="p-3 font-medium text-[var(--text-secondary)]">{evalItem.userValue}</td>
-                            <td className="p-3 font-medium text-[#E2E8F0]">{evalItem.standardLimit}</td>
+                            <td className="p-3 font-medium text-[var(--text-primary)]">{evalItem.standardLimit}</td>
                             <td className="p-3">
                               <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
                                 evalItem.status === 'Pass' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
@@ -303,16 +316,16 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
 
                 {/* Fix Recommendations */}
                 {result.evaluations.some(e => e.status === 'Fail' || e.status === 'Warning') && (
-                  <div className="mb-8 bg-amber-500 dark:bg-amber-600/10 p-6 rounded-2xl border border-amber-500/20">
-                    <h3 className="text-sm font-black text-amber-400 uppercase tracking-widest mb-4 flex items-center">
+                  <div className="mb-8 bg-amber-50 dark:bg-amber-900/20 p-6 rounded-2xl border border-amber-200 dark:border-amber-700/50">
+                    <h3 className="text-sm font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-4 flex items-center">
                       <i className="fas fa-wrench mr-2"></i> {language === 'Arabic' ? "التعديلات المطلوبة" : "Required Adjustments"}
                     </h3>
                     <ul className="space-y-3">
                       {result.evaluations.filter(e => e.status === 'Fail' || e.status === 'Warning').map((evalItem, i) => (
-                        <li key={i} className="text-sm text-amber-100 flex items-start">
+                        <li key={i} className="text-sm text-amber-900 dark:text-amber-100 flex items-start">
                           <i className="fas fa-arrow-right mt-1 mr-2 text-amber-600 dark:text-amber-400"></i>
                           <div>
-                            <span className="font-bold text-amber-300">{evalItem.parameter}: </span>
+                            <span className="font-bold text-amber-800 dark:text-amber-300">{evalItem.parameter}: </span>
                             {evalItem.fixRecommendation || 'Requires chemical adjustment.'}
                           </div>
                         </li>
@@ -327,9 +340,9 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "ملخص الخبراء" : "Expert Summary"}</h3>
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{result.expertSummary}</p>
                   </div>
-                  <div className="bg-[#E2E8F0]/10 p-6 rounded-2xl border border-#E2E8F0">
-                    <h3 className="text-[10px] font-black text-[#E2E8F0] dark:text-[#E2E8F0] uppercase tracking-widest mb-2">{language === 'Arabic' ? "الجدوى التجارية (عُمان)" : "Commercial Viability (Oman)"}</h3>
-                    <p className="text-sm text-[var(--text-secondary)]  leading-relaxed font-medium">{result.commercialViability}</p>
+                  <div className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
+                    <h3 className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "الجدوى التجارية (عُمان)" : "Commercial Viability (Oman)"}</h3>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{result.commercialViability}</p>
                   </div>
                 </div>
 

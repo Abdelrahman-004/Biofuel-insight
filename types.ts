@@ -491,9 +491,9 @@ export interface ProposalInput {
 }
 
 export interface Installment {
-  period: string;
-  paymentAmount: string;
-  milestoneDescription: string;
+  year: string;
+  amount: string;
+  description: string;
 }
 
 export interface FinancialTables {
@@ -502,7 +502,6 @@ export interface FinancialTables {
   expectedRevenue: string;
   roiPercentage: string;
   paybackPeriod: string;
-  fundingReturnStrategy: string;
   installmentSchedule: Installment[];
 }
 
@@ -510,17 +509,51 @@ export interface ProposalResult {
   id: string;
   timestamp: string;
   title: string;
+  
+  // The 14 Core Sections
   executiveSummary: string[];
   problemStatement: string[];
-  omanVision2040Alignment: string[];
-  methodology: string;
-  financials: FinancialTables;
+  marketOpportunity: string[];
+  competitiveAdvantage: string[];
+  businessModel: string[];
+  revenueStreams: string[];
+  technicalOverview: string[];
+  feedstockStrategy: string[];
+  financialModel: FinancialTables;
+  riskAnalysis: {
+    risk: string;
+    mitigation: string;
+  }[];
+  esgImpact: string[];
   carbonCreditPotential: {
     estimatedTonsSaved: string;
     monetaryValueRange: string;
     explanation: string;
   };
-  conclusion: string;
+  investmentProposal: {
+    requestedAmount: string;
+    fundingUtilization: string[];
+    investorReturns: string;
+    equityStructure: string;
+    repaymentStrategy: string;
+  };
+  whyInvestorsShouldFund: string[];
+
+  // Additional Deliverables
+  pitchDeckOutline: {
+    slideNumber: number;
+    title: string;
+    content: string;
+  }[];
+  investorEmailTemplate: string;
+  onePageSummary: string;
+  fundingRecommendations: string[];
+  strategicPartners: string[];
+  phasedScalingStrategy: {
+    phase: string;
+    duration: string;
+    milestones: string[];
+  }[];
 }
 
 export interface ProposalHistoryEntry {

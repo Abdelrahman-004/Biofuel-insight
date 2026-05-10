@@ -426,6 +426,7 @@ export default function App() {
     electricityCost?: number;
     laborCost?: number;
     co2Source?: string;
+    advancedParams?: any;
   }) => {
     setStatus('ANALYZING');
     setError(null);
