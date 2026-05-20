@@ -29,15 +29,15 @@
     --nav-bg: rgba(255, 255, 255, 0.85);
     --text-primary: #111827; /* Tailwind gray-900 */
     --text-secondary: #4B5563; /* Tailwind gray-600 */
-    --text-muted: #9CA3AF; /* Tailwind gray-400 */
-    --accent-emerald: #059669; /* Elegant dark green */
+    --text-muted: #6B7280; /* Tailwind gray-500 (Accessible) */
+    --accent-emerald: #047857; /* Emerald-700 for WCAG AA */
     --border-subtle: #F3F4F6; /* Gray-100 */
     --border-glow: #E5E7EB; /* Gray-200, no neon */
     --border-dark: #D1D5DB; 
     --zebra-even: #F9FAFB;
     --zebra-odd: #FFFFFF;
-    --color-up: #059669; 
-    --color-down: #DC2626; 
+    --color-up: #047857; /* Emerald-700 */
+    --color-down: #B91C1C;  /* Red-700 */
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 

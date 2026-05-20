@@ -186,7 +186,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     <span className="text-xs font-bold text-[var(--text-secondary)]">{entry.biofuelType}</span>
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
                       entry.overallStatus === 'Compliant' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 
-                      entry.overallStatus === 'Non-Compliant' ? 'bg-red-500 dark:bg-red-600/20 text-red-400' : 'bg-amber-500 dark:bg-amber-600/20 text-amber-400'
+                      entry.overallStatus === 'Non-Compliant' ? 'bg-red-600 dark:bg-red-600/20 text-red-700 dark:text-red-400' : 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400'
                     }`}>
                       {entry.overallStatus}
                     </span>
@@ -221,7 +221,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 p-12"
+              className="h-full flex flex-col items-center justify-center text-blue-700 dark:text-blue-400 p-12"
             >
               <i className="fas fa-cog fa-spin text-6xl mb-6"></i>
               <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "يتم تقييم المعايير..." : "Evaluating Parameters..."}</h3>
@@ -235,7 +235,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-red-600 dark:text-red-400 p-12"
+              className="h-full flex flex-col items-center justify-center text-red-700 dark:text-red-400 p-12"
             >
               <i className="fas fa-exclamation-triangle text-6xl mb-4"></i>
               <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "فشل التحليل" : "Analysis Failed"}</h3>
@@ -255,7 +255,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                   onClick={downloadPDF}
                   className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-card"
                 >
-                  <i className="fas fa-file-pdf mr-2 text-red-400"></i>{language === 'Arabic' ? "تحميل التقرير كـ PDF" : "Download PDF Report"}</button>
+                  <i className="fas fa-file-pdf mr-2 text-red-700 dark:text-red-400"></i>{language === 'Arabic' ? "تحميل التقرير كـ PDF" : "Download PDF Report"}</button>
               </div>
 
               <div id="standards-report" className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
@@ -267,7 +267,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                   </div>
                   <div className={`mt-4 md:mt-0 px-4 py-2 rounded-xl border flex items-center ${
                     result.overallStatus === 'Compliant' ? 'bg-[var(--accent-emerald)]/10 border-var(--accent-emerald) text-[var(--accent-emerald)] dark:text-emerald-400' : 
-                    result.overallStatus === 'Non-Compliant' ? 'bg-red-500 dark:bg-red-600/10 border-red-500 dark:border-red-600/30/20 text-red-400' : 'bg-amber-500 dark:bg-amber-600/10 border-amber-500/20 text-amber-400'
+                    result.overallStatus === 'Non-Compliant' ? 'bg-red-600 dark:bg-red-600/10 border-red-500 dark:border-red-600/30/20 text-red-700 dark:text-red-400' : 'bg-amber-600 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
                   }`}>
                     <i className={`fas ${
                       result.overallStatus === 'Compliant' ? 'fa-check-circle' : 
@@ -300,8 +300,8 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                             <td className="p-3">
                               <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
                                 evalItem.status === 'Pass' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
-                                evalItem.status === 'Fail' ? 'bg-red-500 dark:bg-red-600/20 text-red-400' :
-                                evalItem.status === 'Warning' ? 'bg-amber-500 dark:bg-amber-600/20 text-amber-400' : 'bg-[var(--bg-main)] text-[var(--text-secondary)]'
+                                evalItem.status === 'Fail' ? 'bg-red-600 dark:bg-red-600/20 text-red-700 dark:text-red-400' :
+                                evalItem.status === 'Warning' ? 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400' : 'bg-[var(--bg-main)] text-[var(--text-secondary)]'
                               }`}>
                                 {evalItem.status}
                               </span>
@@ -323,7 +323,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     <ul className="space-y-3">
                       {result.evaluations.filter(e => e.status === 'Fail' || e.status === 'Warning').map((evalItem, i) => (
                         <li key={i} className="text-sm text-amber-900 dark:text-amber-100 flex items-start">
-                          <i className="fas fa-arrow-right mt-1 mr-2 text-amber-600 dark:text-amber-400"></i>
+                          <i className="fas fa-arrow-right mt-1 mr-2 text-amber-700 dark:text-amber-400"></i>
                           <div>
                             <span className="font-bold text-amber-800 dark:text-amber-300">{evalItem.parameter}: </span>
                             {evalItem.fixRecommendation || 'Requires chemical adjustment.'}

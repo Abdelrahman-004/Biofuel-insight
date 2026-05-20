@@ -264,36 +264,75 @@ export interface RiskAssessmentAI {
 }
 
 export interface ChallengeSolverResult {
-  IdentifiedChallenge: string;
-  ScientificHypothesis: string;
-  ExperimentalDesign: {
-    Title: string;
-    Variables: string[];
-    ControlConditions: string[];
-    ExpectedOutcomes: string[];
-    FeasibilityNote: string;
+  researchChallenge: string;
+  researchGap: string;
+  hypothesis: string;
+  experimentalDesign: {
+    title: string;
+    objective: string;
+    variables: { type: string; name: string; range: string }[];
+    steps: string[];
+    equipment: string[];
+    duration: string;
+    budget: string;
   };
-  IndustrialRelevance: string;
-  ExpectedImpact: {
-    Environmental: string;
-    Economic: string;
-    Strategic: string;
-    Scalability: string;
+  statisticalDesign: {
+    replicates: number;
+    totalExperimentalUnits: number;
+    primaryTest: string;
+    postHocTest: string;
+    correlationTest: string;
+    software: string;
+    availableAt: string;
+    significanceLevel: string;
+    minimumDetectableDifference: string;
+    requiredNFor80Power: number;
+    dataPresentation: string[];
   };
-  DataDrivenInsights: {
-    LifeCycleAssessment: string;
-    ResourceEfficiency: string;
-    EnvironmentalImpact: string;
-    ConventionalComparison: string;
+  expectedOutcomes: { metric: string; baseline: string; target: string; unit: string }[];
+  lifeCycleAssessment: {
+    systemBoundary: string;
+    functionalUnit: string;
+    methodology: string;
+    phases: { phase: string; energy: number; ghg: number }[];
+    comparison: { parameter: string; fossilBaseline: string; conventional: string; thisStudy: string }[];
+    resourceEfficiency: { resource: string; convMethod: string; thisStudy: string; saving: string }[];
+    netGhgPosition: { fossilBaseline: string; thisStudyTarget: string; reductionAchieved: string; euRedIIIMet: boolean };
+    lcaAssumptions: string[];
+    dataGaps: string[];
+    isoCompliance: { status: string; reason: string };
   };
-  AIAudit: {
-    LogicalConsistency: string;
-    Assumptions: string[];
+  literatureLandscape: {
+    established: string[];
+    contested: string[];
+    unknown: string[];
+    keyResearchGroupsWorldwide: { group: string; focus: string }[];
+    searchTerms: string[];
+    targetJournals: { journal: string; impactFactor: string }[];
   };
-  AlternativeMethods: {
-    MethodName: string;
-    Description: string;
-  }[];
+  researchPathway: {
+    lab: { scale: string; duration: string; goal: string };
+    pilot: { scale: string; duration: string; goal: string };
+    commercial: { scale: string; timeline: string; goal: string };
+  };
+  researchOutputPlan: {
+    publications: { topic: string; journal: string; timeline: string; targetIF: string }[];
+    conference: { name: string; location: string; deadline: string };
+    intellectualProperty: { patentPotential: string; action: string; contact: string };
+    capacityBuilding: { mscTrained: number; phdTrained: number; capabilityBuilt: string; createdAsset: string };
+    kpis: { publications: number; citationsTarget: number; studentsTrained: number; patentsFiled: number; industryEngaged: boolean; policyBriefSubmitted: boolean };
+    knowledgeTransfer: string[];
+  };
+  fundingMatch: {
+    bestFit: string;
+    grantType: string;
+    budgetRange: string;
+    frameItAs: string;
+    applicationCycle: string;
+  };
+  limitations: { limitation: string; mitigation: string }[];
+  dataConfidence: { high: string; medium: string; low: string };
+  recommendedCollaboration: { internal: string; external: string; industry: string; why: string };
 }
 
 export interface ChallengeHistoryEntry {
@@ -304,15 +343,45 @@ export interface ChallengeHistoryEntry {
 }
 
 export interface OptimizerResult {
-  ProfitOpportunities: string[];
-  CarbonReductionStrategies: string[];
-  FossilFuelReplacementPlan: string[];
-  LogisticsOptimization: string[];
-  NetZeroRoadmap: {
-    CarbonIntensityEstimate: string;
-    StandardsComparison: string;
-    RoadmapSteps: string[];
+  projectOverview: {
+    tagline: string;
+    description: string;
   };
+  revenueStack: {
+    sources: { name: string; amount: number; confidence: 'HIGH' | 'MEDIUM' | 'LOW' }[];
+    baseCaseTarget: number;
+    upsideCaseTarget: number;
+  };
+  carbonPerformance: {
+    intensityBefore: string;
+    intensityAfter: string;
+    co2SavedPerYear: number;
+    reductionPercentage: number;
+    euRedIIIFlag: boolean;
+    carbonCreditValue: string;
+  };
+  financialSnapshot: {
+    capex: number;
+    budget: number;
+    fundingGap: number;
+    annualProfit: number;
+    irr: number;
+    paybackYears: number;
+    npv: number;
+  };
+  topOpportunities: { title: string; value: string; action: string }[];
+  topRisks: { title: string; probability: 'High' | 'Medium' | 'Low' | 'HIGH' | 'MEDIUM' | 'LOW'; mitigation: string }[];
+  smartVerdict: {
+    profitScore: number;
+    carbonScore: number;
+    omanAlignmentScore: number;
+    overallScore: number;
+    decision: string;
+    comparison: string;
+  };
+  optimizationRoadmap: { year: number | string; action: string; cost: string; impact: string }[];
+  nextSteps: { urgentAction: string; cost: string; timeline: string }[];
+  dataTransparency: { dataPoint: string; source: string; confidence: 'HIGH' | 'MEDIUM' | 'LOW' }[];
 }
 
 export interface OptimizerHistoryEntry {
@@ -437,7 +506,7 @@ export interface ProjectHistoryEntry {
 
 export type AnalysisStatus = 'IDLE' | 'ANALYZING' | 'COMPLETED' | 'ERROR';
 
-export type MainTab = 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
+export type MainTab = 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES' | 'CHALLENGES_HUB' | 'MARKETPLACE' | 'HOME' | 'GIS_MAP' | 'FEASIBILITY';
 
 // Standards Checker Interfaces
 export interface StandardsInput {
@@ -511,20 +580,20 @@ export interface ProposalResult {
   title: string;
   
   // The 14 Core Sections
-  executiveSummary: string[];
-  problemStatement: string[];
-  marketOpportunity: string[];
-  competitiveAdvantage: string[];
-  businessModel: string[];
-  revenueStreams: string[];
-  technicalOverview: string[];
-  feedstockStrategy: string[];
+  executiveSummary: string | string[];
+  problemStatement: string | string[];
+  marketOpportunity: string | string[];
+  competitiveAdvantage: string | string[];
+  businessModel: string | string[];
+  revenueStreams: string | string[];
+  technicalOverview: string | string[];
+  feedstockStrategy: string | string[];
   financialModel: FinancialTables;
   riskAnalysis: {
     risk: string;
     mitigation: string;
   }[];
-  esgImpact: string[];
+  esgImpact: string | string[];
   carbonCreditPotential: {
     estimatedTonsSaved: string;
     monetaryValueRange: string;
@@ -532,12 +601,12 @@ export interface ProposalResult {
   };
   investmentProposal: {
     requestedAmount: string;
-    fundingUtilization: string[];
+    fundingUtilization: string | string[];
     investorReturns: string;
     equityStructure: string;
     repaymentStrategy: string;
   };
-  whyInvestorsShouldFund: string[];
+  whyInvestorsShouldFund: string | string[];
 
   // Additional Deliverables
   pitchDeckOutline: {
@@ -547,12 +616,12 @@ export interface ProposalResult {
   }[];
   investorEmailTemplate: string;
   onePageSummary: string;
-  fundingRecommendations: string[];
-  strategicPartners: string[];
+  fundingRecommendations: string | string[];
+  strategicPartners: string | string[];
   phasedScalingStrategy: {
     phase: string;
     duration: string;
-    milestones: string[];
+    milestones: string | string[];
   }[];
 }
 

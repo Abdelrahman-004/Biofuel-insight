@@ -43,7 +43,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
           {selectedIds.length > 0 && (
             <button 
               onClick={() => onCompare(selectedIds)}
-              className="bg-emerald-600 hover:bg-[var(--accent-emerald)] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
+              className="bg-emerald-700 dark:bg-emerald-600 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
             >
               Compare ({selectedIds.length}) Selected
             </button>

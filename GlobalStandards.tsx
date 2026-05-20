@@ -78,7 +78,7 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
           whileTap={{ scale: 0.95 }}
           onClick={handleSuggest}
           disabled={loading}
-          className="mt-6 px-6 py-3 bg-[var(--card-bg)] shadow-card hover:bg-emerald-600 text-white font-bold rounded-xl transition shadow-card flex items-center space-x-2 disabled:opacity-50 mx-auto md:mx-0"
+          className="mt-6 px-6 py-3 bg-[var(--card-bg)] shadow-card hover:bg-emerald-700 dark:bg-emerald-600 font-bold rounded-xl transition shadow-card flex items-center space-x-2 disabled:opacity-50 mx-auto md:mx-0"
         >
           {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-wand-magic-sparkles"></i>}
           <span>{language === 'Arabic' ? "اقتراح مشروع متوافق مع المعايير" : "Suggest Standards-Compliant Project"}</span>

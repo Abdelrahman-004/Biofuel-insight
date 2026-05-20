@@ -14,9 +14,9 @@ interface UnifiedHistorySidebarProps {
 
 const TYPE_CONFIG: Record<ProjectType, { icon: string; color: string; label: string, labelAr: string }> = {
   FEASIBILITY: { icon: 'fa-chart-pie', color: 'text-[var(--accent-emerald)] dark:text-emerald-400', label: 'Feasibility', labelAr: 'الجدوى' },
-  CHALLENGE: { icon: 'fa-lightbulb', color: 'text-blue-400', label: 'Challenge', labelAr: 'تحدي' },
+  CHALLENGE: { icon: 'fa-lightbulb', color: 'text-blue-700 dark:text-blue-400', label: 'Challenge', labelAr: 'تحدي' },
   OPTIMIZER: { icon: 'fa-rocket', color: 'text-purple-400', label: 'Optimizer', labelAr: 'محسن' },
-  RESEARCH: { icon: 'fa-microscope', color: 'text-amber-400', label: 'Research', labelAr: 'بحث' },
+  RESEARCH: { icon: 'fa-microscope', color: 'text-amber-700 dark:text-amber-400', label: 'Research', labelAr: 'بحث' },
 };
 
 export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({ 
@@ -88,7 +88,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
                     <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
                       <button 
                         onClick={(e) => { e.stopPropagation(); onEdit(project); }}
-                        className="text-[var(--text-secondary)] hover:text-blue-400 transition p-1"
+                        className="text-[var(--text-secondary)] hover:text-blue-700 dark:text-blue-400 transition p-1"
                         title="Edit Project"
                       >
                         <i className="fas fa-edit text-xs"></i>
@@ -102,7 +102,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-                        className="text-[var(--text-secondary)] hover:text-red-400 transition p-1"
+                        className="text-[var(--text-secondary)] hover:text-red-700 dark:text-red-400 transition p-1"
                         title="Delete Project"
                       >
                         <i className="fas fa-trash text-xs"></i>

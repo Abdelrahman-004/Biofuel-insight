@@ -105,7 +105,7 @@ export const CompareProjects: React.FC<CompareProjectsProps> = ({ language = 'En
               {entries.map(e => (
                 <td key={e.id} className="p-4 text-center border-r border-[var(--border-glow)]">
                   <div className="text-2xl font-black text-[var(--text-secondary)] ">{e.score}%</div>
-                  <div className={`text-[10px] font-bold uppercase ${e.score > 80 ? 'text-[var(--accent-emerald)] dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                  <div className={`text-[10px] font-bold uppercase ${e.score > 80 ? 'text-[var(--accent-emerald)] dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
                     {e.level}
                   </div>
                 </td>

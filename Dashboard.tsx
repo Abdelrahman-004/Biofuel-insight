@@ -93,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
   if (isDataMissing) {
     return (
       <div className="p-8 text-center text-[var(--text-secondary)]">
-        <i className="fas fa-exclamation-triangle text-4xl mb-4 text-amber-600 dark:text-amber-400"></i>
+        <i className="fas fa-exclamation-triangle text-4xl mb-4 text-amber-700 dark:text-amber-400"></i>
         <p>{language === 'Arabic' ? "بيانات التحليل غير مكتملة. يرجى محاولة التحليل مرة أخرى." : "Incomplete analysis data. Please try analyzing again."}</p>
       </div>
     );
@@ -125,9 +125,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
   const getScoreAssets = (score: number) => {
     if (score >= 80) return { color: 'text-[var(--accent-emerald)] dark:text-emerald-400', bg: 'bg-[var(--accent-emerald)]', border: 'border-[var(--accent-emerald)]', label: language === 'Arabic' ? 'درجة استثمارية' : 'INVESTMENT GRADE', description: language === 'Arabic' ? 'توافق تقني ومالي قوي.' : 'Strong technical & financial alignment.' };
-    if (score >= 60) return { color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500 dark:bg-blue-600', border: 'border-blue-500 dark:border-blue-400', label: language === 'Arabic' ? 'مجدي بشروط' : 'CONDITIONALLY VIABLE', description: language === 'Arabic' ? 'مخاطر معتدلة يمكن إدارتها عبر التخفيف.' : 'Moderate risks manageable via mitigation.' };
-    if (score >= 40) return { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500 dark:bg-amber-600', border: 'border-amber-500', label: language === 'Arabic' ? 'مخاطر عالية' : 'HIGH RISK', description: language === 'Arabic' ? 'يتطلب تعديل استراتيجي كبير.' : 'Requires significant strategic adjustment.' };
-    return { color: 'text-red-600 dark:text-red-400', bg: 'bg-red-500 dark:bg-red-600', border: 'border-red-500 dark:border-red-600/30', label: language === 'Arabic' ? 'غير قابل للتمويل' : 'NOT BANKABLE', description: language === 'Arabic' ? 'مقاييس غير مواتية على المستوى الحالي.' : 'Unfavorable metrics at current scale.' };
+    if (score >= 60) return { color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-600 dark:bg-blue-600', border: 'border-blue-500 dark:border-blue-400', label: language === 'Arabic' ? 'مجدي بشروط' : 'CONDITIONALLY VIABLE', description: language === 'Arabic' ? 'مخاطر معتدلة يمكن إدارتها عبر التخفيف.' : 'Moderate risks manageable via mitigation.' };
+    if (score >= 40) return { color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-600 dark:bg-amber-600', border: 'border-amber-500', label: language === 'Arabic' ? 'مخاطر عالية' : 'HIGH RISK', description: language === 'Arabic' ? 'يتطلب تعديل استراتيجي كبير.' : 'Requires significant strategic adjustment.' };
+    return { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-600 dark:bg-red-600', border: 'border-red-500 dark:border-red-600/30', label: language === 'Arabic' ? 'غير قابل للتمويل' : 'NOT BANKABLE', description: language === 'Arabic' ? 'مقاييس غير مواتية على المستوى الحالي.' : 'Unfavorable metrics at current scale.' };
   };
 
   const scoreAssets = getScoreAssets(data?.FinalFeasibilityScore || 0);
@@ -135,8 +135,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
   const getRiskColor = (level: string) => {
     if (!level) return 'text-[var(--text-secondary)] bg-[var(--bg-main)] border-[var(--border-glow)] dark:bg-white/5 dark:border-white/10';
     if (level === 'Moderate') return 'text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--bg-main)] border-emerald-100 dark:bg-emerald-900/30 dark:border-emerald-500/30 dark:text-[var(--accent-emerald)] font-medium';
-    if (level === 'Significant') return 'text-amber-600 dark:text-amber-400 bg-[var(--bg-main)] border-amber-100 dark:bg-amber-900/30 dark:border-amber-500/30 dark:text-amber-200 font-medium';
-    return 'text-red-600 dark:text-red-400 bg-[var(--bg-main)] border-red-100 dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30/30 dark:text-red-300 font-medium';
+    if (level === 'Significant') return 'text-amber-700 dark:text-amber-400 bg-[var(--bg-main)] border-amber-100 dark:bg-amber-900/30 dark:border-amber-500/30 dark:text-amber-200 font-medium';
+    return 'text-red-700 dark:text-red-400 bg-[var(--bg-main)] border-red-100 dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30/30 dark:text-red-300 font-medium';
   };
 
   const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -161,7 +161,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             exit={{ height: 0, opacity: 0 }}
             className="bg-[var(--bg-main)] border-l-4 border-red-500 dark:border-red-600/30 p-4 rounded-xl flex items-center mb-4 shadow-sm dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30"
           >
-            <i className="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
+            <i className="fas fa-exclamation-triangle text-red-700 dark:text-red-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
             <div>
               <p className="text-red-800 dark:text-red-300 font-black text-sm uppercase">{language === 'Arabic' ? 'تم اكتشاف نقص شديد في التمويل' : 'Severe Underfunding Detected'}</p>
               <p className="text-red-700 dark:text-red-200/80 text-xs font-medium">
@@ -209,7 +209,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 {/* Technical AI */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3 border-b border-[var(--border-glow)] pb-2">
-                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                    <div className="w-8 h-8 rounded-lg bg-blue-700 dark:bg-blue-600">
                       <i className="fas fa-microchip"></i>
                     </div>
                     <h3 className="font-black text-[var(--text-secondary)]  uppercase text-sm tracking-wider">{t("Technical Engineering AI", "الذكاء الاصطناعي للهندسة التقنية")}</h3>
@@ -229,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                       <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("TRL Level", "مستوى الجاهزية التكنولوجية")}</p>
-                      <p className="text-sm font-black text-blue-600 dark:text-blue-400">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
+                      <p className="text-sm font-black text-blue-700 dark:text-blue-400">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 {/* Financial AI */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3 border-b border-[var(--border-glow)] pb-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-700 dark:bg-emerald-600">
                       <i className="fas fa-chart-line"></i>
                     </div>
                     <h3 className="font-black text-[var(--text-secondary)]  uppercase text-sm tracking-wider">{t("Financial Modeling AI", "الذكاء الاصطناعي للنمذجة المالية")}</h3>
@@ -279,7 +279,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                       <span className="text-xs text-[var(--text-secondary)]">{t("Audit Classification", "تصنيف التدقيق")}</span>
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                         data?.AuditorAI?.Classification === 'Pass' ? 'bg-[var(--accent-emerald)] text-white' : 
-                        data?.AuditorAI?.Classification === 'Needs Revision' ? 'bg-amber-500 text-black dark:text-amber-950 font-bold' : 'bg-red-500 text-white dark:bg-red-600 dark:text-white'
+                        data?.AuditorAI?.Classification === 'Needs Revision' ? 'bg-amber-600 text-black dark:text-amber-950 font-bold' : 'bg-red-700 text-white dark:bg-red-700 dark:bg-red-600'
                       }`}>
                         {tt(data?.AuditorAI?.Classification || 'N/A', language || 'Arabic')}
                       </span>
@@ -291,7 +291,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-[var(--text-secondary)]">{t("Funding Gap", "فجوة التمويل")}</span>
-                        <span className="font-bold text-red-400">{formatCurrency(data?.AuditorAI?.FundingGapUSD || 0)} ({data?.AuditorAI?.FundingGapPercentage?.toFixed(1) || '0.0'}%)</span>
+                        <span className="font-bold text-red-700 dark:text-red-400">{formatCurrency(data?.AuditorAI?.FundingGapUSD || 0)} ({data?.AuditorAI?.FundingGapPercentage?.toFixed(1) || '0.0'}%)</span>
                       </div>
                     </div>
                     <div className="pt-4 border-t border-[var(--border-glow)]">
@@ -317,7 +317,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 {/* Risk AI */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3 border-b border-[var(--border-glow)] pb-2">
-                    <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white">
+                    <div className="w-8 h-8 rounded-lg bg-red-700 dark:bg-red-600">
                       <i className="fas fa-shield-virus"></i>
                     </div>
                     <h3 className="font-black text-[var(--text-secondary)]  uppercase text-sm tracking-wider">{t("Risk Assessment AI", "الذكاء الاصطناعي لتقييم المخاطر")}</h3>
@@ -326,7 +326,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Capital Adequacy", "كفاية رأس المال")}</p>
-                        <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
                           {data?.RiskAI?.CapitalAdequacyRatio?.toFixed(2) || '0.00'}
                         </p>
                       </div>
@@ -334,7 +334,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Risk Level", "مستوى الخطر")}</p>
                         <p className={`text-sm font-black ${
                           data?.RiskAI?.RiskClassification === 'Moderate' ? 'text-emerald-700 dark:text-emerald-400' : 
-                          data?.RiskAI?.RiskClassification === 'Significant' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
+                          data?.RiskAI?.RiskClassification === 'Significant' ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'
                         }`}>
                           {tt(data?.RiskAI?.RiskClassification || 'N/A', language || 'Arabic')}
                         </p>
@@ -399,13 +399,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <div className="flex items-center space-x-3 text-sm text-[var(--text-secondary)] font-medium">
             <span className="flex items-center"><i className="fas fa-location-dot mr-1.5 text-[var(--accent-emerald)] dark:text-emerald-400 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.Location || 'Oman'}</span>
             <span>•</span>
-            <span className="flex items-center"><i className="fas fa-bolt mr-1.5 text-blue-600 dark:text-blue-400 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.TechnologyCategory || 'Energy'}</span>
+            <span className="flex items-center"><i className="fas fa-bolt mr-1.5 text-blue-700 dark:text-blue-400 rtl:ml-1.5 rtl:mr-0"></i> {data?.ProjectAnalyzer?.TechnologyCategory || 'Energy'}</span>
           </div>
         </div>
         <div className="flex space-x-3">
           <button 
             onClick={() => setShowReport(true)}
-            className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-[var(--accent-emerald)] transition flex items-center shadow-card"
+            className="px-4 py-2 bg-emerald-700 dark:bg-emerald-600 text-xs font-bold rounded-lg hover:bg-[var(--accent-emerald)] transition flex items-center shadow-card"
           >
             <i className="fas fa-file-contract mr-2 rtl:ml-2 rtl:mr-0"></i>{t("Official Report", "التقرير الرسمي")}</button>
           <button 
@@ -443,7 +443,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Investment Verdict", "قرار الاستثمار")}</div>
           <div className={`text-lg font-black leading-tight ${
             data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-700 dark:text-emerald-400' : 
-            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
+            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'
           }`}>
             {t("Rating:", "التقييم:")} {data.DynamicScores?.overallViabilityRating || 'N/A'}
           </div>
@@ -506,27 +506,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <i className="fas fa-search-plus mr-2 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("SWOT Intelligence Analyze", "تحليل ذكاء SWOT")}</h3>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <h4 className="text-[10px] font-black text-[var(--accent-emerald)] dark:text-emerald-400 uppercase mb-2">{t("Strengths", "نقاط القوة")}</h4>
+              <h4 className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase mb-2">{t("Strengths", "نقاط القوة")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-[var(--accent-emerald)] dark:text-emerald-400/50"></i> {s}</li>)}
+                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-emerald-700 dark:text-emerald-400/50"></i> {s}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-blue-400 uppercase mb-2">{t("Opportunities", "الفرص")}</h4>
+              <h4 className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase mb-2">{t("Opportunities", "الفرص")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-600 dark:text-blue-400/50"></i> {o}</li>)}
+                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-700 dark:text-blue-400/50"></i> {o}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-amber-400 uppercase mb-2">{t("Weaknesses", "نقاط الضعف")}</h4>
+              <h4 className="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase mb-2">{t("Weaknesses", "نقاط الضعف")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-600 dark:text-amber-400/50"></i> {w}</li>)}
+                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-700 dark:text-amber-400/50"></i> {w}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-red-400 uppercase mb-2">{t("Threats", "التهديدات")}</h4>
+              <h4 className="text-[10px] font-black text-red-700 dark:text-red-400 uppercase mb-2">{t("Threats", "التهديدات")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-[var(--text-secondary)] flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-600 dark:text-red-400/50"></i> {t}</li>)}
+                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-700 dark:text-red-400/50"></i> {t}</li>)}
               </ul>
             </div>
           </div>
@@ -537,7 +537,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         {/* Localization & Taxes */}
         <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
           <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 flex items-center">
-            <i className="fas fa-landmark mr-2 text-blue-600 dark:text-blue-400"></i>{t("Omani Localization Logic", "منطق التوطين العماني")}</h3>
+            <i className="fas fa-landmark mr-2 text-blue-700 dark:text-blue-400"></i>{t("Omani Localization Logic", "منطق التوطين العماني")}</h3>
           <div className="space-y-4">
             <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
               <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industry Tax (Oman)", "ضريبة الصناعة (عُمان)")}</p>
@@ -545,9 +545,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
             <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
+                <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
                 <p className="text-lg font-black text-blue-900">{data.OmanLogic?.omanizationCostEstimate.OMR} OMR / Year</p>
-                <p className="text-[10px] text-blue-400 italic">{t("35% Minimum Quota Applied", "الحد الأدنى مطبق بنسبة 35%")}</p>
+                <p className="text-[10px] text-blue-700 dark:text-blue-400 italic">{t("35% Minimum Quota Applied", "الحد الأدنى مطبق بنسبة 35%")}</p>
               </div>
               <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-3 rounded-xl shadow-sm text-center">
                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{t("In USD", "بالدولار الأمريكي")}</p>
@@ -603,7 +603,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         {/* Enhanced Sensitivity */}
         <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-6 rounded-3xl border border-[var(--border-glow)] shadow-sm">
            <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-4 flex items-center">
-            <i className="fas fa-robot mr-2 text-amber-600 dark:text-amber-400"></i>{t("Monte Carlo Summary", "ملخص مونت كارلو")}</h3>
+            <i className="fas fa-robot mr-2 text-amber-700 dark:text-amber-400"></i>{t("Monte Carlo Summary", "ملخص مونت كارلو")}</h3>
            <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
              {data.AdvancedSensitivity?.monteCarloSummary}
            </p>
@@ -612,7 +612,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
              <div className="flex justify-between items-center">
                <div>
                  <p className="text-xs font-bold text-[var(--text-secondary)]">{t("New Payback", "استرداد جديد")}</p>
-                 <p className="text-lg font-black text-amber-600 dark:text-amber-400">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
+                 <p className="text-lg font-black text-amber-700 dark:text-amber-400">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
                </div>
                <div className="text-right">
                  <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase">{t("Viability", "الجدوى")}</p>
@@ -643,7 +643,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Funding Gap", "فجوة التمويل")}</span>
-                <span className={`text-sm font-black ${data.EconomicFeasibility.FundingGapUSD > 0 ? 'text-red-600 dark:text-red-400' : 'text-[var(--accent-emerald)] dark:text-emerald-400'}`}>
+                <span className={`text-sm font-black ${data.EconomicFeasibility.FundingGapUSD > 0 ? 'text-red-700 dark:text-red-400' : 'text-[var(--accent-emerald)] dark:text-emerald-400'}`}>
                   {formatCurrency(data.EconomicFeasibility.FundingGapUSD)} ({data.EconomicFeasibility.FundingGapPercentage.toFixed(1)}%)
                 </span>
               </div>
@@ -659,11 +659,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</span>
-                <span className="text-sm font-black text-red-600 dark:text-red-400">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
+                <span className="text-sm font-black text-red-700 dark:text-red-400">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-xs text-[var(--text-secondary)]">{t("Gross Profit", "إجمالي الربح")}</span>
-                <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
                    {formatCurrency(data.EconomicFeasibility.GrossProfit)}
                 </span>
               </div>
@@ -677,7 +677,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           </div>
           <div className="bg-[var(--bg-main)] p-4 border-t border-[var(--border-glow)]">
             <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">
-              <i className="fas fa-info-circle mr-2 text-blue-600 dark:text-blue-400"></i>
+              <i className="fas fa-info-circle mr-2 text-blue-700 dark:text-blue-400"></i>
               {data.Rationale}
             </p>
           </div>
@@ -687,7 +687,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) rounded-2xl border border-[var(--border-glow)] shadow-sm overflow-hidden flex flex-col">
           <div className="bg-[var(--bg-main)] px-6 py-4">
             <h3 className="text-[var(--text-primary)] font-bold text-sm flex items-center">
-              <i className="fas fa-vial mr-3 text-amber-400"></i>{t("Sensitivity Stress Tests", "اختبارات تحمل الحساسية")}</h3>
+              <i className="fas fa-vial mr-3 text-amber-700 dark:text-amber-400"></i>{t("Sensitivity Stress Tests", "اختبارات تحمل الحساسية")}</h3>
           </div>
           <div className="p-6 flex-grow space-y-6">
             <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
@@ -753,7 +753,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         >
           <div className="px-6 py-5 border-b border-[var(--border-glow)] flex items-center justify-between">
             <h3 className="text-[var(--text-primary)] font-bold text-lg flex items-center">
-              <i className="fas fa-lightbulb text-amber-400 mr-3 text-xl"></i>{t("Expert Counsel & Actionable Recommendations", "مشورة الخبراء وتوصيات قابلة للتنفيذ")}</h3>
+              <i className="fas fa-lightbulb text-amber-700 dark:text-amber-400 mr-3 text-xl"></i>{t("Expert Counsel & Actionable Recommendations", "مشورة الخبراء وتوصيات قابلة للتنفيذ")}</h3>
             <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-300 dark:border-indigo-500/30">{t("Strategic Advisory", "استشارات استراتيجية")}</span>
           </div>
           <div className="p-6 md:p-8">
@@ -780,7 +780,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         {/* Economic Chart */}
         <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
           <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-            <i className="fas fa-coins mr-3 text-blue-600 dark:text-blue-400"></i>{t("Capital Expenditure Profile", "ملف النفقات الرأسمالية")}</h3>
+            <i className="fas fa-coins mr-3 text-blue-700 dark:text-blue-400"></i>{t("Capital Expenditure Profile", "ملف النفقات الرأسمالية")}</h3>
           <div className="h-64 mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={costData}>
@@ -835,7 +835,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       {/* Investor Perspective AI */}
       <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
         <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-          <i className="fas fa-briefcase mr-3 text-blue-600 dark:text-blue-400"></i>{t("Investor Perspective AI", "الذكاء الاصطناعي من منظور المستثمر")}</h3>
+          <i className="fas fa-briefcase mr-3 text-blue-700 dark:text-blue-400"></i>{t("Investor Perspective AI", "الذكاء الاصطناعي من منظور المستثمر")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
             <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Return Potential", "إمكانات العائد")}</p>
@@ -866,7 +866,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         {/* Risks */}
         <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
           <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-6 flex items-center">
-            <i className="fas fa-shield-halved mr-3 text-amber-600 dark:text-amber-400"></i>{t("Critical Risk Matrix", "مصفوفة المخاطر الحرجة")}</h3>
+            <i className="fas fa-shield-halved mr-3 text-amber-700 dark:text-amber-400"></i>{t("Critical Risk Matrix", "مصفوفة المخاطر الحرجة")}</h3>
           <div className="space-y-4">
             {data.KeyRisks?.map((risk, i) => (
               <div key={i} className="p-4 rounded-xl border border-[var(--border-glow)] hover:border-amber-200 hover:bg-[var(--bg-main)]/20 transition group">
@@ -894,14 +894,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <h3 className="text-xl font-bold mb-6 flex items-center">
               <i className="fas fa-user-check mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Local Consistency Review", "مراجعة الاتساق المحلي")}</h3>
             <div className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase mb-6 ${
-              data.AuditAIReview.ConsistencyCheck === 'Passed' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-500 dark:bg-amber-600/20 text-amber-400'
+              data.AuditAIReview.ConsistencyCheck === 'Passed' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400'
             }`}>
               Consistency: {data.AuditAIReview.ConsistencyCheck}
             </div>
             <div className="space-y-2">
               {data.AuditAIReview.DataWarnings?.map((w, i) => (
                 <div key={i} className="text-xs text-[var(--text-secondary)] flex items-start">
-                  <i className="fas fa-circle-info text-amber-400 mr-2 mt-0.5 shrink-0"></i>
+                  <i className="fas fa-circle-info text-amber-700 dark:text-amber-400 mr-2 mt-0.5 shrink-0"></i>
                   {w}
                 </div>
               ))}

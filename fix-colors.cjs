@@ -1,20 +1,10 @@
 const fs = require('fs');
 const files = fs.readdirSync('.').filter(f => f.endsWith('.tsx'));
-
-for (const file of files) {
-  let content = fs.readFileSync(file, 'utf8');
-  let original = content;
-
-  content = content.replace(/text-slate-[4567]00 dark:text-slate-[34]00/g, 'text-[var(--text-secondary)]');
-  content = content.replace(/text-slate-600/g, 'text-[var(--text-secondary)]');
-  content = content.replace(/text-slate-500/g, 'text-[var(--text-secondary)]');
-  content = content.replace(/text-slate-400/g, 'text-[var(--text-secondary)]');
-  content = content.replace(/text-slate-300/g, 'text-[var(--text-secondary)]');
-  content = content.replace(/text-slate-200/g, 'text-[var(--text-primary)]');
-  
-  if (original !== content) {
-    fs.writeFileSync(file, content, 'utf8');
-    console.log('Updated', file);
-  }
-}
-
+files.forEach(f => {
+  let content = fs.readFileSync(f, 'utf8');
+  content = content.replace(/(?<!dark:)text-red-400/g, 'text-red-700 dark:text-red-400');
+  content = content.replace(/(?<!dark:)text-amber-400/g, 'text-amber-700 dark:text-amber-400');
+  content = content.replace(/(?<!dark:)text-emerald-400/g, 'text-emerald-700 dark:text-emerald-400');
+  content = content.replace(/(?<!dark:)text-blue-400/g, 'text-blue-700 dark:text-blue-400');
+  fs.writeFileSync(f, content);
+});

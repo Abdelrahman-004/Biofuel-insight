@@ -4,6 +4,42 @@ import { ProposalInput, ProposalResult, ProposalHistoryEntry } from './types';
 import { generateProposal } from './geminiService';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+
+const renderSectionContent = (content: string | string[] | undefined) => {
+  if (!content) return null;
+  if (Array.isArray(content)) {
+    return (
+      <ul className="list-outside ml-6 list-disc text-[var(--text-secondary)] leading-relaxed space-y-3">
+        {content.map((item, idx) => (
+          <li key={idx} className="pl-1">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{p: 'span'}}
+            >
+              {item}
+            </ReactMarkdown>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return (
+    <div className="text-[var(--text-secondary)] leading-relaxed space-y-4 markdown-body text-sm font-sans">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 const autoDict: Record<string, string> = {
   "N/A": "غير متوفر",
@@ -260,19 +296,21 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               </div>
             </div>
 
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit" 
               disabled={status === 'GENERATING'}
-              className={`w-full mt-6 text-[var(--text-primary)] font-bold py-4 px-6 rounded-xl transition-all  flex items-center justify-center space-x-2 ${
-                status === 'GENERATING' ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)]' : 'bg-gradient-to-r from-[#059669] to-[#10B981] hover:shadow-md active:scale-95'
+              className={`w-full mt-6 text-[var(--text-primary)] font-black py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-3 border border-transparent ${
+                status === 'GENERATING' ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)] border-[var(--border-glow)]' : 'bg-[var(--card-bg)] shadow-[0_0_40px_-10px_rgba(139,92,246,0.5)] hover:shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] border-[#8B5CF6]/50 hover:border-[#8B5CF6] text-[#8B5CF6]'
               }`}
             >
               {status === 'GENERATING' ? (
-                <><i className="fas fa-circle-notch fa-spin"></i><span>{language === 'Arabic' ? 'جاري كتابة المقترح...' : 'Drafting Proposal...'}</span></>
+                <><i className="fas fa-circle-notch fa-spin text-xl"></i><span>{language === 'Arabic' ? 'جاري كتابة المقترح...' : 'Drafting Proposal...'}</span></>
               ) : (
-                <><i className="fas fa-magic"></i><span>{language === 'Arabic' ? 'توليد مسودة المقترح' : 'Generate Proposal'}</span></>
+                <><i className="fas fa-bolt text-xl"></i><span className="tracking-widest uppercase">{language === 'Arabic' ? 'توليد مسودة المقترح' : 'Generate Proposal'}</span></>
               )}
-            </button>
+            </motion.button>
           </form>
         </motion.div>
 
@@ -339,7 +377,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-full flex flex-col items-center justify-center text-red-600 dark:text-red-400 p-12"
+              className="h-full flex flex-col items-center justify-center text-red-700 dark:text-red-400 p-12"
             >
               <i className="fas fa-exclamation-triangle text-6xl mb-4"></i>
               <h3 className="text-2xl font-black mb-2">{language === 'Arabic' ? "فشل الإنشاء" : "Generation Failed"}</h3>
@@ -359,7 +397,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   onClick={downloadPDF}
                   className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-card"
                 >
-                  <i className="fas fa-file-pdf mx-2 text-red-400"></i> {language === 'Arabic' ? 'تحميل التقرير كـ PDF' : 'Download PDF Proposal'}
+                  <i className="fas fa-file-pdf mx-2 text-red-700 dark:text-red-400"></i> {language === 'Arabic' ? 'تحميل التقرير كـ PDF' : 'Download PDF Proposal'}
                 </button>
               </div>
 
@@ -389,89 +427,100 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
 
                 <div className="space-y-8">
                   {/* 1. Executive Summary */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                      1. {language === 'Arabic' ? 'الملخص التنفيذي' : 'Executive Summary'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-chart-pie text-xl"></i>
+                      </div>
+                      <span className="leading-tight">1. {language === 'Arabic' ? 'الملخص التنفيذي' : 'Executive Summary'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.executiveSummary?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.executiveSummary)}
                   </section>
 
                   {/* 2. Problem Statement */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       2. {language === 'Arabic' ? 'بيان المشكلة المقترحة' : 'Problem Statement'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-exclamation-triangle text-xl"></i>
+                      </div>
+                      <span className="leading-tight">2. {language === 'Arabic' ? 'بيان المشكلة المقترحة' : 'Problem Statement'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.problemStatement?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.problemStatement)}
                   </section>
 
                   {/* 3. Market Opportunity */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       3. {language === 'Arabic' ? 'الفرصة السوقية' : 'Market Opportunity'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-globe-americas text-xl"></i>
+                      </div>
+                      <span className="leading-tight">3. {language === 'Arabic' ? 'الفرصة السوقية' : 'Market Opportunity'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.marketOpportunity?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.marketOpportunity)}
                   </section>
 
                   {/* 4. Competitive Advantage */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       4. {language === 'Arabic' ? 'الميزة التنافسية' : 'Competitive Advantage'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-trophy text-xl"></i>
+                      </div>
+                      <span className="leading-tight">4. {language === 'Arabic' ? 'الميزة التنافسية' : 'Competitive Advantage'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.competitiveAdvantage?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.competitiveAdvantage)}
                   </section>
 
                    {/* 5. Business Model */}
-                   <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       5. {language === 'Arabic' ? 'نموذج العمل' : 'Business Model'}
+                   <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-project-diagram text-xl"></i>
+                      </div>
+                      <span className="leading-tight">5. {language === 'Arabic' ? 'نموذج العمل' : 'Business Model'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.businessModel?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.businessModel)}
                   </section>
 
                    {/* 6. Revenue Streams */}
-                   <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       6. {language === 'Arabic' ? 'مصادر الإيرادات' : 'Revenue Streams'}
+                   <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-money-bill-wave text-xl"></i>
+                      </div>
+                      <span className="leading-tight">6. {language === 'Arabic' ? 'مصادر الإيرادات' : 'Revenue Streams'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.revenueStreams?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.revenueStreams)}
                   </section>
 
                    {/* 7. Technical Overview */}
-                   <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       7. {language === 'Arabic' ? 'نظرة عامة تقنية وتشغيلية' : 'Technical & Operational Overview'}
+                   <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-cogs text-xl"></i>
+                      </div>
+                      <span className="leading-tight">7. {language === 'Arabic' ? 'نظرة عامة تقنية وتشغيلية' : 'Technical & Operational Overview'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.technicalOverview?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.technicalOverview)}
                   </section>
 
                   {/* 8. Raw Material / Feedstock Strategy */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       8. {language === 'Arabic' ? 'استراتيجية المواد الخام' : 'Raw Material / Feedstock Strategy'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-boxes text-xl"></i>
+                      </div>
+                      <span className="leading-tight">8. {language === 'Arabic' ? 'استراتيجية المواد الخام' : 'Raw Material / Feedstock Strategy'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.feedstockStrategy?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.feedstockStrategy)}
                   </section>
 
                   {/* 9. Financial Model */}
                   <section className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
-                    <h2 className="text-xl font-black text-[var(--text-primary)] mb-4">
-                      9. {language === 'Arabic' ? 'النموذج المالي ومقترح التمويل' : 'Financial Model & Funding Proposal'}
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-calculator text-xl"></i>
+                      </div>
+                      <span className="leading-tight">9. {language === 'Arabic' ? 'النموذج المالي ومقترح التمويل' : 'Financial Model & Funding Proposal'}</span>
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       <div className="bg-[var(--card-bg)] shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
@@ -516,15 +565,18 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   </section>
 
                    {/* 10. Risk Analysis & Mitigation */}
-                   <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       10. {language === 'Arabic' ? 'تحليل المخاطر والتخفيف' : 'Risk Analysis & Mitigation'}
+                   <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-shield-alt text-xl"></i>
+                      </div>
+                      <span className="leading-tight">10. {language === 'Arabic' ? 'تحليل المخاطر والتخفيف' : 'Risk Analysis & Mitigation'}</span>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {result.riskAnalysis?.map((item, idx) => (
                          <div key={idx} className="bg-[var(--card-bg)] shrink shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
-                             <div className="font-bold text-red-400 mb-2">{item.risk}</div>
-                             <div className="text-sm text-[var(--text-secondary)]">{item.mitigation}</div>
+                             <div className="font-bold text-red-700 dark:text-red-400 mb-2">{renderSectionContent(item.risk)}</div>
+                             <div className="text-sm text-[var(--text-secondary)]">{renderSectionContent(item.mitigation)}</div>
                          </div>
                       ))}
                     </div>
@@ -532,38 +584,45 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
 
                   {/* 11. ESG & Sustainability Impact (with Oman Vision 2040 included) */}
                   <section className="bg-[#8B5CF6]/10 p-6 rounded-2xl border border-#8B5CF6">
-                    <h2 className="text-lg font-black text-[#8B5CF6] mb-3 flex items-center">
-                      <i className="fas fa-bullseye mx-2"></i> 11. {language === 'Arabic' ? 'الأثر البيئي والاجتماعي ورؤية 2040' : 'ESG, Sustainability & Vision 2040'}
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-leaf text-xl"></i>
+                      </div>
+                      <span className="leading-tight">11. {language === 'Arabic' ? 'الأثر البيئي والاجتماعي ورؤية 2040' : 'ESG, Sustainability & Vision 2040'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                       {result.esgImpact?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.esgImpact)}
                   </section>
 
                   {/* 12. Carbon Credit Potential */}
-                  <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                      12. {language === 'Arabic' ? 'قيمة شهادات الكربون المتوقعة' : 'Carbon Credit Potential'}
+                  <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-smog text-xl"></i>
+                      </div>
+                      <span className="leading-tight">12. {language === 'Arabic' ? 'قيمة شهادات الكربون المتوقعة' : 'Carbon Credit Potential'}</span>
                     </h2>
                     <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                         <div>
                           <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'أطنان CO2 المستثناة' : 'Tons Saved'}</div>
-                          <div className="text-xl font-black text-emerald-400">{result.carbonCreditPotential?.estimatedTonsSaved}</div>
+                          <div className="text-xl font-black text-[var(--accent-emerald)] dark:text-emerald-400">{result.carbonCreditPotential?.estimatedTonsSaved}</div>
                         </div>
                         <div>
                           <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'القيمة النقدية التقديرية' : 'Est. Monetary Value Range'}</div>
                           <div className="text-xl font-black text-[#8B5CF6]">{result.carbonCreditPotential?.monetaryValueRange}</div>
                         </div>
                       </div>
-                      <p className="text-sm text-[var(--text-secondary)]">{result.carbonCreditPotential?.explanation}</p>
+                      <div className="text-sm text-[var(--text-secondary)]">{renderSectionContent(result.carbonCreditPotential?.explanation)}</div>
                     </div>
                   </section>
 
                    {/* 13. Investment Proposal */}
-                   <section className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-2xl">
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-4`}>
-                       13. {language === 'Arabic' ? 'صيغة الاستثمار المعروضة' : 'Investment Proposal Offer'}
+                   <section className="bg-amber-600/5 border border-amber-500/20 p-6 rounded-2xl">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-amber-600/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shrink-0">
+                        <i className="fas fa-hand-holding-usd text-xl"></i>
+                      </div>
+                      <span className="leading-tight">13. {language === 'Arabic' ? 'صيغة الاستثمار المعروضة' : 'Investment Proposal Offer'}</span>
                     </h2>
                     <div className="space-y-4 text-sm md:text-base">
                       <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'المبلغ المطلوب:' : 'Requested Amount:'}</span> <span className="font-black text-amber-500">{result.investmentProposal?.requestedAmount}</span></div>
@@ -572,21 +631,20 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                       <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'العوائد للمستثمر:' : 'Investor Returns:'}</span> <span className="text-[#10B981]">{result.investmentProposal?.investorReturns}</span></div>
                       <div className="pt-2 border-t border-[var(--border-glow)] mt-2">
                         <span className="font-bold text-[var(--text-secondary)] text-sm">{language === 'Arabic' ? 'استخدام التمويل:' : 'Funding Utilization Details:'}</span>
-                        <ul className="list-disc list-inside mt-2 text-sm text-[var(--text-secondary)]">
-                          {result.investmentProposal?.fundingUtilization?.map((item, idx) => <li key={idx}>{item}</li>)}
-                        </ul>
+                        {renderSectionContent(result.investmentProposal?.fundingUtilization)}
                       </div>
                     </div>
                    </section>
 
                    {/* 14. Why Investors Should Fund */}
-                   <section>
-                    <h2 className={`text-xl font-black text-[var(--text-primary)] border-[#8B5CF6] mb-4 ${language === 'Arabic' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>
-                       14. {language === 'Arabic' ? 'لماذا يشكل هذا المشروع استثماراً ممتازاً؟' : 'Why Investors Should Fund This Project'}
+                   <section className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                    <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] border border-[#8B5CF6]/20 shrink-0">
+                        <i className="fas fa-star text-xl"></i>
+                      </div>
+                      <span className="leading-tight">14. {language === 'Arabic' ? 'لماذا يشكل هذا المشروع استثماراً ممتازاً؟' : 'Why Investors Should Fund This Project'}</span>
                     </h2>
-                    <ul className="list-disc list-inside text-[var(--text-secondary)] leading-relaxed space-y-2">
-                      {result.whyInvestorsShouldFund?.map((item, idx) => <li key={idx}>{item}</li>)}
-                    </ul>
+                    {renderSectionContent(result.whyInvestorsShouldFund)}
                   </section>
 
                   {/* Additional Deliverables Separator */}
@@ -601,7 +659,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                       {result.pitchDeckOutline?.map((slide) => (
                         <div key={slide.slideNumber} className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
                             <h4 className="text-sm font-bold text-[#8B5CF6] mb-1">Slide {slide.slideNumber}: {slide.title}</h4>
-                            <p className="text-xs text-[var(--text-secondary)]">{slide.content}</p>
+                            {renderSectionContent(slide.content)}
                         </div>
                       ))}
                     </div>
@@ -611,12 +669,12 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   <div className="grid grid-cols-1 gap-6">
                     <section className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
                       <h2 className="text-sm font-black text-[var(--text-primary)] mb-4">{language === 'Arabic' ? 'قالب بريد المستثمر' : 'Investor Email Template'}</h2>
-                      <div className="whitespace-pre-wrap text-sm text-[var(--text-secondary)] font-mono bg-[var(--card-bg)] shadow-card p-4 rounded-xl leading-relaxed">{result.investorEmailTemplate}</div>
+                      <div className="text-sm text-[var(--text-secondary)] font-mono bg-[var(--card-bg)] shadow-card p-4 rounded-xl leading-relaxed">{renderSectionContent(result.investorEmailTemplate)}</div>
                     </section>
 
                     <section className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
                        <h2 className="text-sm font-black text-[var(--text-primary)] mb-4">{language === 'Arabic' ? 'ملخص تنفيذي لصفحة واحدة' : 'One-Page Executive Summary'}</h2>
-                       <div className="whitespace-pre-wrap text-sm text-[var(--text-secondary)] leading-relaxed">{result.onePageSummary}</div>
+                       <div className="text-sm text-[var(--text-secondary)] leading-relaxed">{renderSectionContent(result.onePageSummary)}</div>
                     </section>
                   </div>
 
@@ -624,15 +682,11 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <section>
                       <h2 className="text-sm font-black text-amber-500 mb-4 flex items-center"><i className="fas fa-lightbulb mr-2"></i>{language === 'Arabic' ? 'توصيات لزيادة فرصة القبول' : 'Recommendations for Approval'}</h2>
-                      <ul className="list-disc list-inside text-sm text-[var(--text-secondary)] space-y-2">
-                        {result.fundingRecommendations?.map((r, i) => <li key={i}>{r}</li>)}
-                      </ul>
+                        {renderSectionContent(result.fundingRecommendations)}
                     </section>
                     <section>
                       <h2 className="text-sm font-black text-emerald-500 mb-4 flex items-center"><i className="fas fa-handshake mr-2"></i>{language === 'Arabic' ? 'الشركاء والجهات المقترحة' : 'Suggested Partners in Oman/GCC'}</h2>
-                      <ul className="list-disc list-inside text-sm text-[var(--text-secondary)] space-y-2">
-                        {result.strategicPartners?.map((r, i) => <li key={i}>{r}</li>)}
-                      </ul>
+                        {renderSectionContent(result.strategicPartners)}
                     </section>
                   </div>
 
@@ -647,9 +701,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                                <div className="text-xs text-[var(--text-secondary)]">{phase.duration}</div>
                             </div>
                             <div className="flex-1 pl-0 md:pl-4">
-                                <ul className="list-disc list-inside text-sm text-[var(--text-secondary)] mt-2 md:mt-0">
-                                  {phase.milestones?.map((m, i) => <li key={i}>{m}</li>)}
-                                </ul>
+                                {renderSectionContent(phase.milestones)}
                             </div>
                           </div>
                        ))}

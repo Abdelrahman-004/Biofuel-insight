@@ -10,6 +10,7 @@ interface InputFormProps {
     category: 'Biofuel' | 'Renewable Energy';
     feedstock: string;
     production: number;
+    capacity?: number;
     budget: number;
     sellingPrice: number;
     electricityCost?: number;

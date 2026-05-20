@@ -108,37 +108,58 @@ const getApiKey = () => {
 
 const MOCK_DATA = {
   optimize: (projectName: string, description: string): OptimizerResult => ({
-    ProfitOpportunities: [
-      `Production of high-value co-products specifically for ${projectName} based on its focus on ${description.substring(0, 30)}...`,
-      "Carbon credit monetization through international carbon markets.",
-      "Integration of solar-powered processing units to reduce operational costs.",
-      "Strategic partnerships with local Omani logistics firms for reduced transport fees."
+    projectOverview: {
+      tagline: `${projectName}: Optimized production leveraging local Oman resources.`,
+      description: "Under construction for mockup... Please use real API for complete reporting."
+    },
+    revenueStack: {
+      sources: [
+        { name: "Main product", amount: 1000000, confidence: 'HIGH' },
+        { name: "Carbon credits", amount: 200000, confidence: 'MEDIUM' }
+      ],
+      baseCaseTarget: 1000000,
+      upsideCaseTarget: 1200000
+    },
+    carbonPerformance: {
+      intensityBefore: "90 gCO2/MJ",
+      intensityAfter: "20 gCO2/MJ",
+      co2SavedPerYear: 5000,
+      reductionPercentage: 78,
+      euRedIIIFlag: true,
+      carbonCreditValue: "$100,000/year"
+    },
+    financialSnapshot: {
+      capex: 5000000,
+      budget: 6000000,
+      fundingGap: 0,
+      annualProfit: 800000,
+      irr: 15,
+      paybackYears: 6,
+      npv: 2000000
+    },
+    topOpportunities: [
+      { title: "Export to EU", value: "$300k/yr", action: "Obtain ISCC certification" }
     ],
-    CarbonReductionStrategies: [
-      `Implementation of closed-loop water recycling systems tailored for ${projectName}.`,
-      "Use of solar thermal energy for feedstock drying and processing.",
-      "Methane capture and utilization from waste processing units.",
-      "Optimization of transport routes using AI-driven logistics."
+    topRisks: [
+      { title: "Feedstock shortage", probability: "Medium", mitigation: "Diversify suppliers" }
     ],
-    FossilFuelReplacementPlan: [
-      "Transitioning facility vehicles to electric or biodiesel-powered fleets.",
-      "Replacing diesel generators with solar-battery hybrid systems.",
-      "Using bio-gas for on-site heating and steam generation."
+    smartVerdict: {
+      profitScore: 4,
+      carbonScore: 5,
+      omanAlignmentScore: 4,
+      overallScore: 8,
+      decision: "Strong investment",
+      comparison: "Better than standard diesel because of low CI."
+    },
+    optimizationRoadmap: [
+      { year: 1, action: "Launch phase 1", cost: "$1M", impact: "High" }
     ],
-    LogisticsOptimization: [
-      "Establishing processing hubs near feedstock collection points in Salalah and Sohar.",
-      "Utilizing the Duqm port for efficient international export of refined products.",
-      "Implementing real-time tracking for feedstock supply chain transparency."
+    nextSteps: [
+      { urgentAction: "Secure feedstock agreements", cost: "$5k", timeline: "Month 1" }
     ],
-    NetZeroRoadmap: {
-      CarbonIntensityEstimate: "15.5 kg CO2-eq per MJ (75% lower than fossil diesel)",
-      StandardsComparison: "Exceeds EU RED II sustainability criteria and Oman Vision 2040 targets.",
-      RoadmapSteps: [
-        `Phase 1: 100% renewable energy integration for ${projectName} processing (Years 1-2).`,
-        "Phase 2: Full electrification of logistics fleet (Years 3-5).",
-        "Phase 3: Implementation of Carbon Capture and Storage (CCS) for negative emissions (Years 5+)."
-      ]
-    }
+    dataTransparency: [
+      { dataPoint: "Feedstock availability", source: "be'ah", confidence: 'HIGH' }
+    ]
   }),
   analyze: (inputs: any): BioFuelAnalysis => {
     const budget = inputs.budget || 1000000;
@@ -334,38 +355,105 @@ const MOCK_DATA = {
     };
   },
   solve: (topic: string): ChallengeSolverResult => ({
-    IdentifiedChallenge: `Scientific and technical bottlenecks in ${topic} specifically within Oman's arid climate.`,
-    ScientificHypothesis: `Integration of specialized microbial consortia to enhance ${topic} resilience in high-salinity and high-heat Omani environments.`,
-    ExperimentalDesign: {
-      Title: `${topic} Optimization in Omani Conditions`,
-      Variables: [`${topic} intensity levels`, "Microbial consortia composition", "Nutrient concentration"],
-      ControlConditions: ["Standard freshwater cultivation", "Ambient Oman temperature (35°C)"],
-      ExpectedOutcomes: [`30% increase in ${topic} efficiency under stress`, "Enhanced accumulation of target compounds in stress conditions"],
-      FeasibilityNote: "Highly feasible using existing university laboratory equipment in Oman."
+    researchChallenge: `Scientific constraints and technical bottlenecks in ${topic} within Oman's arid environment.`,
+    researchGap: `Lack of data on performance degradation of ${topic} under simultaneous high heat and dust soiling conditions.`,
+    hypothesis: `If specialized heat-resistant materials are applied, then ${topic} efficiency will increase by 15%, because thermal degradation is mitigated.`,
+    experimentalDesign: {
+      title: `${topic} Optimization in Oman`,
+      objective: `To quantify the efficiency gain for ${topic} using new materials.`,
+      variables: [
+        { type: "Independent", name: "Temperature", range: "25°C to 45°C" },
+        { type: "Dependent", name: "Efficiency", range: "% yield" }
+      ],
+      steps: ["Setup equipment", "Run baseline tests", "Apply materials", "Run test phase", "Analyze data"],
+      equipment: ["Spectrometer", "Thermal Chamber", "Data Logger"],
+      duration: "6 months",
+      budget: "OMR 15,000"
     },
-    IndustrialRelevance: `Reduces freshwater demand by 80%, enabling ${topic} implementation in coastal desert areas.`,
-    ExpectedImpact: {
-      Environmental: "Preservation of freshwater resources.",
-      Economic: "Lower operational costs through use of seawater.",
-      Strategic: "Enables large-scale production in non-arable land.",
-      Scalability: "High - Applicable across Oman's 3,000km coastline."
+    statisticalDesign: {
+      replicates: 5,
+      totalExperimentalUnits: 25,
+      primaryTest: "Two-way ANOVA",
+      postHocTest: "Tukey's HSD",
+      correlationTest: "Pearson Correlation",
+      software: "R version 4.2",
+      availableAt: "SQU Analytical Lab",
+      significanceLevel: "p < 0.05",
+      minimumDetectableDifference: "5%",
+      requiredNFor80Power: 12,
+      dataPresentation: ["Mean ± Standard Deviation", "Boxplots indicating quartiles"]
     },
-    DataDrivenInsights: {
-      LifeCycleAssessment: "### Life Cycle Assessment\n| Phase | CO2 Emissions (kg CO2e/kg) | Energy Consumed (MJ/kg) |\n|---|---|---|\n| Cultivation | 0.5 | 4.2 |\n| Harvesting | 0.2 | 1.8 |",
-      ResourceEfficiency: "### Resource Efficiency\n| Resource | Usage |\n|---|---|\n| Water | 5 L/L |\n| Land | 2 m²/kg |",
-      EnvironmentalImpact: "### Environmental Impact\n| Metric | Value |\n|---|---|\n| Carbon Reduction | 85% compared to diesel |\n| Waste Generation | Less than 5% solid residue |",
-      ConventionalComparison: "### Comparison vs Fossil Fuels\n| Metric | Traditional Fossil Diesel | OmanEcosync Proposed |\n|---|---|---|\n| Emissions | 2.68 kg CO2/L | 0.4 kg CO2/L |\n| Cost | $0.80/L | $0.45/L |"
+    expectedOutcomes: [
+      { metric: "Efficiency", baseline: "65%", target: "80%", unit: "%" },
+      { metric: "Water Usage", baseline: "10 L/kg", target: "2 L/kg", unit: "L/kg" }
+    ],
+    lifeCycleAssessment: {
+      systemBoundary: "Cradle-to-gate",
+      functionalUnit: "1 kg of output",
+      methodology: "ISO 14040/14044 compliant",
+      phases: [
+        { phase: "Production", energy: 50, ghg: 10 },
+        { phase: "Operation", energy: 20, ghg: 2 }
+      ],
+      comparison: [
+        { parameter: "GHG (kgCO2e/kg)", fossilBaseline: "+3.5", conventional: "1.2", thisStudy: "0.8" }
+      ],
+      resourceEfficiency: [
+        { resource: "Freshwater", convMethod: "15 m³/ton", thisStudy: "5 m³/ton", saving: "66%" }
+      ],
+      netGhgPosition: { fossilBaseline: "5.0", thisStudyTarget: "1.2", reductionAchieved: "76%", euRedIIIMet: true },
+      lcaAssumptions: ["Electricity mix is current Oman grid.", "Transport distance max 50km."],
+      dataGaps: ["End-of-life recycling rates."],
+      isoCompliance: { status: "PARTIAL", reason: "Wait for third-party audit." }
     },
-    AIAudit: {
-      LogicalConsistency: "The proposed CAPEX reduction aligns closely with the expected decrease in water footprint, ensuring logical scalability.",
-      Assumptions: ["Assumes 90% solar uptime.", "Local desalination costs are subsidized for research."],
+    literatureLandscape: {
+      established: ["Efficiency drops inversely to temperature."],
+      contested: ["Whether dust composition dominates heat effects."],
+      unknown: ["Combining specific Omani dust mineralogy with ultra-high temperatures in experimental rigs."],
+      keyResearchGroupsWorldwide: [
+        { group: "NREL PV Reliability Group", focus: "Thermal degradation" }
+      ],
+      searchTerms: ["Oman heat stress", "Efficiency optimization", "Advanced materials"],
+      targetJournals: [
+        { journal: "Applied Energy", impactFactor: "11.2" }
+      ]
     },
-    AlternativeMethods: [
-      {
-        MethodName: "Photobioreactor Integration",
-        Description: "Utilizing highly controlled closed networks."
-      }
-    ]
+    researchPathway: {
+      lab: { scale: "Bench (1L)", duration: "6 months", goal: "Validate hypothesis and define variables" },
+      pilot: { scale: "Pilot (100L)", duration: "12 months", goal: "Test scalable continuous production" },
+      commercial: { scale: "Commercial (10kL)", timeline: "3 years", goal: "Full market deployment" }
+    },
+    researchOutputPlan: {
+        publications: [
+            { topic: "Initial proof of concept", journal: "Applied Energy", timeline: "Month 6", targetIF: ">10" }
+        ],
+        conference: { name: "World Future Energy Summit", location: "Abu Dhabi", deadline: "Q3 2026" },
+        intellectualProperty: { patentPotential: "POSSIBLE", action: "File preliminary report", contact: "TRC Technology Transfer" },
+        capacityBuilding: { mscTrained: 2, phdTrained: 0, capabilityBuilt: "Thermal testing rig", createdAsset: "Dataset on dust degradation" },
+        kpis: { publications: 2, citationsTarget: 20, studentsTrained: 2, patentsFiled: 0, industryEngaged: true, policyBriefSubmitted: false },
+        knowledgeTransfer: ["Share protocol with GUtech", "Report findings to PDO"]
+    },
+    fundingMatch: {
+      bestFit: "The Research Council (TRC)",
+      grantType: "Strategic Research Grant",
+      budgetRange: "OMR 30,000 - 50,000",
+      frameItAs: "Aligns with Vision 2040 sustainable energy transition goals.",
+      applicationCycle: "Spring/Fall cycle"
+    },
+    limitations: [
+      { limitation: "High dust accumulation may skew optical readings.", mitigation: "Use continuous automated cleaning." }
+    ],
+    dataConfidence: {
+      high: "Solar irradiance and temperature ranges.",
+      medium: "Material degradation rates.",
+      low: "Long-term scaling effects."
+    },
+    recommendedCollaboration: {
+      internal: "SQU College of Engineering",
+      external: "KAUST",
+      industry: "PDO Research Division",
+      why: "Combines local expertise with world-class facilities and industry validation."
+    }
   }),
   research: (inputs: any): ResearchImplementationAnalysis => {
     const feedstock = inputs.feedstockType || "Waste Cooking Oil";
@@ -532,57 +620,218 @@ export async function optimizeProject(projectName: string, description: string, 
   }
   const ai = new GoogleGenAI({ apiKey });
   
-  const SYSTEM_PROMPT = `You are Smart Profit and Low-Carbon Optimizer AI, a multi-agent system designed to help biofuel projects become profitable while minimizing lifecycle greenhouse gas emissions.
-Your goal is to support both investors and researchers by providing realistic and actionable strategies.
+  const SYSTEM_PROMPT = `YOUR MISSION FOR EVERY PROJECT:
+"Find the most profitable low-carbon pathway using real Oman market data"
 
-CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
+You are Smart Profit and Low-Carbon Optimizer AI, a multi-agent system designed to help sustainability projects in Oman become profitable.
 
-The system includes:
-1. Profit Strategy AI: Identify revenue streams, co-products (glycerol, biochar, fertilizers), carbon credits, and ESG financing.
-2. Carbon Reduction AI: Analyze lifecycle emissions (cultivation, processing, transport) and suggest renewable energy integration.
-3. Fossil Fuel Replacement AI: Recommend electrification, green hydrogen, and renewable power alternatives.
-4. Low-Carbon Logistics AI: Optimize supply chain, facility location, and local sourcing.
-5. Net-Zero Advisor AI: Estimate carbon intensity (kg CO2-eq per MJ) and provide a roadmap to net-zero.
+═══════════════════════════════════════
+PART 1 — AUTO-DETECT & SMART SETUP
+═══════════════════════════════════════
+Step 1: Identify project type automatically.
+Step 2: Apply correct Oman benchmarks.
+Step 3: Find ALL revenue streams (not just one).
+Step 4: Find ALL carbon reduction paths.
 
-Tone: Clear, Practical, Scientific, Investor-friendly, Realistic.
-Output MUST be valid JSON following the provided schema.${getLanguageInstruction(language)}`;
+PROJECT TYPES COVERED: Biofuel, Solar PV, Wind, Green Hydrogen, Waste-to-Energy, Carbon Credits, Carbon Capture, Nature-Based Solutions, Hybrid.
 
-  const prompt = `CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, and explanations, natively in ${language}. ${getLanguageInstruction(language)}
-  
-  Optimize the following biofuel project for profit and low-carbon impact:
-  Project Name: ${projectName}
-  Description: ${description}
-  
-  Your optimization strategy must be highly specific to the project name and description provided above. 
-  - Profit opportunities should leverage the specific feedstock or location mentioned.
-  - Carbon reduction should address the specific operational challenges described.
-  - The Net-Zero roadmap should be a realistic timeline for this specific project.`;
+═══════════════════════════════════════
+PART 2 — OMAN REAL MARKET DATA 2025
+═══════════════════════════════════════
+### BIOFUELS:
+UCO local: $600–700/ton, imported GCC: $1,000–1,200/ton
+Biodiesel local: $800–900/ton, EU export: $1,100–1,300/ton
+Glycerin byproduct: $150–200/ton
+Fish oil collection: $20–35/ton (max 20% blend with UCO)
+Algae: not viable before 2030
+Biogas tipping fee: $15–25/ton (be'ah)
+Reference: Wakud International. Warning: 90% UCO smuggled.
+
+### SOLAR PV:
+Rooftop CAPEX: $0.65–0.80/Wp, Utility: $0.45–0.55/Wp
+Irradiance: Muscat 5.5–6.2, Salalah 5.8–6.5, Duqm 6.0–6.8, Sohar 5.4–6.0 kWh/m²/day
+Performance Ratio: 76–80%. Degradation: 0.45%/year.
+Grid export: $0.025–0.035/kWh. Payback rooftop: 6–9 years.
+
+### WIND:
+Viable zones ONLY: Dhofar, Duqm, Masirah. CAPEX: $1.1–1.4M/MW.
+Capacity factor Dhofar: 38–45%, Duqm: 28–33%.
+
+### GREEN HYDROGEN:
+Current cost: $4.5–6.5/kg H2, Target: $2.5–3.5/kg.
+Electrolyzer CAPEX: $600–900/kW. Min scale: 100MW.
+
+### WASTE-TO-ENERGY:
+MSW Muscat: 1.7–2.1 kg/capita/day. Tipping fee: $15–25/ton. CAPEX: $400–600/ton/day.
+
+### CARBON MARKETS:
+Gold Standard VCM: $15–35/ton, EU ETS: €55–75/ton.
+UCO biodiesel CI: ~15–25 gCO2eq/MJ (74–84% reduction).
+EU RED III threshold: 65% reduction.
+Blue carbon (Oman coast): HIGH potential.
+
+### OPTIMIZATION & RULES:
+Optimal blend: UCO 70% + Fish Oil 20% + Seeds 10%.
+Discount rate: 8%. Corporate tax: 15%.
+Omanization: 24,000–26,000 OMR/year. 1 OMR = 2.60 USD.
+
+═══════════════════════════════════════
+PART 3 — THE OPTIMIZER ENGINE
+═══════════════════════════════════════
+PROFIT OPTIMIZER: primary + byproduct + carbon + export premium.
+CARBON OPTIMIZER: lowest-cost reduction path, calculate baseline.
+REALITY CHECK: 
+🚩 IRR > 28% → recheck
+🚩 Payback < 2 years → flag
+🚩 Budget < 30% CAPEX → flag underfunded
+CARBON RULE: Base case = product revenue only.
+
+CRITICAL INSTRUCTION: You must strictly output the requested markdown format wrapped inside the JSON field. Ensure everything is natively translated to ${language} if requested.
+`;
+
+  const prompt = `CRITICAL INSTRUCTION: Analyze the project using the benchmarks and output the findings purely in JSON matching the exact schema requested. Translate to ${language} if necessary.
+
+Project Name: ${projectName}
+Project Description: ${description}`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: `${SYSTEM_PROMPT}\n\nCRITICAL INSTRUCTION: Output EVERYTHING in ${language}. ${getLanguageInstruction(language)}`,
+        systemInstruction: SYSTEM_PROMPT,
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            ProfitOpportunities: { type: Type.ARRAY, items: { type: Type.STRING } },
-            CarbonReductionStrategies: { type: Type.ARRAY, items: { type: Type.STRING } },
-            FossilFuelReplacementPlan: { type: Type.ARRAY, items: { type: Type.STRING } },
-            LogisticsOptimization: { type: Type.ARRAY, items: { type: Type.STRING } },
-            NetZeroRoadmap: {
+            projectOverview: {
               type: Type.OBJECT,
               properties: {
-                CarbonIntensityEstimate: { type: Type.STRING },
-                StandardsComparison: { type: Type.STRING },
-                RoadmapSteps: { type: Type.ARRAY, items: { type: Type.STRING } }
+                tagline: { type: Type.STRING },
+                description: { type: Type.STRING }
               },
-              required: ["CarbonIntensityEstimate", "StandardsComparison", "RoadmapSteps"]
+              required: ["tagline", "description"]
+            },
+            revenueStack: {
+              type: Type.OBJECT,
+              properties: {
+                sources: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      name: { type: Type.STRING },
+                      amount: { type: Type.NUMBER },
+                      confidence: { type: Type.STRING }
+                    },
+                    required: ["name", "amount", "confidence"]
+                  }
+                },
+                baseCaseTarget: { type: Type.NUMBER },
+                upsideCaseTarget: { type: Type.NUMBER }
+              },
+              required: ["sources", "baseCaseTarget", "upsideCaseTarget"]
+            },
+            carbonPerformance: {
+              type: Type.OBJECT,
+              properties: {
+                intensityBefore: { type: Type.STRING },
+                intensityAfter: { type: Type.STRING },
+                co2SavedPerYear: { type: Type.NUMBER },
+                reductionPercentage: { type: Type.NUMBER },
+                euRedIIIFlag: { type: Type.BOOLEAN },
+                carbonCreditValue: { type: Type.STRING }
+              },
+              required: ["intensityBefore", "intensityAfter", "co2SavedPerYear", "reductionPercentage", "euRedIIIFlag", "carbonCreditValue"]
+            },
+            financialSnapshot: {
+              type: Type.OBJECT,
+              properties: {
+                capex: { type: Type.NUMBER },
+                budget: { type: Type.NUMBER },
+                fundingGap: { type: Type.NUMBER },
+                annualProfit: { type: Type.NUMBER },
+                irr: { type: Type.NUMBER },
+                paybackYears: { type: Type.NUMBER },
+                npv: { type: Type.NUMBER }
+              },
+              required: ["capex", "budget", "fundingGap", "annualProfit", "irr", "paybackYears", "npv"]
+            },
+            topOpportunities: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  title: { type: Type.STRING },
+                  value: { type: Type.STRING },
+                  action: { type: Type.STRING }
+                },
+                required: ["title", "value", "action"]
+              }
+            },
+            topRisks: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  title: { type: Type.STRING },
+                  probability: { type: Type.STRING },
+                  mitigation: { type: Type.STRING }
+                },
+                required: ["title", "probability", "mitigation"]
+              }
+            },
+            smartVerdict: {
+              type: Type.OBJECT,
+              properties: {
+                profitScore: { type: Type.NUMBER },
+                carbonScore: { type: Type.NUMBER },
+                omanAlignmentScore: { type: Type.NUMBER },
+                overallScore: { type: Type.NUMBER },
+                decision: { type: Type.STRING },
+                comparison: { type: Type.STRING }
+              },
+              required: ["profitScore", "carbonScore", "omanAlignmentScore", "overallScore", "decision", "comparison"]
+            },
+            optimizationRoadmap: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  year: { type: Type.STRING },
+                  action: { type: Type.STRING },
+                  cost: { type: Type.STRING },
+                  impact: { type: Type.STRING }
+                },
+                required: ["year", "action", "cost", "impact"]
+              }
+            },
+            nextSteps: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  urgentAction: { type: Type.STRING },
+                  cost: { type: Type.STRING },
+                  timeline: { type: Type.STRING }
+                },
+                required: ["urgentAction", "cost", "timeline"]
+              }
+            },
+            dataTransparency: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  dataPoint: { type: Type.STRING },
+                  source: { type: Type.STRING },
+                  confidence: { type: Type.STRING }
+                },
+                required: ["dataPoint", "source", "confidence"]
+              }
             }
           },
-          required: ["ProfitOpportunities", "CarbonReductionStrategies", "FossilFuelReplacementPlan", "LogisticsOptimization", "NetZeroRoadmap"]
+          required: ["projectOverview", "revenueStack", "carbonPerformance", "financialSnapshot", "topOpportunities", "topRisks", "smartVerdict", "optimizationRoadmap", "nextSteps", "dataTransparency"]
         }
       }
     }));
@@ -686,6 +935,79 @@ export async function analyzeProject(inputs: {
   - Generate a professional Executive Summary (3-4 sentences).
   - Include a SWOT Analysis (Strengths, Weaknesses, Opportunities, Threats).
   - Explicitly mention strategic alignment with Oman Vision 2040 goals.
+
+  ## CRITICAL DATA CORRECTIONS — Apply these benchmarks before any calculation:
+
+  ### BIOFUEL (UCO Biodiesel) — Oman Market Reality 2025:
+  - UCO Collection Cost: $600–800/ton (local Oman), $1,000–1,200/ton (imported GCC/Asia)
+  - Biodiesel Selling Price: $1,100–1,500/ton (EU export), $700–900/ton (local Oman)
+  - Realistic CAPEX for 1,700 ton/yr plant: $800K–$1.2M (Green Fuels FuelMatic GSX20 benchmark)
+  - Methanol cost: $400–500/ton
+  - Conversion efficiency: 92–95%
+  - Yield: 1 ton UCO → 0.92–0.95 ton biodiesel + 0.10 ton glycerin byproduct (credit: $200/ton)
+  - Reference: Wakud International, Khazaen Economic City, Oman
+
+  ### SOLAR PV — Oman Benchmarks 2025:
+  - CAPEX: $0.45–0.55/Wp (utility scale), $0.65–0.80/Wp (commercial rooftop)
+  - O&M: $8–12/kW/year
+  - Daily irradiance (Muscat): 5.5–6.2 kWh/m²/day
+  - Daily irradiance (Salalah): 5.8–6.5 kWh/m²/day  
+  - Daily irradiance (Duqm): 6.0–6.8 kWh/m²/day
+  - Panel efficiency: 21–23% (monocrystalline 2025)
+  - Performance Ratio: 78–82% (accounting for Oman heat)
+  - Degradation rate: 0.4–0.5%/year
+  - PPA tariff benchmark: $0.016–0.024/kWh (OETC 2024)
+  - Grid sell-back: $0.025–0.035/kWh
+  - Reference: Manah I & II Solar Projects, 1 GW total
+
+  ### WIND — Oman Benchmarks:
+  - Viable zones: Dhofar (Salalah), Duqm, Masirah Island
+  - Average wind speed: 7.5–9.5 m/s (Dhofar monsoon)
+  - CAPEX: $1.1–1.4M/MW (onshore Oman)
+  - Capacity factor: 35–45% (Dhofar), 25–30% (other)
+  - Reference: Dhofar Wind Farm 50MW (operational)
+
+  ### GREEN HYDROGEN — Oman NEOM/OQ Benchmarks:
+  - Electrolyzer CAPEX: $600–900/kW (alkaline 2025)
+  - Production cost target: $2.5–3.5/kg H2 (Oman 2030)
+  - Current realistic cost: $4.5–6.0/kg H2
+  - Electricity requirement: 50–55 kWh/kg H2
+  - Water requirement: 9–10 L/kg H2
+  - Storage cost: $1.5–2.0/kg H2
+  - Reference: HYPORT Duqm (OQ + ACWA Power, 1.8 GW)
+
+  ### WASTE-TO-ENERGY — Oman Context:
+  - MSW generation: 1.7–2.1 kg/capita/day (Muscat)
+  - Tipping fee income: $15–25/ton (be'ah contracts)
+  - Energy content MSW Oman: 8–12 MJ/kg
+  - CAPEX: $400–600/ton/day capacity
+
+  ### ALGAE BIOFUEL — Oman Context:
+  - Pilot scale only — no commercial plants in Oman yet
+  - Realistic CAPEX: $15–25M for 3,700 ton/yr (greenfield)
+  - Production cost: $3,000–5,000/ton (not yet competitive)
+  - Reference: Net Zero Solutions + Al Tharmad + Green Gulf Industries ($23M project, development stage)
+
+  ### JATROPHA & DATE SEEDS — Oman Context:
+  - Jatropha: Yield 1,500–2,000 kg seeds/ha/yr. Oil content 30–40%. SQU research confirmed feasibility.
+  - Date Seeds: Mwasalat Green Bus pilot (proof of concept only). Not commercial scale.
+
+  ## FINANCIAL MODEL CORRECTIONS:
+  - NPV Formula: NPV = -CAPEX + Σ [((Revenue - OPEX) × (1-tax)) / (1+r)^t]. Where: r = 8% discount rate, tax = 15% (Oman). Include 5% annual O&M escalation.
+  - CAPEX Validation Rule: If (Investor Budget / Required CAPEX) < 0.4 → FLAG as "Severely Underfunded".
+  - UCO Unit Economics Check: IF (UCO_cost_per_ton > Biodiesel_selling_price) → Alert: "Inverted economics detected."
+  - Omanization Cost: Avg 24,000–26,000 OMR/year total. Minimum 35% Omani workforce.
+
+  ## OUTPUT REQUIREMENTS for Investment-Grade Report (Inject into Dashboard/ExecutiveSummary markdown where applicable):
+  1. FINANCIAL METRICS TABLE: NPV (base, +20%, -20%), IRR (pre/post tax), Payback, LCOE/LCOP, DSCR.
+  2. SENSITIVITY ANALYSIS: Feedstock price ±20%, Product selling price ±15%, CAPEX overrun +25%, Discount rate 6%/8%/10%/12%, Production volume ±15%.
+  3. RISK MATRIX: Rate 1-5 for Feedstock, Regulatory, Tech, Market, Currency in KeyRisks.
+  4. BENCHMARKING vs real Oman projects (Wakud, Manah, Dhofar Wind, HYPORT Duqm).
+  5. OMAN VISION 2040 ALIGNMENT SCORE: Rate 1-10 on KPIs.
+  6. INVESTOR RED FLAGS: List all.
+  7. NEXT STEPS: 3-5 actionable items in ExpertCounsel.
+  8. CONSISTENCY: Round figures to nearest $1,000. Report USD / OMR (1 OMR = 2.60 USD). Format numbers distinctly.
+  9. CONFIDENCE RATING: End with Data confidence, Model reliability, Recommendation for professional validation.
 
   Override investor optimism with realistic engineering numbers.${getLanguageInstruction(inputs.language)}`;
 
@@ -1022,127 +1344,249 @@ export async function solveChallenge(topic: string, language: string = 'English'
   }
   const ai = new GoogleGenAI({ apiKey });
   
-  const SYSTEM_PROMPT = `You are Oman Biofuel Challenge Solver AI, a scientific multi-agent system designed to identify and solve biofuel research challenges in Oman.
-Your role is to support researchers, students, and industry by generating realistic, locally relevant scientific solutions.
+  const SYSTEM_PROMPT = `YOUR SINGLE MISSION:
+Transform any green energy technical challenge into a clear, structured, publishable research framework.
 
-CRITICAL INSTRUCTION: You must strictly output the entire JSON content, including all values, descriptions, titles, explanations, and tables, natively in ${language}. ${getLanguageInstruction(language)} Ensure the output is comprehensive, accurate, professional, and clearly understandable while maintaining scientific correctness.
+CRITICAL INSTRUCTION: You must strictly output the requested JSON format natively in ${language} if requested.
 
-The system consists of six AI agents:
-1. Challenge Identifier AI: Identify key scientific and technical bottlenecks in biofuel production in Oman (climate, salinity, water scarcity, energy use).
-2. Scientific Hypothesis Generator AI: Propose innovative and realistic biological, biochemical, or engineering solutions (strain engineering, adaptive cultivation).
-3. Experimental Design AI: Suggest laboratory and pilot-scale experiments feasible in university labs.
-4. Industrial Translation AI: Explain how the research can reduce CAPEX, OPEX, or technical risk.
-5. Impact Evaluation AI: Evaluate environmental, economic, and strategic impact for Oman.
-6. Data & Audit AI: Provide structured tables containing accurate, data-driven insights that support the proposed solution. Conduct a logical AI audit and propose alternative accurate methods.
+═══════════════════════════════════════
+STEP 1 — AUTO-DETECT RESEARCH FIELD
+═══════════════════════════════════════
+Read the challenge and identify category: Biofuel, Solar, Wind, Green Hydrogen, Waste-to-Energy, Carbon & Env, or Energy Systems.
 
-Output MUST be valid JSON following the provided schema.
-Tone: Scientific, Clear, Practical, Educational, Realistic.`;
+═══════════════════════════════════════
+STEP 2 — OMAN SCIENTIFIC CONTEXT
+═══════════════════════════════════════
+Use realistic Oman context (climate, 28-42°C summer peak, high DNI, Dhofar monsoon wind, dust soiling). Use local institutions (SQU, GUtech, TRC, PDO).
 
-  const prompt = `Identify and solve a specific scientific and technical challenge related to: "${topic}".
-  
-  Context: Oman's biofuel industry, climate (high heat, humidity), and resource constraints (water scarcity).
-  
-  CRITICAL INSTRUCTION FOR TOPIC FOCUS: You MUST accurately analyze the specific stated problem ("${topic}"). Do NOT assume the feedstock is algae unless "algae" is explicitly mentioned in the topic. If the topic is about date seeds, used cooking oil, municipal solid waste, or any other feedstock, your entire analysis, hypothesis, and experimental design MUST focus solely on that specific feedstock and problem.
-  
-  Your response must directly address the specific details and keywords in the user's topic. Do not provide generic answers. Apply or generate many accurate and reliable methods to solve the stated problem accurately.
-  
-  CRITICAL: You must provide highly detailed, comprehensive information, utilizing realistic, research-based estimates relevant to Oman or similar regions. Avoid generic assumptions; prioritize credible ranges or benchmark data. Output MUST be entirely in ${language}. ${getLanguageInstruction(language)} DO NOT under ANY circumstances use HTML tags (e.g., <table>, <br>, <b>, <span>). STRICTLY use native Markdown only.
-  
-  1. DATA-DRIVEN INSIGHTS & STRUCTURED TABLES
-  For the solution, generate STRICT Markdown tables (using | Column 1 | Column 2 | format) with a brief explanation under each table:
-  - Life Cycle Assessment: Detail emissions, energy consumed per phase.
-  - Resource Efficiency: Detail water, energy, and land use parameters.
-  - Environmental Impact: Include CO2 reduction, waste, and sustainability metrics.
-  - Conventional Comparison: Compare the OmanEcosync Proposed method with conventional alternatives (e.g., fossil fuels or traditional methods).
-  Provide all outputs in a professional format suitable for academic or project presentation.
+SCIENTIFIC INTEGRITY — ALWAYS APPLY:
+✓ Hypothesis clearly separated from fact
+✓ Search terms given — not fake citations
+✓ Limitations stated honestly
+✓ Oman-specific data flagged as such
+✓ Equipment realistic for local labs
+✗ Never invent paper titles or DOIs
+✗ Never present estimates as proven
+✗ No financial/investor language
+✗ No market prices or IRR
+✗ No Vision 2040 business framing
 
-  Oman-Specific Constants to use (if applicable):
-  - Solar Irradiance: ~2200-2500 kWh/m²/year.
-  - Diesel Price Baseline: 0.250 OMR/L.
-  - Produced Water Salinity: 5,000 to 50,000 ppm.
-  
-  2. AI AUDIT
-  - Perform a logical consistency check across all values.
-  - Ensure no contradictions between numbers (e.g., cost vs output vs efficiency).
-  - Highlight assumptions clearly.
+MANDATORY ADDITIONS — Always include these sections in every output:
+1. STATISTICAL DESIGN: Replicates, units, tests, significance, power, data presentation.
+2. LITERATURE LANDSCAPE: What is established, contested, unknown, key groups worldwide, search terms, target journals.
+3. RESEARCH OUTPUT PLAN: Publications, conferences, intellectual property, capacity building, KPIs.
+4. LIFE CYCLE ASSESSMENT: System boundary, functional unit, methodology, phase-by-phase, comparison with baseline, resource efficiency, and net GHG position vs fossil baseline for EU RED III.`;
 
-  3. UI/UX VISUAL STYLE (THEME INTEGRATION)
-  - You MUST use ONLY native Markdown strings. 
-  - Use Markdown bold (**text**) for emphasis. 
-  - Do NOT use inline HTML for colors or formatting.
-  - Make sure the language output matches the requested language perfectly.
+  const prompt = `Convert this challenge into a structured research framework matching the schema requested:
+Topic: "${topic}"
 
-  4. OUTPUT CONSTRAINTS (PREVENT TRUNCATION)
-  - Priority: Prioritize Tables, Data, and Audit points over long prose.
-  - Completeness: Never cut off a table or an explanation. If the response is reaching the limit, provide the core data first.
-  - Tone: Professional, Engineering-focused, and Academic-ready.`;
+OUTPUT MUST BE IN ${language}.`;
 
   try {
     const response = await withRetry(() => ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
-        systemInstruction: `${SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST process and output everything natively in ${language || 'English'}. ${getLanguageInstruction(language)}`,
+        systemInstruction: SYSTEM_PROMPT,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            IdentifiedChallenge: { type: Type.STRING },
-            ScientificHypothesis: { type: Type.STRING },
-            ExperimentalDesign: {
+            researchChallenge: { type: Type.STRING },
+            researchGap: { type: Type.STRING },
+            hypothesis: { type: Type.STRING },
+            experimentalDesign: {
               type: Type.OBJECT,
               properties: {
-                Title: { type: Type.STRING },
-                Variables: { type: Type.ARRAY, items: { type: Type.STRING } },
-                ControlConditions: { type: Type.ARRAY, items: { type: Type.STRING } },
-                ExpectedOutcomes: { type: Type.ARRAY, items: { type: Type.STRING } },
-                FeasibilityNote: { type: Type.STRING }
+                title: { type: Type.STRING },
+                objective: { type: Type.STRING },
+                variables: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { type: { type: Type.STRING }, name: { type: Type.STRING }, range: { type: Type.STRING } },
+                    required: ["type", "name", "range"]
+                  }
+                },
+                steps: { type: Type.ARRAY, items: { type: Type.STRING } },
+                equipment: { type: Type.ARRAY, items: { type: Type.STRING } },
+                duration: { type: Type.STRING },
+                budget: { type: Type.STRING }
               },
-              required: ["Title", "Variables", "ControlConditions", "ExpectedOutcomes"]
+              required: ["title", "objective", "variables", "steps", "equipment", "duration", "budget"]
             },
-            IndustrialRelevance: { type: Type.STRING },
-            ExpectedImpact: {
+            statisticalDesign: {
               type: Type.OBJECT,
               properties: {
-                Environmental: { type: Type.STRING },
-                Economic: { type: Type.STRING },
-                Strategic: { type: Type.STRING },
-                Scalability: { type: Type.STRING }
+                replicates: { type: Type.NUMBER },
+                totalExperimentalUnits: { type: Type.NUMBER },
+                primaryTest: { type: Type.STRING },
+                postHocTest: { type: Type.STRING },
+                correlationTest: { type: Type.STRING },
+                software: { type: Type.STRING },
+                availableAt: { type: Type.STRING },
+                significanceLevel: { type: Type.STRING },
+                minimumDetectableDifference: { type: Type.STRING },
+                requiredNFor80Power: { type: Type.NUMBER },
+                dataPresentation: { type: Type.ARRAY, items: { type: Type.STRING } }
               },
-              required: ["Environmental", "Economic", "Strategic", "Scalability"]
+              required: ["replicates", "totalExperimentalUnits", "primaryTest", "postHocTest", "correlationTest", "software", "availableAt", "significanceLevel", "minimumDetectableDifference", "requiredNFor80Power", "dataPresentation"]
             },
-            DataDrivenInsights: {
-              type: Type.OBJECT,
-              properties: {
-                LifeCycleAssessment: { type: Type.STRING },
-                ResourceEfficiency: { type: Type.STRING },
-                EnvironmentalImpact: { type: Type.STRING },
-                ConventionalComparison: { type: Type.STRING }
-              },
-              required: ["LifeCycleAssessment", "ResourceEfficiency", "EnvironmentalImpact", "ConventionalComparison"]
-            },
-            AIAudit: {
-              type: Type.OBJECT,
-              properties: {
-                LogicalConsistency: { type: Type.STRING },
-                Assumptions: { type: Type.ARRAY, items: { type: Type.STRING } }
-              },
-              required: ["LogicalConsistency", "Assumptions"]
-            },
-            AlternativeMethods: {
+            expectedOutcomes: {
               type: Type.ARRAY,
               items: {
                 type: Type.OBJECT,
-                properties: {
-                  MethodName: { type: Type.STRING },
-                  Description: { type: Type.STRING }
-                },
-                required: ["MethodName", "Description"]
+                properties: { metric: { type: Type.STRING }, baseline: { type: Type.STRING }, target: { type: Type.STRING }, unit: { type: Type.STRING } },
+                required: ["metric", "baseline", "target", "unit"]
               }
+            },
+            lifeCycleAssessment: {
+              type: Type.OBJECT,
+              properties: {
+                systemBoundary: { type: Type.STRING },
+                functionalUnit: { type: Type.STRING },
+                methodology: { type: Type.STRING },
+                phases: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { phase: { type: Type.STRING }, energy: { type: Type.NUMBER }, ghg: { type: Type.NUMBER } },
+                    required: ["phase", "energy", "ghg"]
+                  }
+                },
+                comparison: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { parameter: { type: Type.STRING }, fossilBaseline: { type: Type.STRING }, conventional: { type: Type.STRING }, thisStudy: { type: Type.STRING } },
+                    required: ["parameter", "fossilBaseline", "conventional", "thisStudy"]
+                  }
+                },
+                resourceEfficiency: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { resource: { type: Type.STRING }, convMethod: { type: Type.STRING }, thisStudy: { type: Type.STRING }, saving: { type: Type.STRING } },
+                    required: ["resource", "convMethod", "thisStudy", "saving"]
+                  }
+                },
+                netGhgPosition: {
+                  type: Type.OBJECT,
+                  properties: { fossilBaseline: { type: Type.STRING }, thisStudyTarget: { type: Type.STRING }, reductionAchieved: { type: Type.STRING }, euRedIIIMet: { type: Type.BOOLEAN } },
+                  required: ["fossilBaseline", "thisStudyTarget", "reductionAchieved", "euRedIIIMet"]
+                },
+                lcaAssumptions: { type: Type.ARRAY, items: { type: Type.STRING } },
+                dataGaps: { type: Type.ARRAY, items: { type: Type.STRING } },
+                isoCompliance: {
+                  type: Type.OBJECT,
+                  properties: { status: { type: Type.STRING }, reason: { type: Type.STRING } },
+                  required: ["status", "reason"]
+                }
+              },
+              required: ["systemBoundary", "functionalUnit", "methodology", "phases", "comparison", "resourceEfficiency", "netGhgPosition", "lcaAssumptions", "dataGaps", "isoCompliance"]
+            },
+            literatureLandscape: {
+              type: Type.OBJECT,
+              properties: {
+                established: { type: Type.ARRAY, items: { type: Type.STRING } },
+                contested: { type: Type.ARRAY, items: { type: Type.STRING } },
+                unknown: { type: Type.ARRAY, items: { type: Type.STRING } },
+                keyResearchGroupsWorldwide: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { group: { type: Type.STRING }, focus: { type: Type.STRING } },
+                    required: ["group", "focus"]
+                  }
+                },
+                searchTerms: { type: Type.ARRAY, items: { type: Type.STRING } },
+                targetJournals: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { journal: { type: Type.STRING }, impactFactor: { type: Type.STRING } },
+                    required: ["journal", "impactFactor"]
+                  }
+                }
+              },
+              required: ["established", "contested", "unknown", "keyResearchGroupsWorldwide", "searchTerms", "targetJournals"]
+            },
+            researchPathway: {
+              type: Type.OBJECT,
+              properties: {
+                lab: { type: Type.OBJECT, properties: { scale: { type: Type.STRING }, duration: { type: Type.STRING }, goal: { type: Type.STRING } }, required: ["scale", "duration", "goal"] },
+                pilot: { type: Type.OBJECT, properties: { scale: { type: Type.STRING }, duration: { type: Type.STRING }, goal: { type: Type.STRING } }, required: ["scale", "duration", "goal"] },
+                commercial: { type: Type.OBJECT, properties: { scale: { type: Type.STRING }, timeline: { type: Type.STRING }, goal: { type: Type.STRING } }, required: ["scale", "timeline", "goal"] }
+              },
+              required: ["lab", "pilot", "commercial"]
+            },
+            researchOutputPlan: {
+              type: Type.OBJECT,
+              properties: {
+                publications: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: { topic: { type: Type.STRING }, journal: { type: Type.STRING }, timeline: { type: Type.STRING }, targetIF: { type: Type.STRING } },
+                    required: ["topic", "journal", "timeline", "targetIF"]
+                  }
+                },
+                conference: {
+                  type: Type.OBJECT,
+                  properties: { name: { type: Type.STRING }, location: { type: Type.STRING }, deadline: { type: Type.STRING } },
+                  required: ["name", "location", "deadline"]
+                },
+                intellectualProperty: {
+                  type: Type.OBJECT,
+                  properties: { patentPotential: { type: Type.STRING }, action: { type: Type.STRING }, contact: { type: Type.STRING } },
+                  required: ["patentPotential", "action", "contact"]
+                },
+                capacityBuilding: {
+                  type: Type.OBJECT,
+                  properties: { mscTrained: { type: Type.NUMBER }, phdTrained: { type: Type.NUMBER }, capabilityBuilt: { type: Type.STRING }, createdAsset: { type: Type.STRING } },
+                  required: ["mscTrained", "phdTrained", "capabilityBuilt", "createdAsset"]
+                },
+                kpis: {
+                  type: Type.OBJECT,
+                  properties: { publications: { type: Type.NUMBER }, citationsTarget: { type: Type.NUMBER }, studentsTrained: { type: Type.NUMBER }, patentsFiled: { type: Type.NUMBER }, industryEngaged: { type: Type.BOOLEAN }, policyBriefSubmitted: { type: Type.BOOLEAN } },
+                  required: ["publications", "citationsTarget", "studentsTrained", "patentsFiled", "industryEngaged", "policyBriefSubmitted"]
+                },
+                knowledgeTransfer: { type: Type.ARRAY, items: { type: Type.STRING } }
+              },
+              required: ["publications", "conference", "intellectualProperty", "capacityBuilding", "kpis", "knowledgeTransfer"]
+            },
+            fundingMatch: {
+              type: Type.OBJECT,
+              properties: {
+                bestFit: { type: Type.STRING },
+                grantType: { type: Type.STRING },
+                budgetRange: { type: Type.STRING },
+                frameItAs: { type: Type.STRING },
+                applicationCycle: { type: Type.STRING }
+              },
+              required: ["bestFit", "grantType", "budgetRange", "frameItAs", "applicationCycle"]
+            },
+            limitations: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: { limitation: { type: Type.STRING }, mitigation: { type: Type.STRING } },
+                required: ["limitation", "mitigation"]
+              }
+            },
+            dataConfidence: {
+              type: Type.OBJECT,
+              properties: { high: { type: Type.STRING }, medium: { type: Type.STRING }, low: { type: Type.STRING } },
+              required: ["high", "medium", "low"]
+            },
+            recommendedCollaboration: {
+              type: Type.OBJECT,
+              properties: { internal: { type: Type.STRING }, external: { type: Type.STRING }, industry: { type: Type.STRING }, why: { type: Type.STRING } },
+              required: ["internal", "external", "industry", "why"]
             }
           },
-          required: ["IdentifiedChallenge", "ScientificHypothesis", "ExperimentalDesign", "IndustrialRelevance", "ExpectedImpact", "DataDrivenInsights", "AIAudit", "AlternativeMethods"]
+          required: ["researchChallenge", "researchGap", "hypothesis", "experimentalDesign", "statisticalDesign", "expectedOutcomes", "lifeCycleAssessment", "literatureLandscape", "researchPathway", "researchOutputPlan", "fundingMatch", "limitations", "dataConfidence", "recommendedCollaboration"]
         }
       }
     }));
@@ -1559,33 +2003,108 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
       Provide high-quality mathematical equations in the technical and financial sections to justify your CAPEX/OPEX operations. 
       Use accurate, real numbers for Oman's economy.`,
       config: {
-        systemInstruction: `You are an Expert Industrial Investment Analyst working for a top-tier global consulting firm, specializing in Oman's energy sector.
-        Your goal is to write a highly persuasive, detailed, and realistic proposal tailored specifically to the Target Audience (e.g., MoHERI, PDO/OQ, OTF).
-        
+        systemInstruction: `TARGET AUDIENCE: Banks, Private Investors, Green Finance 
+Institutions, Government Funding Bodies (TRC, PDO, MoHERI)
+
+YOUR MISSION:
+Take ANY green energy project proposal and produce a complete, 
+investment-ready document that:
+
+1. AUTO-DETECTS the energy sector/technology
+2. Applies sector-specific financial models
+3. Corrects technical specifications & costs
+4. Provides detailed year-by-year projections
+5. Includes realistic risk analysis
+6. Proposes appropriate financing structures
+7. Clarifies market positioning & revenue streams
+8. Produces a professional investment proposal
+
+═══════════════════════════════════════════════════════════════
+PART A — AUTO-DETECTION & SECTOR CLASSIFICATION
+═══════════════════════════════════════════════════════════════
+
+When you receive a proposal, FIRST identify:
+
+SECTOR 1: BIOFUEL TECHNOLOGIES
+A1) MICROALGAE BIODIESEL:
+A2) UCO BIODIESEL (Used Cooking Oil):
+A3) JATROPHA OIL:
+A4) BIOGAS/BIOMETHANE (Agricultural/Organic Waste):
+A5) BIOETHANOL (Lignocellulosic/Sugar Crops):
+A6) WASTE OIL RECOVERY (Fish/Animal Processing):
+
+SECTOR 2: SOLAR ENERGY TECHNOLOGIES
+B1) ROOFTOP SOLAR PV (Distributed):
+B2) UTILITY-SCALE PV (Ground-mounted):
+B3) BIFACIAL PV (Albedo capture):
+B4) CONCENTRATED PHOTOVOLTAICS (CPV):
+B5) SOLAR THERMAL/CSP (Concentrated Solar Power):
+B6) AGRIVOLTAICS (Solar + Agriculture):
+
+SECTOR 3: WIND ENERGY TECHNOLOGIES
+C1) ONSHORE WIND (Fixed-foundation):
+C2) OFFSHORE WIND (Floating potential):
+C3) DISTRIBUTED WIND (Community/Farm-scale):
+
+SECTOR 4: GREEN HYDROGEN TECHNOLOGIES
+D1) ALKALINE ELECTROLYZER:
+D2) PEM ELECTROLYZER (Proton Exchange Membrane):
+D3) SOLID OXIDE ELECTROLYSIS (SOEC):
+D4) HYDROGEN STORAGE:
+D5) HYDROGEN TRANSPORT & END-USE:
+
+SECTOR 5: WASTE-TO-ENERGY TECHNOLOGIES
+E1) ANAEROBIC DIGESTION (Biogas Generation):
+E2) INCINERATION & WASTE-TO-ENERGY (WTE):
+E3) PYROLYSIS/GASIFICATION (Advanced Thermal):
+E4) COMPOSTING (Low-tech, Organic Waste):
+
+SECTOR 6: ENERGY STORAGE TECHNOLOGIES
+F1) LITHIUM-ION BATTERY (Electrochemical):
+F2) VANADIUM REDOX FLOW BATTERY (Long-duration):
+F3) THERMAL ENERGY STORAGE (TES):
+F4) MECHANICAL STORAGE (Pumped Hydro/Compressed Air):
+
+SECTOR 7: BLUE CARBON & NATURE-BASED SOLUTIONS
+G1) MANGROVE RESTORATION & MANAGEMENT:
+G2) SEAGRASS RESTORATION (Emerging):
+
+SECTOR 8: HYBRID RENEWABLE SYSTEMS
+H1) SOLAR + WIND (Complementary):
+H2) SOLAR + BATTERY (Diurnal Cycling):
+H3) SOLAR + WIND + HYDROGEN (Long-duration):
+H4) MICROGRID (Integrated islanding):
+
+Determine the applicable templates, costs (CAPEX, OPEX), and benchmarks based on Oman parameters.
+
         RULES:
-        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. ${getLanguageInstruction(inputs.language)} Ensure proper spacing between words. NEVER return mashed together words in Arabic (e.g., "التزامسلطنةعمان"). Every word must be properly spaced.
+        1. STRONGLY IMPORTANT: Output MUST be entirely in the requested language: ${inputs.language}. ${getLanguageInstruction(inputs.language)} Ensure proper spacing between words. NEVER return mashed together words in Arabic. Every word must be properly spaced.
         2. TONE: Sound like it was prepared by a McKinsey or BCG consultant. Highly persuasive but realistic. Balance profitability with sustainability. Appeal to corporate investors, energy companies, and industrial decision-makers.
-        3. REALISTIC FINANCIALS: Industrial projects take time to become profitable. You MUST provide strictly realistic financial metrics. ROI should naturally be between 10% to 35%. Payback periods should be 3 to 8 years. DO NOT invent 200% ROI or 5-month return periods; this destroys investor trust because it screams "AI-generated". Ensure your CAPEX scaling makes sense compared to revenue. Let OPEX correctly reflect labor, energy, feedstock acquisition, and maintenance.
-        4. OMAN ACCURACY: Use real, accurate data specific to Oman (e.g., electricity cost per kWh, labor costs, land rates in free zones).
-        5. ADDITIONAL: You MUST provide the pitch deck outline, investor email template, one-page summary, funding recommendations, strategic partners, and scaling strategy.
-        6. SOLAR/WIND RENEWABLE CALCULATIONS: If the project involves Solar or Wind, accurately calculate capacity vs energy output. For example, 1,000 kW (1 MW) solar capacity produces roughly 1,700 to 2,000 MWh/year in Oman (based on a ~20-22% capacity factor). Use this realistic relationship, strictly showcase MWh/year or kWh/year production instead of confusing it with capacity, and correctly price electricity unit rates to logically justify total revenues.
-        
+        3. REALISTIC FINANCIALS: Industrial projects take time to become profitable. You MUST provide strictly realistic financial metrics. ROI should naturally be between 10% to 35%. Payback periods should be 3 to 8 years. DO NOT invent 200% ROI. Let OPEX correctly reflect labor, energy, feedstock acquisition, and maintenance. Use Oman benchmarks (e.g., electricity 0.05 OMR/kWh in Madayn, Water 0.50-1.00 OMR/m3).
+        4. OMAN ACCURACY: Use real, accurate data specific to Oman.
+        5. MODERN & SPECIAL: The results should look very modern and special, not just generated by standard AI.
+           - Use rich markdown formatting and modern markdown tables.
+           - STRICTLY PROHIBITED: Do not use any colorful emojis, cartoonish icons, or excessive unicode geometric symbols (NO 🔋 💡 🌍 📈 💵 📊 🏗️ 🚀 🛡️ ⬢ ❖ ✦ ◈ ⟡ ⯁).
+           - Output purely clean, professional textual content focusing on structure and data. We are rendering high-end graphical icons on the frontend, so text should remain clean.
+           - Do not produce plain boring text blocks. Structure the content beautifully with lists, bold text, italics, and headers inside the text fields.
+        6. SOLAR/WIND RENEWABLE CALCULATIONS: Accurately calculate capacity vs energy output. Provide real metrics based on standard CFs in Oman.
+
         ### REAL-TIME DATA MANDATE (CRITICAL):
-        - You MUST use the provided Google Search tool to find live market prices for Carbon Credits, Feedstock values, and Omani economic parameters before finalizing numbers. Do not hallucinate estimates.`,
+        - You MUST use the provided Google Search tool to find live market prices before finalizing numbers.`,
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
             title: { type: Type.STRING },
-            executiveSummary: { type: Type.ARRAY, items: { type: Type.STRING } },
-            problemStatement: { type: Type.ARRAY, items: { type: Type.STRING } },
-            marketOpportunity: { type: Type.ARRAY, items: { type: Type.STRING } },
-            competitiveAdvantage: { type: Type.ARRAY, items: { type: Type.STRING } },
-            businessModel: { type: Type.ARRAY, items: { type: Type.STRING } },
-            revenueStreams: { type: Type.ARRAY, items: { type: Type.STRING } },
-            technicalOverview: { type: Type.ARRAY, items: { type: Type.STRING } },
-            feedstockStrategy: { type: Type.ARRAY, items: { type: Type.STRING } },
+            executiveSummary: { type: Type.STRING },
+            problemStatement: { type: Type.STRING },
+            marketOpportunity: { type: Type.STRING },
+            competitiveAdvantage: { type: Type.STRING },
+            businessModel: { type: Type.STRING },
+            revenueStreams: { type: Type.STRING },
+            technicalOverview: { type: Type.STRING },
+            feedstockStrategy: { type: Type.STRING },
             financialModel: {
               type: Type.OBJECT,
               properties: {
@@ -1620,7 +2139,7 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
                 required: ["risk", "mitigation"]
               }
             },
-            esgImpact: { type: Type.ARRAY, items: { type: Type.STRING } },
+            esgImpact: { type: Type.STRING },
             carbonCreditPotential: {
               type: Type.OBJECT,
               properties: {
@@ -1634,14 +2153,14 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
               type: Type.OBJECT,
               properties: {
                 requestedAmount: { type: Type.STRING },
-                fundingUtilization: { type: Type.ARRAY, items: { type: Type.STRING } },
+                fundingUtilization: { type: Type.STRING },
                 investorReturns: { type: Type.STRING },
                 equityStructure: { type: Type.STRING },
                 repaymentStrategy: { type: Type.STRING }
               },
               required: ["requestedAmount", "fundingUtilization", "investorReturns", "equityStructure", "repaymentStrategy"]
             },
-            whyInvestorsShouldFund: { type: Type.ARRAY, items: { type: Type.STRING } },
+            whyInvestorsShouldFund: { type: Type.STRING },
             pitchDeckOutline: {
               type: Type.ARRAY,
               items: {
@@ -1656,8 +2175,8 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
             },
             investorEmailTemplate: { type: Type.STRING },
             onePageSummary: { type: Type.STRING },
-            fundingRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
-            strategicPartners: { type: Type.ARRAY, items: { type: Type.STRING } },
+            fundingRecommendations: { type: Type.STRING },
+            strategicPartners: { type: Type.STRING },
             phasedScalingStrategy: {
               type: Type.ARRAY,
               items: {
@@ -1665,7 +2184,7 @@ export async function generateProposal(inputs: ProposalInput): Promise<ProposalR
                 properties: {
                   phase: { type: Type.STRING },
                   duration: { type: Type.STRING },
-                  milestones: { type: Type.ARRAY, items: { type: Type.STRING } }
+                  milestones: { type: Type.STRING }
                 },
                 required: ["phase", "duration", "milestones"]
               }

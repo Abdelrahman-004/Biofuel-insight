@@ -78,8 +78,83 @@ export const OmanFreeZones: React.FC<OmanFreeZonesProps> = ({ language = 'Englis
             <option value="English" className="bg-[var(--card-bg)] shadow-card text-[var(--text-primary)]">English</option>
           </select>
         </div>
-        <p className="text-[var(--text-secondary)] max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان.' : 'Leverage the unique strengths of Oman’s economic hubs to optimize your industrial energy projects for Vision 2040.'}</p>
+        <p className="text-[var(--text-secondary)] max-w-2xl">{isArabic ? 'تقترح هذه الأداة المشاريع الأمثل بناءً على البنية التحتية والموارد اللوجستية للمناطق الحرة في عمان، وتستعرض أبرز الفاعلين في قطاع الطاقة الحكومي والخاص.' : 'Leverage the unique strengths of Oman’s economic hubs and key energy players to optimize your industrial energy projects for Vision 2040.'}</p>
       </motion.div>
+
+      {/* Companies Section */}
+      <div className="mb-12">
+        <h3 className="text-2xl font-black text-[var(--text-primary)] mb-6 flex items-center">
+          <i className="fas fa-industry text-[var(--accent-emerald)] mx-3"></i>
+          {isArabic ? 'أبرز شركات قطاع الطاقة في عُمان' : 'Top Energy Companies in Oman'}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            {
+              name: isArabic ? 'أوكيو (OQ)' : 'OQ',
+              type: isArabic ? 'قطاع حكومي (مجموعة طاقة متكاملة)' : 'Government Sector (Integrated Energy Group)',
+              goals: isArabic ? 'التحول نحو الطاقة المتجددة، قيادة مشاريع الهيدروجين الأخضر عبر OQAE (أوكيو للطاقة البديلة)، وتعظيم القيمة المضافة من البتروكيماويات.' : 'Transitioning towards renewable energy, leading green hydrogen projects via OQAE (OQ Alternative Energy), and maximizing petrochemical value.',
+              investorBenefit: isArabic ? 'شراكات استراتيجية في مشاريع الهيدروجين وتوفير المواد الأولية البيولوجية وتطوير التقنيات النظيفة.' : 'Strategic partnerships in green hydrogen, bio-feedstock supply, and clean tech co-development.',
+              icon: 'fa-leaf'
+            },
+            {
+              name: isArabic ? 'هيدروم (Hydrom)' : 'Hydrom',
+              type: isArabic ? 'قطاع حكومي (إدارة الهيدروجين)' : 'Government Sector (Hydrogen Orchestrator)',
+              goals: isArabic ? 'تسريع وتطوير منظومة الهيدروجين الأخضر في عُمان، طرح الأراضي الاستراتيجية، وإدارة البنية التحتية المشتركة.' : 'Accelerating green hydrogen ecosystem, auctioning strategic land blocks, and managing shared infrastructure.',
+              investorBenefit: isArabic ? 'الحصول على أراضي لمشاريع الهيدروجين/الأمونيا الضخمة والوصول المباشر لشبكات التصدير العالمية.' : 'Acquiring mega-scale land for hydrogen/ammonia plants and accessing unified export networks.',
+              icon: 'fa-water'
+            },
+            {
+              name: isArabic ? 'تنمية نفط عُمان (PDO)' : 'Petroleum Development Oman (PDO)',
+              type: isArabic ? 'شراكة حكومية/خاصة' : 'Government / Private Joint Venture',
+              goals: isArabic ? 'التحول إلى شركة طاقة شاملة، تحقيق الحياد الكربوني بحلول 2050، والريادة في احتجاز وتخزين الكربون (CCUS).' : 'Evolving into a fully-fledged energy company, targeting Net Zero by 2050, and leading CCUS implementation.',
+              investorBenefit: isArabic ? 'فرص استثمارية في مشاريع كفاءة الطاقة، والنفايات العضوية، وتقنيات تخزين الكربون واستخلاص النفط المعزز.' : 'Investment ops in energy efficiency, organic waste upcycling, and carbon capture / EOR tech.',
+              icon: 'fa-oil-well'
+            },
+            {
+              name: isArabic ? 'الشركة العمانية للغاز الطبيعي المسال (Oman LNG)' : 'Oman LNG',
+              type: isArabic ? 'شراكة حكومية/خاصة' : 'Government / Private Joint Venture',
+              goals: isArabic ? 'تصنيع وتصدير الغاز الطبيعي المسال بكفاءة بيئية عالية، وخفض الانبعاثات والتحول التدريجي للطاقة النظيفة.' : 'Processing and exporting LNG with high environmental efficiency, reducing emissions, and steady transition to clean energy.',
+              investorBenefit: isArabic ? 'التعاون في سلاسل التوريد المستدامة ومشاريع إزالة الكربون الصناعي وإنتاج الميثان الصناعي.' : 'Collabs in sustainable supply chains, industrial decarbonization, and synthetic methane pilot projects.',
+              icon: 'fa-fire-flame-simple'
+            },
+            {
+              name: isArabic ? 'مجموعة نماء (Nama Group)' : 'Nama Group',
+              type: isArabic ? 'قطاع حكومي' : 'Government Sector',
+              goals: isArabic ? 'إدارة وتطوير شبكات الكهرباء والمياه، وزيادة مساهمة الطاقة المتجددة في الشبكة الوطنية لتصل إلى 30% بحلول 2030.' : 'Managing water & electricity grids, aiming for 30% renewable energy capacity in the national grid by 2030.',
+              investorBenefit: isArabic ? 'توقيع اتفاقيات شراء الطاقة (PPAs) لمشاريع الطاقة الشمسية وطاقة الرياح، وربط المشاريع الصناعية بالشبكة.' : 'Signing PPAs for utility-scale solar/wind projects and grid-connecting industrial sites.',
+              icon: 'fa-bolt'
+            }
+          ].map((company, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-[var(--card-bg)] shadow-card p-6 rounded-2xl border border-[var(--border-glow)] hover:border-[var(--accent-emerald)] transition-all"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 rounded-lg bg-[var(--accent-emerald)]/10 flex items-center justify-center text-[var(--accent-emerald)] border border-[var(--accent-emerald)]/20 shrink-0 mx-3 rtl:mr-0 rtl:ml-3">
+                  <i className={`fas ${company.icon}`}></i>
+                </div>
+                <div>
+                  <h4 className="text-lg font-black text-[var(--text-primary)]">{company.name}</h4>
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{company.type}</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-bold text-[var(--text-primary)] mb-1">{isArabic ? 'الأهداف الاستراتيجية:' : 'Strategic Goals:'}</p>
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{company.goals}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-[#D97706] mb-1">{isArabic ? 'فرص المستثمر:' : 'Investor Benefit:'}</p>
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{company.investorBenefit}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
       <AnimatePresence>
         {suggestion && (

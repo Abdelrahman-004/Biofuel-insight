@@ -1,11 +1,13 @@
 
 import * as React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Home } from './Home';
 import { InputForm } from './InputForm';
 import { StandardsChecker } from './StandardsChecker';
 import { ProposalGenerator } from './ProposalGenerator';
 import { Marketplace } from './Marketplace';
 import { GisMap } from './GisMap';
+import { ChallengesHub } from './ChallengesHub';
 
 interface NavbarProps {
   activeTab: string;
@@ -84,7 +86,7 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
             <div className="hidden lg:flex items-center space-x-4 rtl:space-x-reverse">
               {[
                 { id: 'MARKETPLACE', label: isArabic ? 'منصة الاستثمار الذكية' : 'Smart Marketplace', icon: 'fa-handshake' },
-                { id: 'GIS_MAP', label: isArabic ? 'خريطة GIS' : 'GIS Map', icon: 'fa-map-marked-alt' },
+                { id: 'CHALLENGES_HUB', label: isArabic ? 'تحديات وحلول الذكاء الاصطناعي' : 'Challenges & Solutions Hub', icon: 'fa-brain' }
               ].map(item => (
                 <button 
                   key={item.id}
@@ -108,7 +110,7 @@ const TopNavbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, language, on
               className="px-3 py-2.5 bg-[var(--card-bg)] hover:bg-[var(--border-glow)] text-[var(--text-primary)] rounded-full border border-[var(--border-glow)] transition flex items-center text-xs font-bold shadow-sm"
               title="Toggle Theme"
             >
-              <i className={`fas ${theme === 'dark' ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-400'}`}></i>
+              <i className={`fas ${theme === 'dark' ? 'fa-sun text-amber-700 dark:text-amber-400' : 'fa-moon text-indigo-400'}`}></i>
             </button>
             <button
               onClick={() => onLanguageChange(isArabic ? 'English' : 'Arabic')}
@@ -136,65 +138,105 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-const SIDEBAR_ITEMS = [
-  { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
-  { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-600 dark:text-blue-400' },
-  { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-600 dark:text-amber-400' },
-  { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
-  { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-[var(--text-secondary)] ' },
-  { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature', color: '#8B5CF6', colorClass: 'text-violet-500' },
-  { id: 'ZONES', labelEn: 'Free Zones DB', labelAr: 'المناطق الحرة', icon: 'fa-map', color: '#D97706', colorClass: 'text-amber-600 dark:text-amber-400' }
+const SIDEBAR_GROUPS = [
+  {
+    id: 'INVESTMENT',
+    labelEn: 'Companies & Investors',
+    labelAr: 'الشركات والمستثمرين',
+    items: [
+      { id: 'INVESTOR_FEASIBILITY', labelEn: 'Feasibility Tools', labelAr: 'الجدوى الاستثمارية', icon: 'fa-calculator', color: '#10B981', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
+      { id: 'OPTIMIZER', labelEn: 'Financial Optimizer', labelAr: 'التحسين المالي', icon: 'fa-chart-line', color: '#34D399', colorClass: 'text-[var(--accent-emerald)] dark:text-emerald-400' },
+      { id: 'PROPOSAL', labelEn: 'AI Proposals', labelAr: 'المقترحات الاستثمارية', icon: 'fa-file-signature', color: '#8B5CF6', colorClass: 'text-violet-500' },
+      { id: 'ZONES', labelEn: 'Energy & Zones DB', labelAr: 'بيئة الطاقة والاستثمار', icon: 'fa-city', color: '#D97706', colorClass: 'text-amber-700 dark:text-amber-400' },
+      { id: 'GIS_MAP', labelEn: 'GIS Supply Map', labelAr: 'خريطة التوريد الجغرافية', icon: 'fa-map-marked-alt', color: '#EF4444', colorClass: 'text-red-500' }
+    ]
+  },
+  {
+    id: 'RESEARCH_DEV',
+    labelEn: 'Researchers',
+    labelAr: 'الباحثين',
+    items: [
+      { id: 'RESEARCH', labelEn: 'Research Engine', labelAr: 'تحليل البحوث', icon: 'fa-microscope', color: '#3B82F6', colorClass: 'text-blue-700 dark:text-blue-400' },
+      { id: 'SOLVER', labelEn: 'Challenge Solver', labelAr: 'حل العوائق', icon: 'fa-lightbulb', color: '#F59E0B', colorClass: 'text-amber-700 dark:text-amber-400' },
+      { id: 'STANDARDS', labelEn: 'Standards Checks', labelAr: 'المعايير والاشتراطات', icon: 'fa-book', color: '#E2E8F0', colorClass: 'text-[var(--text-secondary)] ' },
+    ]
+  }
 ];
 
 const MainSidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, language, isOpen, onToggle }) => {
   const isArabic = language === 'Arabic';
+  const [expandedGroup, setExpandedGroup] = React.useState<string | null>('INVESTMENT');
+
   return (
     <aside className={`bg-[var(--nav-bg)] backdrop-blur-2xl transition-all duration-300 flex flex-col z-40 relative py-6 flex-shrink-0 shadow-none border-t-0
       ${isOpen ? 'w-72' : 'w-20'}
     `}>
       <button 
         onClick={onToggle}
-        className={`mx-4 mb-8 flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--bg-main)] hover:bg-[var(--border-glow)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition border border-[var(--border-glow)] ${isOpen ? 'self-end' : 'mx-auto'}`}
+        className={`mx-4 mb-6 flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--bg-main)] hover:bg-[var(--border-glow)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition border border-[var(--border-glow)] ${isOpen ? 'self-end' : 'mx-auto'}`}
       >
          <i className={`fas fa-chevron-${isOpen ? (isArabic ? 'right' : 'left') : (isArabic ? 'left' : 'right')}`}></i>
       </button>
 
-      {isOpen && (
-        <div className="flex flex-col space-y-2 px-3 animate-in fade-in duration-300">
-           {SIDEBAR_ITEMS.map(item => {
-             const isActive = activeTab === item.id || (activeTab === 'FEASIBILITY' && item.id === 'INVESTOR_FEASIBILITY');
-             return (
-               <button
-                 key={item.id}
-                 onClick={() => onTabChange(item.id)}
-                 className={`relative flex items-center p-3 rounded-lg transition-all group mb-1 justify-start overflow-hidden ${
-                   isActive 
-                     ? 'bg-transparent text-[var(--text-primary)]' 
-                     : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glow)]'
-                 }`}
-                 title={isArabic ? item.labelAr : item.labelEn}
-               >
-                 {isActive && (
-                   <div 
-                     className={`absolute ${isArabic ? 'right-0' : 'left-0'} top-0 bottom-0 w-1 rounded-full dark:opacity-100 opacity-80`} 
-                     style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}` }}
-                   />
-                 )}
-                 <i 
-                   className={`fas ${item.icon} text-lg ${isArabic ? 'ml-4' : 'mr-4'} transition-all group-hover:bg-black/5 dark:group-hover:bg-transparent p-1.5 rounded-lg`}
-                   style={isActive ? { color: item.color, textShadow: document.documentElement.classList.contains('dark') ? `0 0 15px ${item.color}` : 'none' } : {}}
-                 ></i>
-                 <span 
-                   className="text-xs font-black uppercase tracking-wider whitespace-nowrap text-left rtl:text-right transition-all"
-                   style={isActive ? { textShadow: `0 0 10px ${item.color}` } : {}}
-                 >
-                   {isArabic ? item.labelAr : item.labelEn}
+      <div className={`flex flex-col space-y-2 px-3 ${!isOpen && 'items-center'} animate-in fade-in duration-300`}>
+         {SIDEBAR_GROUPS.map(group => (
+           <div key={group.id} className="flex flex-col w-full mb-2">
+             <button 
+               onClick={() => {
+                 if (!isOpen) onToggle();
+                 setExpandedGroup(expandedGroup === group.id ? null : group.id);
+               }}
+               className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
+                 expandedGroup === group.id ? 'bg-[var(--border-glow)] text-[var(--text-primary)]' : 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--border-glow)] hover:text-[var(--text-primary)]'
+               }`}
+             >
+               {isOpen ? (
+                 <span className="text-xs font-black uppercase tracking-widest text-left rtl:text-right">
+                   {isArabic ? group.labelAr : group.labelEn}
                  </span>
-               </button>
-             )
-           })}
-        </div>
-      )}
+               ) : (
+                 <i className={`fas ${group.id === 'INVESTMENT' ? 'fa-briefcase' : 'fa-microscope'} text-lg mx-auto`}></i>
+               )}
+               {isOpen && (
+                 <i className={`fas fa-chevron-${expandedGroup === group.id ? 'down' : (isArabic ? 'left' : 'right')} text-[10px] opacity-70`}></i>
+               )}
+             </button>
+
+             {isOpen && expandedGroup === group.id && (
+               <div className="flex flex-col space-y-1 w-full mt-2 pl-2 rtl:pr-2 rtl:pl-0 border-l border-r-0 rtl:border-l-0 rtl:border-r border-[var(--border-glow)] ml-2 rtl:mr-2 rtl:ml-0">
+                 {group.items.map(item => {
+                   const isActive = activeTab === item.id || (activeTab === 'FEASIBILITY' && item.id === 'INVESTOR_FEASIBILITY');
+                   return (
+                     <button
+                       key={item.id}
+                       onClick={() => onTabChange(item.id)}
+                       className={`relative flex items-center p-3 rounded-lg transition-all group mb-1 justify-start overflow-hidden ${
+                         isActive 
+                           ? 'bg-transparent text-[var(--text-primary)]' 
+                           : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glow)]'
+                       }`}
+                       title={isArabic ? item.labelAr : item.labelEn}
+                     >
+                       {isActive && (
+                         <div 
+                           className={`absolute ${isArabic ? 'right-0' : 'left-0'} top-0 bottom-0 w-1 rounded-full dark:opacity-100 opacity-80`} 
+                           style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}` }}
+                         />
+                       )}
+                       <span 
+                         className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap text-left rtl:text-right transition-all ${isArabic ? 'mr-4' : 'ml-4'}`}
+                         style={isActive ? { textShadow: `0 0 10px ${item.color}` } : {}}
+                       >
+                         {isArabic ? item.labelAr : item.labelEn}
+                       </span>
+                     </button>
+                   )
+                 })}
+               </div>
+             )}
+           </div>
+         ))}
+      </div>
     </aside>
   );
 };
@@ -267,7 +309,7 @@ const ACTIVE_TAB_KEY = 'biofuel_insight_active_tab';
 const CURRENT_ANALYSIS_KEY = 'biofuel_insight_current_analysis';
 const CURRENT_RESEARCH_KEY = 'biofuel_insight_current_research';
 
-type MainTab = 'HOME' | 'MARKETPLACE' | 'GIS_MAP' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
+type MainTab = 'HOME' | 'MARKETPLACE' | 'CHALLENGES_HUB' | 'GIS_MAP' | 'FEASIBILITY' | 'INVESTOR_FEASIBILITY' | 'RESEARCH' | 'SOLVER' | 'OPTIMIZER' | 'STANDARDS' | 'PROPOSAL' | 'ZONES';
 type FeasibilityView = 'ANALYZE' | 'HISTORY' | 'COMPARE';
 type ResearchView = 'ANALYZE' | 'HISTORY';
 
@@ -671,7 +713,24 @@ export default function App() {
     </>
   );
   return (
-    <div className="h-screen flex flex-col font-sans bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--accent-emerald)]/30 selection:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors duration-500 overflow-hidden" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
+    <div className="h-screen flex flex-col font-sans bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--accent-emerald)]/30 selection:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors duration-500 overflow-hidden relative" dir={language === 'Arabic' ? 'rtl' : 'ltr'}>
+      {/* Global Animated Background Overlay */}
+      {activeMainTab !== 'HOME' && (
+        <>
+          <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, var(--border-glow) 1px, transparent 1px), linear-gradient(to bottom, var(--border-glow) 1px, transparent 1px)', backgroundSize: '4rem 4rem', opacity: 0.15 }}></div>
+          <motion.div 
+             animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
+             transition={{ repeat: Infinity, duration: 20, ease: 'easeInOut' }}
+             className="absolute top-0 right-0 w-[800px] h-[800px] bg-[var(--accent-emerald)]/5 blur-[150px] rounded-full pointer-events-none z-0"
+          ></motion.div>
+          <motion.div 
+             animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
+             transition={{ repeat: Infinity, duration: 25, ease: 'easeInOut' }}
+             className="absolute bottom-0 left-0 w-[600px] h-[800px] bg-[#8B5CF6]/5 blur-[150px] rounded-full pointer-events-none z-0"
+          ></motion.div>
+        </>
+      )}
+
       <TopNavbar 
         activeTab={activeMainTab} 
         onTabChange={(tab) => {
@@ -684,7 +743,7 @@ export default function App() {
         onThemeChange={setTheme}
       />
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         <MainSidebar 
           activeTab={activeMainTab}
           onTabChange={(tab) => {
@@ -702,6 +761,11 @@ export default function App() {
             {activeMainTab === 'MARKETPLACE' && (
               <section className="max-w-7xl mx-auto px-4 py-8 flex-1">
                 <Marketplace language={language} />
+              </section>
+            )}
+            {activeMainTab === 'CHALLENGES_HUB' && (
+              <section className="flex-1 w-full bg-[var(--bg-main)]">
+                <ChallengesHub language={language} theme={theme} />
               </section>
             )}
             {activeMainTab === 'GIS_MAP' && (
@@ -722,7 +786,7 @@ export default function App() {
                     key={tab.id}
                     onClick={() => setResearchView(tab.id as ResearchView)}
                     className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                      researchView === tab.id ? 'bg-blue-500 text-white dark:bg-blue-600 dark:text-white shadow-card translate-y-[-2px]' : 'text-blue-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
+                      researchView === tab.id ? 'bg-blue-700 text-white dark:bg-blue-700 dark:bg-blue-600 shadow-card translate-y-[-2px]' : 'text-blue-700 dark:text-blue-400 hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <i className={`fas ${tab.icon} mr-2`}></i> {tab.label}
@@ -742,9 +806,9 @@ export default function App() {
                   <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                       {language === 'Arabic' ? (
-                        <>مُحَلِّل <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
+                        <>مُحَلِّل <span className="text-blue-700 dark:text-blue-400 underline decoration-blue-500/30">البحوث المخبرية والتطبيقية</span></>
                       ) : (
-                        <>Research Implementation <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-500/30">Analyzer</span></>
+                        <>Research Implementation <span className="text-blue-700 dark:text-blue-400 underline decoration-blue-500/30">Analyzer</span></>
                       )}
                     </h1>
                     <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -799,9 +863,9 @@ export default function App() {
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>أداة <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-500/30">حل العوائق العلمية</span></>
+                    <>أداة <span className="text-amber-700 dark:text-amber-400 underline decoration-amber-500/30">حل العوائق العلمية</span></>
                   ) : (
-                    <>Scientific <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-500/30">Challenge</span> Solver</>
+                    <>Scientific <span className="text-amber-700 dark:text-amber-400 underline decoration-amber-500/30">Challenge</span> Solver</>
                   )}
                 </h1>
                 <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -858,7 +922,7 @@ export default function App() {
                     type: 'OPTIMIZER',
                     inputs: { projectName: entry.projectName },
                     outputs: entry.fullData,
-                    carbonIntensity: entry.fullData.NetZeroRoadmap.CarbonIntensityEstimate
+                    carbonIntensity: entry.fullData.carbonPerformance.intensityAfter
                   });
                 }}
                 onClear={() => { if(window.confirm(language === 'Arabic' ? "هل أنت متأكد من مسح جميع السجلات؟" : "Clear all optimization history?")) setOptimizerHistory([]); }}
@@ -914,13 +978,13 @@ export default function App() {
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                   {language === 'Arabic' ? (
-                    <>قاعدة بيانات <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-600/30">المناطق الحرة</span></>
+                    <>قاعدة بيانات <span className="text-amber-700 dark:text-amber-400 underline decoration-amber-600/30">بيئة الطاقة ومناطق الاستثمار</span></>
                   ) : (
-                    <>Strategic <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-600/30">Free Zones</span> Database</>
+                    <>Strategic <span className="text-amber-700 dark:text-amber-400 underline decoration-amber-600/30">Energy & Zones</span> Database</>
                   )}
                 </h1>
                 <p className="text-md text-[var(--text-secondary)] max-w-2xl mx-auto">
-                  {language === 'Arabic' ? 'استكشف المناطق الاستراتيجية (الدقم، صحار، صلالة) لتحديد الموقع المثالي والدعم الحكومي المتوفر.' : "Explore Oman's free zones (Sohar, Duqm, Salalah) for optimal facility location."}
+                  {language === 'Arabic' ? 'استكشف المناطق الاستراتيجية وتعرف على أبرز المستثمرين وشركات الطاقة في عُمان (الدقم، صحار، صلالة، هيدروم، أوكيو).' : "Explore Oman's strategic zones and top energy ecosystem players to pinpoint optimal opportunities."}
                 </p>
               </div>
             </section>
