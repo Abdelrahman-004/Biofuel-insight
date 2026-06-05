@@ -190,3 +190,136 @@ export async function generateProposal(input: ProposalInput): Promise<ProposalRe
     throw new Error(`فشل إنشاء المقترح: ${err.message}`);
   }
 }
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
+// ======================================================
+// فحص المعايير الدولية
+// ======================================================
+export async function checkStandardsCompliance(
+  input: StandardsInput,
+  language: string
+): Promise<StandardsResult> {
+  try {
+    const data = await callAPI('analyze', {
+      projectName: input.projectName || 'Standards Check',
+      language,
+      isStandardsCheck: true,
+      standardsInput: input,
+    });
+    return data as StandardsResult;
+  } catch (err: any) {
+    throw new Error(`فشل فحص المعايير: ${err.message}`);
+  }
+}
