@@ -15,7 +15,7 @@ interface UnifiedHistorySidebarProps {
 const TYPE_CONFIG: Record<ProjectType, { icon: string; color: string; label: string, labelAr: string }> = {
   FEASIBILITY: { icon: 'fa-chart-pie', color: 'text-[var(--accent-emerald)] dark:text-emerald-400', label: 'Feasibility', labelAr: 'الجدوى' },
   CHALLENGE: { icon: 'fa-lightbulb', color: 'text-blue-700 dark:text-blue-400', label: 'Challenge', labelAr: 'تحدي' },
-  OPTIMIZER: { icon: 'fa-rocket', color: 'text-purple-400', label: 'Optimizer', labelAr: 'محسن' },
+  OPTIMIZER: { icon: 'fa-rocket', color: 'text-purple-700 dark:text-purple-400', label: 'Optimizer', labelAr: 'محسن' },
   RESEARCH: { icon: 'fa-microscope', color: 'text-amber-700 dark:text-amber-400', label: 'Research', labelAr: 'بحث' },
 };
 
@@ -81,7 +81,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
                   onClick={() => onSelect(project)}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>
+                    <span className={`text-xs font-black uppercase tracking-widest ${config.color}`}>
                       <i className={`fas ${config.icon} mr-1`}></i>
                       {language === 'Arabic' ? config.labelAr : config.label}
                     </span>
@@ -111,9 +111,9 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
                   </div>
                   <h3 className="text-[var(--text-primary)] font-bold text-sm mb-1 truncate pr-8">{project.name}</h3>
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-[var(--text-secondary)]">{project.createdAt}</span>
+                    <span className="text-xs text-[var(--text-secondary)]">{project.createdAt}</span>
                     {project.score !== undefined && (
-                      <span className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
                         {language === 'Arabic' ? 'الدرجة:' : 'Score:'} {project.score}
                       </span>
                     )}
@@ -125,7 +125,7 @@ export const UnifiedHistorySidebar: React.FC<UnifiedHistorySidebarProps> = ({
         </div>
 
         <div className="p-4 bg-transparent border-t border-white/5 shrink-0">
-          <p className="text-[10px] text-[var(--text-secondary)] text-center italic">
+          <p className="text-xs text-[var(--text-secondary)] text-center italic">
             {language === 'Arabic' ? 'يتم حفظ المشاريع محليًا في متصفحك.' : 'Projects are saved locally in your browser.'}
           </p>
         </div>

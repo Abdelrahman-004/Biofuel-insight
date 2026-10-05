@@ -1,4 +1,6 @@
+import { Logo } from "./Logo";
 import React, { useState } from 'react';
+import { CustomMarkdown } from './CustomMarkdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StandardsInput, StandardsResult, StandardsHistoryEntry } from './types';
 import { checkStandardsCompliance } from './geminiService';
@@ -7,9 +9,12 @@ import jsPDF from 'jspdf';
 
 interface StandardsCheckerProps {
   language?: 'English' | 'Arabic';
+  onAnalysisRequest?: <T>(fn: () => Promise<T>) => Promise<T>;
+  userPlan?: string;
+  onUpgrade?: () => void;
 }
 
-export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = 'English' }) => {
+export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = 'English', onAnalysisRequest, userPlan, onUpgrade }) => {
   const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
 
   React.useEffect(() => {
@@ -52,8 +57,14 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('ANALYZING');
+    setResult(null);
     try {
-      const res = await checkStandardsCompliance(inputs, localLanguage);
+      const processCall = async () => await checkStandardsCompliance(inputs, localLanguage);
+      const res = onAnalysisRequest ? await onAnalysisRequest(processCall) : await processCall();
+      if (!res) {
+        setStatus('IDLE');
+        return;
+      }
       setResult(res);
       setStatus('COMPLETED');
       setHistory(prev => [{
@@ -70,21 +81,9 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
   };
 
   const downloadPDF = async () => {
-    const element = document.getElementById('standards-report');
-    if (!element) return;
     
-    try {
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Standards_Report_${result?.biofuelType}_${new Date().getTime()}.pdf`);
-    } catch (err) {
-      console.error("Error generating PDF:", err);
-    }
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('standards-report', `${"OMAN_ECOSYNC_Standards_Report_"}${result?.biofuelType || "Biofuel"}_${new Date().getTime()}.pdf`);
   };
 
   return (
@@ -112,7 +111,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
           </div>
           <form onSubmit={handleAnalyze} className="space-y-4">
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{isArabic ? 'نوع الوقود الحيوي' : 'Biofuel Type'}</label>
               <select 
                 name="biofuelType" 
                 value={inputs.biofuelType} 
@@ -138,7 +137,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 { name: 'sulfurContent', label: isArabic ? 'محتوى الكبريت (ppm)' : 'Sulfur Content (ppm)' },
               ].map((field) => (
                 <div key={field.name}>
-                  <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{field.label}</label>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{field.label}</label>
                   <input 
                     type="text" 
                     name={field.name} 
@@ -184,14 +183,14 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-[var(--text-secondary)]">{entry.biofuelType}</span>
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
+                    <span className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded ${
                       entry.overallStatus === 'Compliant' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 
                       entry.overallStatus === 'Non-Compliant' ? 'bg-red-600 dark:bg-red-600/20 text-red-700 dark:text-red-400' : 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400'
                     }`}>
                       {entry.overallStatus}
                     </span>
                   </div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">{entry.timestamp}</div>
+                  <div className="text-xs text-[var(--text-secondary)]">{entry.timestamp}</div>
                 </div>
               ))}
             </div>
@@ -245,12 +244,12 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
 
           {status === 'COMPLETED' && result && (
             <motion.div 
-              key="completed"
+              key={`${result.id || result.timestamp || Date.now()}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end mb-4 no-print">
                 <button 
                   onClick={downloadPDF}
                   className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-card"
@@ -258,7 +257,21 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                   <i className="fas fa-file-pdf mr-2 text-red-700 dark:text-red-400"></i>{language === 'Arabic' ? "تحميل التقرير كـ PDF" : "Download PDF Report"}</button>
               </div>
 
-              <div id="standards-report" className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
+              <div id="standards-report" className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)] relative print-container">
+                {/* PDF BRANDING HEADER */}
+                <div className="absolute top-8 left-8 right-8 flex justify-between items-start select-none pointer-events-none pb-20 z-0 print-only">
+                  <div className="flex items-center space-x-2">
+                    <i className="fas fa-leaf text-2xl text-[var(--accent-emerald)]"></i>
+                    <span className="text-xl font-black tracking-tighter text-[var(--text-primary)]">
+                      {language === 'Arabic' ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
+                    </span>
+                  </div>
+                  <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right text-[var(--text-secondary)]">
+                    {language === 'Arabic' ? 'التحقق من المعايير' : 'Standards Checker'}
+                  </div>
+                </div>
+                
+                <div className="relative z-10">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-[var(--border-glow)]">
                   <div>
@@ -283,7 +296,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[var(--bg-main)] text-[10px] uppercase tracking-widest text-[var(--text-secondary)]">
+                        <tr className="bg-[var(--bg-main)] text-xs uppercase tracking-widest text-[var(--text-secondary)]">
                           <th className="p-3 rounded-tl-xl border-b border-[var(--border-glow)]">{language === 'Arabic' ? "المعيار" : "Parameter"}</th>
                           <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "قيمتك" : "Your Value"}</th>
                           <th className="p-3 border-b border-[var(--border-glow)]">{language === 'Arabic' ? "الحد القياسي" : "Standard Limit"}</th>
@@ -298,7 +311,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                             <td className="p-3 font-medium text-[var(--text-secondary)]">{evalItem.userValue}</td>
                             <td className="p-3 font-medium text-[var(--text-primary)]">{evalItem.standardLimit}</td>
                             <td className="p-3">
-                              <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
+                              <span className={`px-2 py-1 rounded text-xs font-black uppercase tracking-widest ${
                                 evalItem.status === 'Pass' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
                                 evalItem.status === 'Fail' ? 'bg-red-600 dark:bg-red-600/20 text-red-700 dark:text-red-400' :
                                 evalItem.status === 'Warning' ? 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400' : 'bg-[var(--bg-main)] text-[var(--text-secondary)]'
@@ -322,7 +335,7 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                     </h3>
                     <ul className="space-y-3">
                       {result.evaluations.filter(e => e.status === 'Fail' || e.status === 'Warning').map((evalItem, i) => (
-                        <li key={i} className="text-sm text-amber-900 dark:text-amber-100 flex items-start">
+                        <li key={i} className="text-sm text-[var(--text-primary)] flex items-start">
                           <i className="fas fa-arrow-right mt-1 mr-2 text-amber-700 dark:text-amber-400"></i>
                           <div>
                             <span className="font-bold text-amber-800 dark:text-amber-300">{evalItem.parameter}: </span>
@@ -337,15 +350,15 @@ export const StandardsChecker: React.FC<StandardsCheckerProps> = ({ language = '
                 {/* Expert Summary & Commercial Viability */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
-                    <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "ملخص الخبراء" : "Expert Summary"}</h3>
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{result.expertSummary}</p>
+                    <h3 className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "ملخص الخبراء" : "Expert Summary"}</h3>
+                    <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{result.expertSummary}</CustomMarkdown></div></div>
                   </div>
                   <div className="bg-[var(--bg-main)] p-6 rounded-2xl border border-[var(--border-glow)]">
-                    <h3 className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "الجدوى التجارية (عُمان)" : "Commercial Viability (Oman)"}</h3>
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{result.commercialViability}</p>
+                    <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-2">{language === 'Arabic' ? "الجدوى التجارية (عُمان)" : "Commercial Viability (Oman)"}</h3>
+                    <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{result.commercialViability}</CustomMarkdown></div></div>
                   </div>
                 </div>
-
+                </div>
               </div>
             </motion.div>
           )}

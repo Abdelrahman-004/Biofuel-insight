@@ -1,13 +1,12 @@
+import { Logo } from "./Logo";
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
-import ReactMarkdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import remarkGfm from 'remark-gfm';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
+import { CustomMarkdown } from './CustomMarkdown';
 import { OptimizerResult, OptimizerHistoryEntry } from './types';
 import { optimizeProject } from './geminiService';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const autoDict: Record<string, string> = {
   "N/A": "غير متوفر",
@@ -81,11 +80,14 @@ interface OptimizerToolProps {
   initialInputs?: { projectName: string; description: string };
   initialResult?: OptimizerResult;
   language?: 'English' | 'Arabic';
+  onAnalysisRequest?: <T>(fn: () => Promise<T>) => Promise<T>;
+  userPlan?: string;
+  onUpgrade?: () => void;
 }
 
 const DRAFT_KEY = 'biofuel_insight_optimizer_draft';
 
-export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, onClear, initialInputs, initialResult, language = 'English' }) => {
+export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, onClear, initialInputs, initialResult, language = 'English', onAnalysisRequest, userPlan, onUpgrade }) => {
   const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
 
   React.useEffect(() => {
@@ -93,6 +95,13 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
   }, [language]);
 
     const isArabic = language === 'Arabic';
+
+  const downloadPDF = async () => {
+    
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('optimizer-solver-report', `${"OMAN_ECOSYNC_Financial_Optimizer_"}${new Date().getTime()}.pdf`);
+  };
+
   const [projectName, setProjectName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [result, setResult] = React.useState<OptimizerResult | null>(null);
@@ -135,8 +144,14 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
 
     setIsLoading(true);
     setError(null);
+    setResult(null);
     try {
-      const data = await optimizeProject(projectName, description, localLanguage);
+      const processCall = async () => await optimizeProject(projectName, description, localLanguage);
+      const data = onAnalysisRequest ? await onAnalysisRequest(processCall) : await processCall();
+      if (!data) {
+        setIsLoading(false);
+        return;
+      }
       setResult(data);
       
       const newEntry: OptimizerHistoryEntry = {
@@ -171,7 +186,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
         <div className="bg-[var(--card-bg)] shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
           <button 
             onClick={() => setViewMode('OPTIMIZE')}
-            className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-6 py-2 rounded-lg text-xs md:text-sm font-black uppercase tracking-widest transition-all ${
               viewMode === 'OPTIMIZE' ? 'bg-emerald-700 dark:bg-emerald-600 shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
@@ -179,7 +194,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
           </button>
           <button 
             onClick={() => setViewMode('HISTORY')}
-            className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-6 py-2 rounded-lg text-xs md:text-sm font-black uppercase tracking-widest transition-all ${
               viewMode === 'HISTORY' ? 'bg-emerald-700 dark:bg-emerald-600 shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
@@ -220,7 +235,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             
             <form onSubmit={handleOptimize} className="p-8 space-y-6">
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
+                <span className="text-xs md:text-sm font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
                 {[
                   { name: "Algae Biofuel Hub", desc: "Large-scale algae cultivation in Duqm using industrial CO2 and seawater." },
                   { name: "Date Seed Oil Pilot", desc: "Extracting oil from date seeds for biodiesel production in Nizwa." },
@@ -233,7 +248,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       setProjectName(ex.name);
                       setDescription(ex.desc);
                     }}
-                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#34D399] hover:shadow-md transition-all"
+                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-xs md:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#34D399] hover:shadow-md transition-all"
                   >
                     {ex.name}
                   </button>
@@ -292,15 +307,40 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
             </div>
           )}
 
-            {result && (
+            {result && !isLoading && (
               <motion.div 
+                key={`${result.projectOverview?.tagline || projectName}_${Date.now()}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="w-full pb-12 space-y-8"
               >
-                {/* 🎯 PROJECT OVERVIEW */}
-                <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
+                <div className="flex justify-end no-print">
+                  <button 
+                    onClick={downloadPDF}
+                    className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--border-glow)] text-[var(--accent-emerald)] text-sm font-bold rounded-lg hover:bg-[var(--bg-main)] transition flex items-center shadow-card"
+                  >
+                    <i className="fas fa-file-pdf mr-2 rtl:ml-2 rtl:mr-0"></i>{isArabic ? "تحميل PDF" : "Download PDF"}
+                  </button>
+                </div>
+
+                <div id="optimizer-solver-report" className="space-y-8 relative p-8 bg-[var(--bg-main)] rounded-3xl print-container">
+                  {/* PDF BRANDING HEADER */}
+                  <div className="absolute top-8 left-8 right-8 flex justify-between items-start select-none pointer-events-none pb-20 z-0 print-only">
+                    <div className="flex items-center space-x-2">
+                      <i className="fas fa-leaf text-2xl text-[var(--accent-emerald)]"></i>
+                      <span className="text-xl font-black tracking-tighter text-[var(--text-primary)]">
+                        {isArabic ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
+                      </span>
+                    </div>
+                    <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right text-[var(--text-secondary)]">
+                      {isArabic ? 'المُحسِّن المالي' : 'Financial Optimizer'}
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 pt-16 space-y-8">
+                  {/* 🎯 PROJECT OVERVIEW */}
+                  <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
                   <div className="bg-emerald-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
                     <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-lg uppercase tracking-widest flex items-center">
                       <i className="fas fa-bullseye mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
@@ -309,7 +349,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   </div>
                   <div className="p-8">
                     <h4 className="text-xl font-bold text-[var(--text-primary)] mb-2">{result.projectOverview.tagline}</h4>
-                    <p className="text-[var(--text-secondary)]">{result.projectOverview.description}</p>
+                    <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{result.projectOverview.description}</CustomMarkdown></div></div>
                   </div>
                 </div>
 
@@ -368,11 +408,11 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       </div>
                       <div className="pt-6 mt-6 border-t border-[var(--border-glow)] flex justify-between gap-4">
                         <div className="flex-1 bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                          <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest mb-1 flex items-center">Base Case</div>
+                          <div className="text-xs md:text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1 flex items-center">Base Case</div>
                           <div className="text-xl font-bold text-[var(--text-primary)] font-mono">${result.revenueStack.baseCaseTarget.toLocaleString()}/yr</div>
                         </div>
                         <div className="flex-1 bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/30">
-                          <div className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1 flex items-center"><i className="fas fa-arrow-trend-up mr-2"></i> Upside Target</div>
+                          <div className="text-xs md:text-sm text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1 flex items-center"><i className="fas fa-arrow-trend-up mr-2"></i> Upside Target</div>
                           <div className="text-xl font-bold text-[var(--accent-emerald)] dark:text-emerald-400 font-mono">${result.revenueStack.upsideCaseTarget.toLocaleString()}/yr</div>
                         </div>
                       </div>
@@ -382,34 +422,30 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                   {/* 📊 FINANCIAL SNAPSHOT */}
                   <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
                     <div className="bg-purple-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                      <h3 className="text-purple-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                        <i className="fas fa-chart-pie mr-3 text-purple-400"></i>
+                      <h3 className="text-purple-700 dark:text-purple-400 font-bold text-lg uppercase tracking-widest flex items-center">
+                        <i className="fas fa-chart-pie mr-3 text-purple-700 dark:text-purple-400"></i>
                         {isArabic ? 'لمحة مالية' : 'Financial Snapshot'}
                       </h3>
                     </div>
                     <div className="p-8 grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">CAPEX</div>
-                        <div className="text-lg font-bold text-[var(--text-primary)] font-mono">${result.financialSnapshot.capex.toLocaleString()}</div>
+                      <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] col-span-2">
+                        <div className="text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1">{isArabic ? 'النفقات الرأسمالية المتوقعة' : 'Expected CAPEX'}</div>
+                        <div className="text-2xl font-bold text-[var(--text-primary)] font-mono">${result.financialSnapshot.capex.toLocaleString()}</div>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">Budget</div>
-                        <div className="text-lg font-bold text-[var(--text-primary)] font-mono">${result.financialSnapshot.budget.toLocaleString()}</div>
-                      </div>
-                      <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">Annual Profit</div>
+                        <div className="text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1">Annual Profit</div>
                         <div className="text-lg font-bold text-[var(--accent-emerald)] dark:text-emerald-400 font-mono">${result.financialSnapshot.annualProfit.toLocaleString()}</div>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">IRR</div>
+                        <div className="text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1">IRR</div>
                         <div className="text-lg font-bold text-[var(--text-primary)] font-mono">{result.financialSnapshot.irr}%</div>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">Payback</div>
+                        <div className="text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1">Payback</div>
                         <div className="text-lg font-bold text-[var(--text-primary)] font-mono">{result.financialSnapshot.paybackYears} yrs</div>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-xs text-[var(--text-secondary)] uppercase tracking-widest mb-1">NPV</div>
+                        <div className="text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-1">NPV</div>
                         <div className="text-lg font-bold text-[var(--text-primary)] font-mono">${result.financialSnapshot.npv.toLocaleString()}</div>
                       </div>
                     </div>
@@ -425,7 +461,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                         {isArabic ? 'الأداء الكربوني' : 'Carbon Performance'}
                       </h3>
                       {result.carbonPerformance.euRedIIIFlag && (
-                        <span className="bg-emerald-500/20 text-[var(--accent-emerald)] dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">EU RED III ✅</span>
+                        <span className="bg-emerald-500/20 text-[var(--accent-emerald)] dark:text-emerald-400 text-xs md:text-sm font-bold px-2 py-1 rounded uppercase tracking-widest">EU RED III ✅</span>
                       )}
                     </div>
                     <div className="p-8">
@@ -452,11 +488,11 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                        
                        <div className="grid grid-cols-2 gap-4">
                          <div className="bg-emerald-500/10 p-4 rounded-xl border border-[var(--border-glow)]">
-                           <div className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">Reduction</div>
+                           <div className="text-xs md:text-sm text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">Reduction</div>
                            <div className="text-2xl font-bold text-[var(--text-primary)] font-mono">-{result.carbonPerformance.reductionPercentage}%</div>
                          </div>
                          <div className="bg-blue-600/10 p-4 rounded-xl border border-[var(--border-glow)]">
-                           <div className="text-[10px] text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">CO2 Saved/yr</div>
+                           <div className="text-xs md:text-sm text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">CO2 Saved/yr</div>
                            <div className="text-2xl font-bold text-[var(--text-primary)] font-mono">{result.carbonPerformance.co2SavedPerYear.toLocaleString()}<span className="text-sm text-[var(--text-secondary)] ml-1">t</span></div>
                          </div>
                        </div>
@@ -494,11 +530,11 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                       </div>
                       
                       <div className="pt-4 border-t border-[var(--border-glow)]">
-                        <h4 className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] mb-2">Decision</h4>
+                        <h4 className="text-xs md:text-sm uppercase tracking-widest text-[var(--text-secondary)] mb-2">Decision</h4>
                         <p className={`text-lg font-bold ${result.smartVerdict.decision.toLowerCase().includes('strong') ? 'text-[var(--accent-emerald)] dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
                           {result.smartVerdict.decision}
                         </p>
-                        <p className="text-sm text-[var(--text-secondary)] mt-2">{result.smartVerdict.comparison}</p>
+                        <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{result.smartVerdict.comparison}</CustomMarkdown></div></div>
                       </div>
                     </div>
                   </div>
@@ -549,8 +585,8 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                 {/* 🗺️ ROADMAP */}
                 <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden pb-4">
                     <div className="bg-indigo-500/10 px-8 py-6 border-b border-[var(--border-glow)] mb-4">
-                      <h3 className="text-indigo-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                        <i className="fas fa-map mr-3 text-indigo-400"></i>
+                      <h3 className="text-indigo-700 dark:text-indigo-400 font-bold text-lg uppercase tracking-widest flex items-center">
+                        <i className="fas fa-map mr-3 text-indigo-700 dark:text-indigo-400"></i>
                         {isArabic ? 'خارطة طريق التحسين' : 'Optimization Roadmap'}
                       </h3>
                     </div>
@@ -567,7 +603,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                         <tbody>
                           {result.optimizationRoadmap.map((step, i) => (
                             <tr key={i} className="border-b border-[var(--border-glow)]/50 hover:bg-[var(--bg-main)] transition">
-                              <td className="py-4 px-4 font-mono text-indigo-400 font-bold">Year {step.year}</td>
+                              <td className="py-4 px-4 font-mono text-indigo-700 dark:text-indigo-400 font-bold">Year {step.year}</td>
                               <td className="py-4 px-4 text-[var(--text-primary)]">{step.action}</td>
                               <td className="py-4 px-4 text-amber-700 dark:text-amber-400 font-mono">{step.cost}</td>
                               <td className="py-4 px-4 text-[var(--accent-emerald)] dark:text-emerald-400 text-sm">{step.impact}</td>
@@ -587,7 +623,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     <div className="p-8 space-y-4">
                       {result.nextSteps.map((step, i) => (
                         <div key={i} className="flex flex-col border-l-2 border-[#34D399] pl-4 py-1">
-                          <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{step.timeline} • {step.cost}</span>
+                          <span className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase">{step.timeline} • {step.cost}</span>
                           <span className="text-[var(--text-primary)]">{step.urgentAction}</span>
                         </div>
                       ))}
@@ -604,15 +640,17 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                           <li key={i} className="flex justify-between items-center text-sm border-b border-[var(--border-glow)]/50 pb-2">
                             <div>
                               <span className="text-[var(--text-primary)] block">{data.dataPoint}</span>
-                              <span className="text-[var(--text-secondary)] text-[10px]">{data.source}</span>
+                              <span className="text-[var(--text-secondary)] text-xs md:text-sm">{data.source}</span>
                             </div>
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${data.confidence === 'HIGH' ? 'bg-emerald-500/20 text-[var(--accent-emerald)] dark:text-emerald-400' : data.confidence === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' : 'bg-red-600/20 text-red-700 dark:text-red-400'}`}>{data.confidence}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs md:text-sm font-bold ${data.confidence === 'HIGH' ? 'bg-emerald-500/20 text-[var(--accent-emerald)] dark:text-emerald-400' : data.confidence === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' : 'bg-red-600/20 text-red-700 dark:text-red-400'}`}>{data.confidence}</span>
                           </li>
                         ))}
                       </ul>
-                      <p className="text-[10px] text-center text-[var(--text-secondary)] mt-6 italic">Professional validation required for investments {'>'} $100K.</p>
+                      <p className="text-xs md:text-sm text-center text-[var(--text-secondary)] mt-6 italic">Professional validation required for investments {'>'} $100K.</p>
                     </div>
                   </div>
+                </div>
+                </div>
                 </div>
 
               </motion.div>
@@ -653,7 +691,7 @@ export const OptimizerTool: React.FC<OptimizerToolProps> = ({ history, onSave, o
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="font-bold text-[var(--text-primary)] group-hover:text-[#34D399] transition">{entry.projectName}</h4>
-                        <p className="text-xs text-[var(--text-secondary)] mt-1">{entry.timestamp}</p>
+                        <p className="text-sm text-[var(--text-secondary)] mt-1">{entry.timestamp}</p>
                       </div>
                       <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-[#34D399] transition"></i>
                     </div>

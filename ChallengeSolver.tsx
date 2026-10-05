@@ -1,78 +1,22 @@
-import * as React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import ReactMarkdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import remarkGfm from 'remark-gfm';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
-import { ChallengeSolverResult, ChallengeHistoryEntry } from './types';
+import { 
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, 
+  Tooltip, ResponsiveContainer, CartesianGrid, Legend, Cell 
+} from 'recharts';
+import { 
+  FlaskConical, Dna, BookOpen, Factory, CheckCircle2, 
+  AlertTriangle, ArrowRight, Download, Copy, Check, 
+  ChevronRight, Layers, Sliders, Activity, RefreshCw, 
+  Sparkles, Microscope, Search, ShieldCheck, FileText,
+  Calendar, CheckSquare, Square
+} from 'lucide-react';
+import { CustomMarkdown } from './CustomMarkdown';
+import { 
+  ChallengeSolverResult, ChallengeHistoryEntry, 
+  MultiAgentChallengeResult, AgentSolution, LabProtocolStep 
+} from './types';
 import { solveChallenge } from './geminiService';
-
-const autoDict: Record<string, string> = {
-  "N/A": "غير متوفر",
-  "Years": "سنوات",
-  "Tons": "طن",
-  "Applied": "مُطبقة",
-  "In USD": "بالدولار الأمريكي",
-  "Pass": "اجتياز",
-  "Needs Revision": "بحاجة لمراجعة",
-  "Critical Financial Issue": "مشكلة مالية حرجة",
-  "Moderate": "متوسط",
-  "Significant": "كبير",
-  "Critical": "حرج",
-  "Investment Grade": "درجة استثمارية",
-  "Conditionally Viable": "مجدي بشروط",
-  "Not Bankable": "غير قابل للتمويل",
-  "High": "عالي",
-  "Low": "منخفض",
-  "Scientific & Technical AI Analysis": "تحليل الذكاء الاصطناعي العلمي والتقني",
-  "Scientific & Technical Audit": "تحليل وتدقيق علمي وتقني",
-  "Identified Challenge:": "التحدي المحدد:",
-  "Scientific Hypothesis:": "الفرضية العلمية:",
-  "Experimental Design Protocol": "بروتوكول التصميم التجريبي",
-  "Variables:": "المتغيرات:",
-  "Control Conditions:": "ظروف التحكم:",
-  "Expected Outcomes:": "النتائج المتوقعة:",
-  "Industrial Relevance & Impact": "الأهمية والأثر الصناعي",
-  "Environmental:": "بيئياً:",
-  "Economic:": "اقتصادياً:",
-  "Strategic:": "استراتيجياً:",
-  "Data-Driven Insights": "رؤى مبنية على البيانات",
-  "Life Cycle Assessment": "تقييم دورة الحياة",
-  "Resource Efficiency": "كفاءة الموارد",
-  "Alternative Methods": "طرق بديلة",
-  "AI Technical Audit": "التدقيق التقني للذكاء الاصطناعي",
-  "Logical Consistency:": "الاتساق المنطقي:",
-  "Core Assumptions:": "الافتراضات الأساسية:",
-  "Smart Profit & Low-Carbon AI Optimizer": "محسن الذكاء الاصطناعي للربح الذكي وتقليل الكربون",
-  "Analyze your biofuel process": "تحليل عملية الوقود الحيوي الخاصة بك",
-  "Enter process name...": "أدخل اسم العملية...",
-  "Describe the process, feedstock, or challenge...": "صف العملية، أو المواد الخام، أو التحدي...",
-  "Generate Optimization Strategy": "توليد استراتيجية التحسين",
-  "Profit Optimization Strategies": "استراتيجيات تحسين الربح",
-  "Carbon Reduction Pathways": "مسارات تقليل الكربون",
-  "Net-Zero Roadmap": "خارطة طريق نحو صافي الانبعاثات الصفري",
-  "Carbon Intensity:": "كثافة الكربون:",
-  "Standards:": "المعايير:",
-  "Fossil Fuel Replacement Plan": "خطة استبدال الوقود الأحفوري",
-  "Logistics & Supply Chain Optimization": "تحسين الخدمات اللوجستية وسلسلة التوريد",
-  "Research Feasibility Report": "تقرير جدوى البحث",
-  "Scientific Summary:": "الملخص العلمي:",
-  "Cost Estimation (Oman Calibrated)": "تقدير التكلفة (مُعاير حسب عُمان)",
-  "Total Budget Component": "مكون الميزانية الإجمالية",
-  "Total Initial Budget:": "الميزانية الأولية الإجمالية:",
-  "Cost Assumptions:": "افتراضات التكلفة:",
-  "Implementation & Equipment": "التنفيذ والمعدات",
-  "Resource Requirements:": "متطلبات الموارد:",
-  "Production Output Estimate": "تقدير الإنتاج",
-  "Annual Fuel Output:": "إنتاج الوقود السنوي:",
-  "Energy Output:": "إنتاج الطاقة:",
-  "Technical Risk Assessment": "تقييم المخاطر الفنية",
-  "Scientific Challenges:": "التحديات العلمية:",
-  "Mitigation Strategies:": "استراتيجيات التخفيف:"
-};
-const tt = (key: string | undefined, lang: string) => { if(!key) return key; return lang === 'Arabic' ? (autoDict[key] || key) : key; };
 
 interface ChallengeSolverProps {
   history: ChallengeHistoryEntry[];
@@ -81,27 +25,117 @@ interface ChallengeSolverProps {
   initialInputs?: { topic: string };
   initialResult?: ChallengeSolverResult;
   language?: 'English' | 'Arabic';
+  onAnalysisRequest?: <T>(fn: () => Promise<T>) => Promise<T>;
+  userPlan?: string;
+  onUpgrade?: () => void;
 }
 
 const TOPIC_STORAGE_KEY = 'biofuel_insight_challenge_topic_draft';
 
-export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSave, onClear, initialInputs, initialResult, language = 'English' }) => {
-  const [localLanguage, setLocalLanguage] = React.useState(language || 'Arabic');
+// Real-world research bottlenecks calibrated for Omani researchers, SQU labs, and clean-tech startups
+const RESEARCH_PRESETS = [
+  {
+    id: 'pyrolysis-deactivation',
+    domainEn: 'Catalytic Pyrolysis & Bio-oil',
+    domainAr: 'الانحلال الحراري والتحفيز',
+    titleEn: 'Date Palm Biomass: Zeolite Catalyst Coking & Rapid Deactivation',
+    titleAr: 'مخلفات النخيل: تفحم وخمول المحفز الزيوليتي أثناء التكسير الحراري',
+    topic: 'Severe catalyst coking and active acid site deactivation during continuous catalytic fast pyrolysis of Omani date palm fronds and seeds',
+    feedstock: 'Omani Date Palm Fronds & Seed Kernels (Moisture < 8%, Cellulose: 42%, Hemicellulose: 27%, Lignin: 25%)',
+    setup: 'Continuous fluidized-bed pyrolyzer at 500°C, HZSM-5 catalyst (Si/Al = 30), WHSV 2.0 h⁻¹, N2 fluidizing gas',
+    obstacle: 'Rapid carbonaceous coke deposition (> 16 wt% on catalyst within 45 min), active Brønsted site blockage, high bio-oil oxygenate content (> 27 wt%)',
+    target: 'Extend continuous catalyst on-stream lifetime to > 4 hours, reduce bio-oil oxygen content to < 12 wt%, and achieve BTX aromatics selectivity > 24%'
+  },
+  {
+    id: 'microalgae-salinity',
+    domainEn: 'Microalgae Photobioreactors',
+    domainAr: 'مفاعلات الطحالب الدقيقة',
+    titleEn: 'Marine Microalgae: Hyper-Salinity Stress & Photo-Bleaching in Seawater',
+    titleAr: 'الطحالب البحرية: إجهاد الملوحة الفائقة والتبييض الضوئي في مياه الخليج',
+    topic: 'Osmotic shock, photo-bleaching, and culture collapse in outdoor high-rate algal raceway ponds using hyper-saline Gulf seawater and intense solar irradiance',
+    feedstock: 'Indigenous Omani coastal microalgae strains (Dunaliella salina / Tetraselmis sp. / Chlorella sp.)',
+    setup: 'Outdoor open raceway pond with paddle wheel mixing, natural summer solar DNI (> 1100 µmol photons/m²/s), ambient summer temperatures 38-43°C',
+    obstacle: 'Photo-inhibition and reactive oxygen species (ROS) accumulation when salinity exceeds 45 ppt; lipid productivity drops drastically below 6 mg/L/day',
+    target: 'Sustain stable biomass productivity > 18 g/m²/day and lipid fraction > 35% dry weight under extreme salinity (45-55 ppt) and summer irradiance'
+  },
+  {
+    id: 'biodiesel-saponification',
+    domainEn: 'Biodiesel Synthesis',
+    domainAr: 'تصنيع الديزل الحيوي',
+    titleEn: 'High-FFA Waste Oil: Saponification & Emulsion Phase Separation Failure',
+    titleAr: 'زيوت الطهي المستعملة: تصبن الأحماض الدهنية العالية وفشل فصل الجلسرين',
+    topic: 'Severe soap formation and intractable emulsification during base-catalyzed transesterification of acidic waste cooking oils and grease',
+    feedstock: 'Commercial Waste Cooking Oil (WCO) with Free Fatty Acid (FFA) content > 12.5 wt% and water content 1.8%',
+    setup: 'Homogeneous alkaline transesterification (KOH / NaOH with anhydrous methanol 6:1 molar ratio at 60°C, 600 RPM mechanical stirring)',
+    obstacle: 'Rapid saponification creating gel-like potassium soaps (> 7 wt%), total loss of phase separation between methyl esters and glycerol, ester yield < 35%',
+    target: 'Achieve complete fatty acid methyl ester (FAME) conversion > 97.5% (EN 14214 / ASTM D6751) with final acid value < 0.5 mg KOH/g'
+  },
+  {
+    id: 'produced-water-toxicity',
+    domainEn: 'Produced Water Bioremediation',
+    domainAr: 'معالجة المياه المصاحبة للنفط',
+    titleEn: 'Oilfield Produced Water: Petroleum Hydrocarbon Toxicity in Bioreactors',
+    titleAr: 'المياه المصاحبة للنفط: سمية الهيدروكربونات والمعادن الثقيلة في المفاعلات الحيوية',
+    topic: 'Petroleum hydrocarbon toxicity, heavy metals (Ni, V), and hyper-salinity inhibition during biological wastewater-to-biofuel valorization in Oman',
+    feedstock: 'Oilfield Co-Produced Water from PDO southern operations (TDS: 40,000-65,000 mg/L, Total Petroleum Hydrocarbons TPH: 190 mg/L, trace Nickel and Vanadium)',
+    setup: 'Hybrid anaerobic biological filter coupled with halo-tolerant microalgae photobioreactor for simultaneous hydrocarbon degradation and lipid accumulation',
+    obstacle: 'Polycyclic aromatic hydrocarbons (PAHs) and heavy metals trigger severe membrane lipid peroxidation; > 80% cellular mortality within 24 hours of inoculation',
+    target: 'Achieve > 95% TPH removal, > 90% heavy metal biosorption, and generate harvestable biofuel precursor biomass > 2.0 g/L'
+  },
+  {
+    id: 'htl-tar-fouling',
+    domainEn: 'Hydrothermal Liquefaction',
+    domainAr: 'الإسالة الحرارية المائية',
+    titleEn: 'Wet Sewage Sludge: Heavy Tar Fouling & Nitrogen Contamination in HTL',
+    titleAr: 'الحمأة المعالجة: ترسب القطران الثقيل والتلوث النيتروجيني في مفاعلات HTL',
+    topic: 'Severe organic tar deposition, continuous reactor tube plugging, and high nitrogen heteroatom content during subcritical hydrothermal liquefaction of municipal sludge',
+    feedstock: 'Municipal dewatered sewage sludge from Haya Water / Nama (82% moisture, 34% dry ash, high organic nitrogen 5.6 wt%)',
+    setup: 'Subcritical continuous tubular HTL reactor operating at 340°C, 19 MPa pressure, 18-minute residence time with homogeneous alkali catalysts',
+    obstacle: 'Rapid wall deposition of refractory nitrogenous polyaromatic tars leading to dangerous pressure differentials and bio-crude nitrogen content > 4.5 wt%',
+    target: 'Prevent tubular reactor coking, reduce bio-crude nitrogen to < 2.0 wt%, and achieve bio-crude higher heating value (HHV) > 36 MJ/kg'
+  }
+];
 
-  React.useEffect(() => {
-    setLocalLanguage(language || 'Arabic');
+export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({
+  history,
+  onSave,
+  onClear,
+  initialInputs,
+  initialResult,
+  language = 'English',
+  onAnalysisRequest
+}) => {
+  const [localLanguage, setLocalLanguage] = useState<'English' | 'Arabic'>(language === 'Arabic' ? 'Arabic' : 'English');
+
+  useEffect(() => {
+    if (language) setLocalLanguage(language === 'Arabic' ? 'Arabic' : 'English');
   }, [language]);
 
-    const isArabic = language === 'Arabic';
-  const [topic, setTopic] = React.useState('');
-  const [result, setResult] = React.useState<ChallengeSolverResult | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [viewMode, setViewMode] = React.useState<'SOLVE' | 'HISTORY'>('SOLVE');
+  const isArabic = localLanguage === 'Arabic';
 
-  // Load draft on mount
-  React.useEffect(() => {
-    if (initialInputs) {
+  // Input states
+  const [topic, setTopic] = useState('');
+  const [feedstock, setFeedstock] = useState('');
+  const [experimentalSetup, setExperimentalSetup] = useState('');
+  const [observedObstacle, setObservedObstacle] = useState('');
+  const [targetMetric, setTargetMetric] = useState('');
+  const [showParametersDrawer, setShowParametersDrawer] = useState(false);
+
+  // Analysis result states
+  const [result, setResult] = useState<MultiAgentChallengeResult | any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'SOLVER' | 'HISTORY'>('SOLVER');
+  
+  // Navigation tabs for results
+  const [activeAgentIndex, setActiveAgentIndex] = useState<number>(0);
+  const [activeSection, setActiveSection] = useState<'AGENTS' | 'PROTOCOL' | 'DIAGNOSTICS' | 'REPORT'>('AGENTS');
+  const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({});
+  const [copiedProtocol, setCopiedProtocol] = useState(false);
+
+  // Restore draft or initialInputs
+  useEffect(() => {
+    if (initialInputs?.topic) {
       setTopic(initialInputs.topic);
     } else {
       const saved = localStorage.getItem(TOPIC_STORAGE_KEY);
@@ -109,17 +143,25 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
     }
   }, [initialInputs]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialResult) {
-      setResult(initialResult);
-      setViewMode('SOLVE');
+      setResult(initialResult as any);
+      setViewMode('SOLVER');
     }
   }, [initialResult]);
 
-  // Save draft on change
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem(TOPIC_STORAGE_KEY, topic);
   }, [topic]);
+
+  const handleApplyPreset = (preset: typeof RESEARCH_PRESETS[0]) => {
+    setTopic(preset.topic);
+    setFeedstock(preset.feedstock);
+    setExperimentalSetup(preset.setup);
+    setObservedObstacle(preset.obstacle);
+    setTargetMetric(preset.target);
+    setShowParametersDrawer(true);
+  };
 
   const handleSolve = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,9 +169,26 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
 
     setIsLoading(true);
     setError(null);
+    setResult(null);
+
+    const researchDetails = (feedstock || experimentalSetup || observedObstacle || targetMetric) ? {
+      feedstock: feedstock.trim() || undefined,
+      experimentalSetup: experimentalSetup.trim() || undefined,
+      observedObstacle: observedObstacle.trim() || undefined,
+      targetMetric: targetMetric.trim() || undefined,
+    } : undefined;
+
     try {
-      const data = await solveChallenge(topic, localLanguage);
+      const processCall = async () => await solveChallenge(topic, localLanguage, researchDetails);
+      const data = onAnalysisRequest ? await onAnalysisRequest(processCall) : await processCall();
+      if (!data) {
+        setIsLoading(false);
+        return;
+      }
       setResult(data);
+      setActiveSection('AGENTS');
+      setActiveAgentIndex(0);
+      setCompletedSteps({});
       
       const newEntry: ChallengeHistoryEntry = {
         id: Date.now().toString(),
@@ -138,620 +197,1004 @@ export const ChallengeSolver: React.FC<ChallengeSolverProps> = ({ history, onSav
         fullData: data
       };
       onSave(newEntry);
-    } catch (err) {
-      setError('Failed to generate solution. Please try again.');
-      console.error(err);
+    } catch (err: any) {
+      setError(err?.message || (isArabic ? 'فشل التحليل العلمي. يرجى التحقق من صياغة المدخلات والمحاولة مجدداً.' : 'Failed to execute scientific analysis. Please refine your inputs and try again.'));
+      console.error('Challenge solver error:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSelectFromHistory = (entry: ChallengeHistoryEntry) => {
-    setResult(entry.fullData);
-    setTopic(entry.topic);
-    setViewMode('SOLVE');
+  const downloadPDF = async () => {
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('challenge-solver-report', `OmanEcoSync_Scientific_Rescue_${Date.now()}.pdf`);
   };
 
+  const handleToggleStep = (stepNumber: number) => {
+    setCompletedSteps(prev => ({
+      ...prev,
+      [stepNumber]: !prev[stepNumber]
+    }));
+  };
+
+  const handleCopyProtocol = () => {
+    if (!result) return;
+    let text = `${result.challengeTitle || topic}\n`;
+    text += `=====================================================\n\n`;
+    
+    if (result.rootCauseAnalysis) {
+      text += `PRIMARY DIAGNOSTIC ROOT CAUSE:\n`;
+      text += `- Primary Failure Mechanism: ${result.rootCauseAnalysis.primaryFailureMechanism}\n`;
+      text += `- Chemical/Thermodynamic Cause: ${result.rootCauseAnalysis.chemicalThermodynamicCause}\n`;
+      text += `- Experimental Confounder: ${result.rootCauseAnalysis.experimentalConfounder}\n\n`;
+    }
+
+    if (result.stepByStepLabProtocol && result.stepByStepLabProtocol.length > 0) {
+      text += `LABORATORY STANDARD OPERATING PROCEDURE (SOP):\n`;
+      result.stepByStepLabProtocol.forEach(s => {
+        text += `\n[Step ${s.stepNumber}] ${s.title}\n`;
+        text += `Instruction: ${s.instructions}\n`;
+        if (s.criticalNotice) text += `CRITICAL PRECAUTION: ${s.criticalNotice}\n`;
+      });
+      text += `\n\n`;
+    }
+
+    if (result.researcherTroubleshootingMatrix && result.researcherTroubleshootingMatrix.length > 0) {
+      text += `RESEARCHER TROUBLESHOOTING MATRIX:\n`;
+      result.researcherTroubleshootingMatrix.forEach((m, idx) => {
+        text += `\n${idx + 1}. Symptom: ${m.symptom}\n`;
+        text += `   Root Cause: ${m.rootCause}\n`;
+        text += `   Diagnostic Assay: ${m.diagnosticAssay}\n`;
+        text += `   Corrective Action: ${m.correctiveAction}\n`;
+        text += `   Target Benchmark: ${m.expectedBenchmark}\n`;
+      });
+      text += `\n\n`;
+    }
+
+    if (result.consensus) {
+      text += `SCIENTIFIC CONSENSUS VERDICT:\n${result.consensus}\n`;
+    }
+
+    navigator.clipboard.writeText(text);
+    setCopiedProtocol(true);
+    setTimeout(() => setCopiedProtocol(false), 3000);
+  };
+
+  // Helper to extract or fallback chart data for an agent
+  const selectedAgent = result?.agents?.[activeAgentIndex];
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-5xl mx-auto space-y-8 pb-20"
+    <div 
+      className={`max-w-6xl mx-auto space-y-8 pb-28 px-3 sm:px-6 ${isArabic ? 'font-cairo' : 'font-sans'}`}
+      dir={isArabic ? 'rtl' : 'ltr'}
     >
-      <div className="flex justify-center mb-4">
-        <div className="bg-[var(--card-bg)] shadow-card p-1 rounded-xl border border-[var(--border-glow)] flex space-x-1">
-          <button 
-            onClick={() => setViewMode('SOLVE')}
-            className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-              viewMode === 'SOLVE' ? 'bg-blue-700 dark:bg-blue-600 shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
+      {/* Top Bar: Title & Mode Switcher */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>{isArabic ? 'مستشار الذكاء الاصطناعي للأبحاث المخبرية' : 'Scientific Research AI Consortium'}</span>
+            <span className="text-slate-400">·</span>
+            <span>{isArabic ? 'سلطنة عمان' : 'SQU / Oman Clean-Tech Labs'}</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+            {isArabic ? 'منصة حل المعضلات العلمية والبحثية' : 'Scientific Challenge & Research Bottleneck Solver'}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
+            {isArabic 
+              ? 'فريق متخصص من 4 وكلاء ذكاء اصطناعي (الحركية الكيميائية، البروتوكول المخبري، تدقيق المراجع المحكمة، والتكيف الصناعي) لتشخيص وحل أعطال الأبحاث المعملية.'
+              : 'Synchronized consortium of 4 specialized AI agents providing kinetic mechanisms, laboratory SOPs, peer-reviewed literature benchmarks, and localized Oman scale-up.'}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 self-end sm:self-center">
+          {/* View mode toggle */}
+          <div className="flex p-1 bg-slate-100 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setViewMode('SOLVER')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'SOLVER'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <FlaskConical className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{isArabic ? 'أداة الحل' : 'Workspace'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('HISTORY')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'HISTORY'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5 text-slate-500" />
+              <span>{isArabic ? 'السجل' : 'History'}</span>
+              {history.length > 0 && (
+                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
+                  {history.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Language Selector */}
+          <select
+            value={localLanguage}
+            onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
+            className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none cursor-pointer"
           >
-            <i className="fas fa-lightbulb mr-2"></i> {isArabic ? 'حل تحدي' : 'Solve'}
-          </button>
-          <button 
-            onClick={() => setViewMode('HISTORY')}
-            className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-              viewMode === 'HISTORY' ? 'bg-blue-700 dark:bg-blue-600 shadow-card' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            <i className="fas fa-history mr-2"></i> {isArabic ? 'السجل' : 'History'} ({history.length})
-          </button>
+            <option value="English">English</option>
+            <option value="Arabic">العربية</option>
+          </select>
         </div>
       </div>
 
       <AnimatePresence mode="wait">
-        {viewMode === 'SOLVE' ? (
+        {viewMode === 'SOLVER' ? (
           <motion.div 
-            key="solve"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3 }}
+            key="solver-panel"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="space-y-8"
           >
-          <div className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] hover:border-#F59E0B transition-all duration-300 overflow-hidden">
-            <div className="bg-[#F59E0B]/10 px-8 py-6 border-b border-[var(--border-glow)] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-              <div>
-                <h2 className="text-2xl font-black text-[#F59E0B] flex items-center tracking-tight drop-shadow-md">
-                  <i className="fas fa-lightbulb mr-3"></i>
-                  {isArabic ? 'الذكاء الاصطناعي لحل تحديات الوقود الحيوي' : 'Oman Biofuel Challenge Solver AI'}
-                </h2>
-                <p className="text-[var(--text-secondary)] text-sm mt-1">{isArabic ? 'تحديد وحل العقبات العلمية في أبحاث الوقود الحيوي' : 'Identify and solve scientific bottlenecks in Oman\'s biofuel research.'}</p>
-              </div>
+            {/* Input Form & Preset Selection */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-6">
               
-              <select 
-                value={localLanguage}
-                onChange={(e) => setLocalLanguage(e.target.value as 'English' | 'Arabic')}
-                className="bg-[var(--card-bg)] shadow-card text-sm border border-[var(--border-glow)] rounded-lg px-3 py-1.5 text-[#F59E0B] outline-none shadow-sm"
-              >
-                <option value="Arabic" className="bg-[var(--card-bg)] text-[var(--text-primary)]">العربية (Arabic)</option>
-                <option value="English" className="bg-[var(--card-bg)] text-[var(--text-primary)]">English</option>
-              </select>
-            </div>
-            
-            <form onSubmit={handleSolve} className="p-8">
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
-                {[
-                  "Algae salinity tolerance",
-                  "Date seed oil extraction",
-                  "Bio-hydrogen storage",
-                  "Solar-thermal pyrolysis"
-                ].map((ex, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setTopic(ex)}
-                    className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#F59E0B] hover:shadow-md transition-all"
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
-              <div className="flex flex-col md:flex-row gap-4">
-                <input 
-                  type="text"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder={isArabic ? 'مثال: تحمل الطحالب للملوحة العالية، كفاءة استخلاص الزيت...' : "e.g., Algae cultivation in high salinity, Date seed oil extraction efficiency..."}
-                  className="flex-grow px-6 py-4 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] focus:ring-2 focus:ring-[#10B981] focus:border-transparent outline-none transition placeholder:text-[var(--text-secondary)]"
-                  dir={isArabic ? 'rtl' : 'ltr'}
-                />
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  disabled={isLoading || !topic.trim()}
-                  className={`px-8 py-4 rounded-2xl font-black text-[var(--text-primary)] flex items-center justify-center gap-3 transition-all border border-transparent ${
-                    isLoading ? 'bg-[var(--bg-main)] cursor-not-allowed text-[var(--text-secondary)] border-[var(--border-glow)]' : 'bg-[var(--card-bg)] shadow-[0_0_40px_-10px_rgba(245,158,11,0.4)] hover:shadow-[0_0_60px_-10px_rgba(245,158,11,0.6)] border-[#F59E0B]/50 hover:border-[#F59E0B] text-[#F59E0B]'
-                  }`}
-                >
-                  {isLoading ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin text-xl"></i>
-                      <span>{isArabic ? 'جاري الحل...' : 'Solving...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-lightbulb text-xl"></i>
-                      <span className="tracking-widest uppercase">{isArabic ? 'إيجاد حل' : 'Generate'}</span>
-                    </>
+              {/* Presets Header */}
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{isArabic ? 'اختر معضلة معملية واقعية (نماذج محملة مسبقاً):' : 'Load Common Research Bottlenecks (Click to auto-populate):'}</span>
+                  </span>
+                  {showParametersDrawer && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFeedstock('');
+                        setExperimentalSetup('');
+                        setObservedObstacle('');
+                        setTargetMetric('');
+                      }}
+                      className="text-xs text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      {isArabic ? 'مسح المعايير' : 'Reset fields'}
+                    </button>
                   )}
-                </motion.button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {RESEARCH_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handleApplyPreset(preset)}
+                      className="text-start p-3 bg-slate-50 dark:bg-slate-800/40 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/40 rounded-xl transition-all group"
+                    >
+                      <div className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold mb-0.5">
+                        {isArabic ? preset.domainAr : preset.domainEn}
+                      </div>
+                      <div className="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 line-clamp-1">
+                        {isArabic ? preset.titleAr : preset.titleEn}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                        {preset.topic}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </form>
-          </div>
 
-          {error && (
-            <div className="p-4 bg-[var(--bg-main)] border border-red-200 rounded-xl text-red-700 dark:text-red-400 text-sm flex items-center">
-              <i className="fas fa-exclamation-circle mr-2"></i>
-              {error}
-            </div>
-          )}
+              {/* Main Problem Description */}
+              <form onSubmit={handleSolve} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Microscope className="w-3.5 h-3.5 text-emerald-500" />
+                      {isArabic ? 'وصف المعضلة البحثية أو المشكلة التجريبية:' : 'Primary Research Bottleneck / Laboratory Obstacle:'}
+                    </span>
+                    <span className="text-[11px] font-normal text-slate-400">
+                      {isArabic ? 'كن دقيقاً بذكر درجات الحرارة والمحفزات إن وجدت' : 'Include operating temperatures & catalysts for higher accuracy'}
+                    </span>
+                  </label>
+                  
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <input
+                      type="text"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      placeholder={isArabic 
+                        ? 'مثال: تفحم المحفز الزيوليتي HZSM-5 وانخفاض استخلاص الزيت الحيوي أثناء التكسير الحراري لمخلفات نوى النخيل...'
+                        : 'e.g., Severe catalyst coking and loss of active sites during fast pyrolysis of date palm biomass...'}
+                      className="flex-grow px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
+                      required
+                    />
 
-            {result && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="w-full pb-12 space-y-8"
-              >
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full space-y-8"
+                    <button
+                      type="button"
+                      onClick={() => setShowParametersDrawer(!showParametersDrawer)}
+                      className={`px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
+                        showParametersDrawer 
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/40 text-emerald-700 dark:text-emerald-300' 
+                          : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <Sliders className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>{isArabic ? 'معايير المختبر الدقيقة' : 'Laboratory Variables'}</span>
+                      {(feedstock || experimentalSetup || observedObstacle || targetMetric) && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Collapsible Laboratory Details */}
+                <AnimatePresence>
+                  {showParametersDrawer && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden bg-slate-50 dark:bg-slate-800/30 p-4 sm:p-5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-4"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                          <Activity className="w-3.5 h-3.5" />
+                          {isArabic ? 'المتغيرات التشغيلية والمخبرية (اختياري لزيادة دقة التشخيص)' : 'Experimental Operating Parameters (Optional for Precision)'}
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {isArabic ? 'يساعد فريق الذكاء الاصطناعي في حساب حركية التفاعل' : 'Enables agents to compute exact reaction kinetics'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            {isArabic ? 'المادة الخام / العينة (Feedstock):' : 'Feedstock / Material Composition:'}
+                          </label>
+                          <input
+                            type="text"
+                            value={feedstock}
+                            onChange={(e) => setFeedstock(e.target.value)}
+                            placeholder={isArabic ? 'مثال: سعف نخيل عماني (رطوبة < 8%، سليلوز 42%)' : 'e.g., Omani Date Palm Fronds (Moisture < 8%, Cellulose 42%)'}
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            {isArabic ? 'التجهيز التجريبي والمفاعل (Setup):' : 'Reactor & Experimental Setup:'}
+                          </label>
+                          <input
+                            type="text"
+                            value={experimentalSetup}
+                            onChange={(e) => setExperimentalSetup(e.target.value)}
+                            placeholder={isArabic ? 'مثال: مفاعل طبقة مائعة عند 500°م، محفز HZSM-5' : 'e.g., Fluidized bed pyrolyzer at 500°C, HZSM-5 (Si/Al=30)'}
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            {isArabic ? 'العَرَض الملاحظ / أين توقف العمل (Symptom):' : 'Specific Roadblock / Failure Symptom:'}
+                          </label>
+                          <input
+                            type="text"
+                            value={observedObstacle}
+                            onChange={(e) => setObservedObstacle(e.target.value)}
+                            placeholder={isArabic ? 'مثال: تفحم المحفز خلال 45 دقيقة، بقاء الأكسجين فوق 25%' : 'e.g., Severe coke formation on acid sites within 45 min, bio-oil O2 > 27%'}
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            {isArabic ? 'المعيار المستهدف للنجاح (Target Yield):' : 'Target Success Metric / Yield Benchmark:'}
+                          </label>
+                          <input
+                            type="text"
+                            value={targetMetric}
+                            onChange={(e) => setTargetMetric(e.target.value)}
+                            placeholder={isArabic ? 'مثال: استقرار المحفز > 4 ساعات وخفض الأكسجين لأقل من 12%' : 'e.g., Catalyst life > 4 hours, bio-oil O2 < 12%, yield > 42%'}
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Submit Action Button */}
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading || !topic.trim()}
+                    className={`px-6 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-sm ${
+                      isLoading || !topic.trim()
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer hover:shadow-md'
+                    }`}
                   >
-                    {/* 🔬 RESEARCH CHALLENGE & GAP */}
-                    <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                      <div className="bg-blue-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                        <h3 className="text-blue-700 dark:text-blue-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                          <i className="fas fa-microscope mr-3 text-blue-700 dark:text-blue-400"></i>
-                          {isArabic ? 'تحدي البحث والفجوة' : 'Research Challenge'}
-                        </h3>
-                      </div>
-                      <div className="p-8 space-y-6">
-                        <div>
-                          <h4 className="text-xl font-bold text-[var(--text-primary)] mb-2">{result.researchChallenge}</h4>
-                          <p className="text-[var(--text-secondary)]"><strong>Gap:</strong> {result.researchGap}</p>
-                        </div>
-                        <div className="bg-blue-900/20 p-6 rounded-2xl border border-blue-500/30">
-                          <h4 className="text-sm tracking-widest text-blue-700 dark:text-blue-400 uppercase font-black mb-2">Hypothesis</h4>
-                          <p className="text-lg font-medium text-blue-100 italic">"{result.hypothesis}"</p>
-                        </div>
-                      </div>
+                    {isLoading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{isArabic ? 'جاري التحليل وتنسيق الوكلاء الأربعة...' : 'Synchronizing 4 AI Scientific Agents...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FlaskConical className="w-4 h-4" />
+                        <span>{isArabic ? 'تشغيل التشخيص العلمي وحل المعضلة' : 'Execute Scientific Multi-Agent Diagnosis'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Error Banner */}
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl text-red-700 dark:text-red-400 text-xs sm:text-sm flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 shrink-0" />
+                <p>{error}</p>
+              </div>
+            )}
+
+            {/* RESULTS DASHBOARD */}
+            {result && !isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                {/* Executive Summary Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {isArabic ? 'حل علمي مدقق بأدلة محكمة' : 'Verified Scientific Consensus'}
+                      </span>
+                      <span className="text-slate-300 dark:text-slate-700">·</span>
+                      {result.scientificConfidenceScore && (
+                        <span className="font-mono text-slate-600 dark:text-slate-400">
+                          {isArabic ? `مستوى الثقة: ${result.scientificConfidenceScore}%` : `Confidence: ${result.scientificConfidenceScore}%`}
+                        </span>
+                      )}
+                      {(result.trlCurrent || result.trlTarget) && (
+                        <>
+                          <span className="text-slate-300 dark:text-slate-700">·</span>
+                          <span className="font-mono text-slate-600 dark:text-slate-400">
+                            TRL {result.trlCurrent || 3} → TRL {result.trlTarget || 6}
+                          </span>
+                        </>
+                      )}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* 🧪 EXPERIMENTAL DESIGN */}
-                      <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                        <div className="bg-purple-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                          <h3 className="text-purple-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                            <i className="fas fa-flask mr-3 text-purple-400"></i>
-                            {isArabic ? 'التصميم التجريبي' : 'Experimental Design'}
-                          </h3>
-                        </div>
-                        <div className="p-8 space-y-6">
-                           <div>
-                             <h4 className="font-bold text-[var(--text-primary)] text-lg">{result.experimentalDesign.title}</h4>
-                             <p className="text-sm text-[var(--text-secondary)] mt-1">{result.experimentalDesign.objective}</p>
-                           </div>
-                           
-                           <div className="grid grid-cols-2 gap-4">
-                             <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">Duration</span>
-                               <span className="font-bold text-[var(--text-primary)] font-mono">{result.experimentalDesign.duration}</span>
-                             </div>
-                             <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">Budget</span>
-                               <span className="font-bold text-amber-700 dark:text-amber-400 font-mono">{result.experimentalDesign.budget}</span>
-                             </div>
-                           </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyProtocol}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedProtocol ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedProtocol ? (isArabic ? 'تم النسخ!' : 'Copied!') : (isArabic ? 'نسخ التقرير' : 'Copy Dossier')}</span>
+                      </button>
 
-                           <div>
-                             <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Variables</span>
-                             <div className="space-y-2">
-                               {result.experimentalDesign.variables.map((v, i) => (
-                                 <div key={i} className="flex justify-between items-center bg-[var(--bg-main)] px-3 py-2 rounded-lg border border-[var(--border-glow)]">
-                                    <span className="text-xs font-bold text-[var(--text-primary)]">{v.name} <span className="text-[10px] text-[var(--text-secondary)] font-normal px-2 py-0.5 rounded bg-gray-500/20 ml-2">{v.type}</span></span>
-                                    <span className="font-mono text-xs text-purple-400">{v.range}</span>
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
+                      <button
+                        type="button"
+                        onClick={downloadPDF}
+                        className="px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>{isArabic ? 'تصدير PDF' : 'Export PDF'}</span>
+                      </button>
+                    </div>
+                  </div>
 
-                           <div className="pt-4 border-t border-[var(--border-glow)]">
-                             <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-3 flex items-center"><i className="fas fa-chart-line mr-2"></i> Statistical Design</h4>
-                             <div className="grid grid-cols-2 gap-3 text-xs mb-4">
-                               <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)]">
-                                 <span className="text-[10px] text-[var(--text-secondary)] block uppercase">Replicates</span>
-                                 <span className="font-mono text-[var(--text-primary)] font-bold">{result.statisticalDesign.replicates}</span>
-                               </div>
-                               <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)]">
-                                 <span className="text-[10px] text-[var(--text-secondary)] block uppercase">Significance (p)</span>
-                                 <span className="font-mono text-[var(--text-primary)] font-bold">{result.statisticalDesign.significanceLevel}</span>
-                               </div>
-                               <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)] col-span-2">
-                                 <span className="text-[10px] text-[var(--text-secondary)] block uppercase">Test</span>
-                                 <span className="text-[var(--text-primary)] font-bold block">{result.statisticalDesign.primaryTest} (Post-hoc: {result.statisticalDesign.postHocTest})</span>
-                               </div>
-                             </div>
-                           </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+                      {result.challengeTitle || topic}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed max-w-4xl">
+                      {result.challengeSummary}
+                    </p>
+                  </div>
+
+                  {/* Root Cause Triad */}
+                  {result.rootCauseAnalysis && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>{isArabic ? 'آلية الفشل الأساسية' : 'Primary Failure Mode'}</span>
                         </div>
+                        <p className="text-xs text-slate-800 dark:text-slate-200 mt-1.5 leading-relaxed font-medium">
+                          {result.rootCauseAnalysis.primaryFailureMechanism}
+                        </p>
                       </div>
 
-                      <div className="space-y-8">
-                        {/* 📊 EXPECTED OUTCOMES */}
-                        <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                          <div className="bg-emerald-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                            <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                              <i className="fas fa-chart-bar mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
-                              {isArabic ? 'النتائج المتوقعة' : 'Expected Outcomes'}
-                            </h3>
-                          </div>
-                          <div className="p-8">
-                            <div className="space-y-4">
-                              {result.expectedOutcomes.map((out, i) => (
-                                <div key={i} className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                                  <div className="text-xs font-bold text-[var(--text-primary)] mb-3">{out.metric} ({out.unit})</div>
-                                  <div className="flex justify-between items-end gap-4">
-                                     <div className="flex-1">
-                                       <span className="text-[10px] text-[var(--text-secondary)] uppercase block mb-1">Baseline</span>
-                                       <span className="font-mono text-[var(--text-secondary)]">{out.baseline}</span>
-                                     </div>
-                                     <div className="flex-1 text-right">
-                                       <span className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase block mb-1">Target</span>
-                                       <span className="font-mono font-bold text-[var(--accent-emerald)] dark:text-emerald-400">{out.target}</span>
-                                     </div>
-                                  </div>
+                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                          <Activity className="w-3 h-3" />
+                          <span>{isArabic ? 'السبب الكيميائي / الثرموديناميكي' : 'Thermodynamic Cause'}</span>
+                        </div>
+                        <p className="text-xs text-slate-800 dark:text-slate-200 mt-1.5 leading-relaxed font-medium">
+                          {result.rootCauseAnalysis.chemicalThermodynamicCause}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1.5">
+                          <Sliders className="w-3 h-3" />
+                          <span>{isArabic ? 'المتغير الخفي في التجربة' : 'Experimental Confounder'}</span>
+                        </div>
+                        <p className="text-xs text-slate-800 dark:text-slate-200 mt-1.5 leading-relaxed font-medium">
+                          {result.rootCauseAnalysis.experimentalConfounder}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Consensus Box */}
+                  {result.consensus && (
+                    <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-500/20 flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                          {isArabic ? 'إجماع فريق الوكلاء العلميين (Scientific Panel Consensus):' : 'Coordinated Scientific Consensus Statement:'}
+                        </span>
+                        <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 mt-1 leading-relaxed italic">
+                          "{result.consensus}"
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Primary Section Navigation Tabs */}
+                <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-x-auto gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection('AGENTS')}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
+                      activeSection === 'AGENTS'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{isArabic ? '1. فريق الوكلاء المتخصصين الأربعة والرسوم البيانية' : '1. 4 Specialized AI Agents & Charts'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection('PROTOCOL')}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
+                      activeSection === 'PROTOCOL'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <CheckSquare className="w-3.5 h-3.5 text-blue-500" />
+                    <span>{isArabic ? '2. بروتوكول الإنقاذ المخبري خطوة بخطوة (SOP)' : '2. Benchtop Protocol Checklist (SOP)'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection('DIAGNOSTICS')}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
+                      activeSection === 'DIAGNOSTICS'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Activity className="w-3.5 h-3.5 text-amber-500" />
+                    <span>{isArabic ? '3. مصفوفة تشخيص الأعطال المعملية' : '3. Researcher Troubleshooting Matrix'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection('REPORT')}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
+                      activeSection === 'REPORT'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5 text-purple-500" />
+                    <span>{isArabic ? '4. التقرير الاستشاري ومخطط التدفق' : '4. Advisory Report & Flowchart'}</span>
+                  </button>
+                </div>
+
+                {/* Printable container */}
+                <div id="challenge-solver-report" className="space-y-6">
+
+                  {/* SECTION 1: THE 4 SPECIALIZED AI AGENTS CONSOLE */}
+                  {activeSection === 'AGENTS' && (
+                    <div className="space-y-6">
+                      {/* Agent Selector Ribbon */}
+                      {Array.isArray(result.agents) && result.agents.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                          {result.agents.map((agent: AgentSolution, idx: number) => {
+                            const isSelected = activeAgentIndex === idx;
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setActiveAgentIndex(idx)}
+                                className={`text-start p-4 rounded-xl border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-white dark:bg-slate-900 border-emerald-500 shadow-xs ring-1 ring-emerald-500/20'
+                                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
+                                    {isArabic ? `وكيل متخصص ${idx + 1}` : `Agent 0${idx + 1}`}
+                                  </span>
+                                  {isSelected && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
                                 </div>
-                              ))}
+                                <div className="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-1">
+                                  {agent.agentName}
+                                </div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                                  {agent.agentRole}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Selected Agent Detailed Workspace */}
+                      {selectedAgent && (
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-6">
+                          
+                          {/* Agent Header Profile */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                  {selectedAgent.agentName}
+                                </h3>
+                                <span className="text-slate-400">·</span>
+                                <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                                  {selectedAgent.agentRole}
+                                </span>
+                              </div>
+                              {selectedAgent.specificMandate && (
+                                <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5 font-mono">
+                                  {isArabic ? 'المهمة التخصصية: ' : 'Specific Mandate: '}{selectedAgent.specificMandate}
+                                </p>
+                              )}
+                            </div>
+
+                            <span className="text-xs font-mono px-3 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                              {isArabic ? `المجال: ${activeAgentIndex === 0 ? 'الحركية والكيمياء' : activeAgentIndex === 1 ? 'البروتوكول المعملي' : activeAgentIndex === 2 ? 'تدقيق المراجع' : 'التكيف الصناعي'}` : `Domain: ${selectedAgent.agentRole}`}
+                            </span>
+                          </div>
+
+                          {/* Proposed Solution / Mechanism */}
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                              <FlaskConical className="w-3.5 h-3.5 text-emerald-500" />
+                              <span>{isArabic ? 'الآلية العلمية وخطة العمل المقترحة من الوكيل:' : 'Proposed Scientific Mechanism & Action Plan:'}</span>
+                            </h4>
+                            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                              {selectedAgent.proposedSolution}
                             </div>
                           </div>
-                        </div>
 
-                        {/* 🌱 LIFE CYCLE ASSESSMENT */}
-                        <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                          <div className="bg-emerald-800 px-8 py-6 border-b border-[var(--border-glow)]">
-                            <h3 className="text-[var(--accent-emerald)] dark:text-emerald-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                              <i className="fas fa-leaf mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>
-                              {isArabic ? 'تقييم دورة الحياة (LCA)' : 'Life Cycle Assessment'}
-                            </h3>
-                          </div>
-                          <div className="p-8">
-                              <div className="flex justify-between items-center bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/20 mb-6">
+                          {/* INTERACTIVE SCIENTIFIC CHART */}
+                          {selectedAgent.dataTables && selectedAgent.dataTables.length > 0 && selectedAgent.dataTables[0].rows?.length > 0 && (
+                            <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 border-b border-slate-200 dark:border-slate-700 pb-2.5">
                                 <div>
-                                  <span className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest block mb-1">System Boundary</span>
-                                  <span className="text-xs font-bold text-[var(--text-primary)]">{result.lifeCycleAssessment.systemBoundary}</span>
+                                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Activity className="w-3.5 h-3.5 text-blue-500" />
+                                    <span>{selectedAgent.dataTables[0].title}</span>
+                                  </h4>
+                                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                                    {selectedAgent.dataTables[0].xAxisLabel} vs. {selectedAgent.dataTables[0].yAxisLabel}
+                                  </span>
                                 </div>
-                                <div className="text-right">
-                                  <span className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest block mb-1">Functional Unit</span>
-                                  <span className="text-xs font-bold text-[var(--text-primary)]">{result.lifeCycleAssessment.functionalUnit}</span>
-                                </div>
+                                <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                                  {isArabic ? 'رسم بياني علمي تفاعلي' : 'Interactive Empirical Plot'}
+                                </span>
                               </div>
-                              
-                              <div className="h-[200px] w-full mb-6 relative">
-                               <ResponsiveContainer width="100%" height="100%">
-                                 <BarChart data={result.lifeCycleAssessment.phases}>
-                                   <XAxis dataKey="phase" stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} />
-                                   <YAxis yAxisId="left" stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} orientation="left"/>
-                                   <YAxis yAxisId="right" orientation="right" stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} />
-                                   <Tooltip 
-                                     contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-glow)', borderRadius: '8px' }}
-                                     cursor={{ fill: 'transparent' }}
-                                    />
-                                   <Bar yAxisId="left" dataKey="energy" name="Energy (MJ)" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={20} />
-                                   <Bar yAxisId="right" dataKey="ghg" name="GHG (kgCO2e)" fill="#10B981" radius={[4, 4, 0, 0]} barSize={20} />
-                                 </BarChart>
-                               </ResponsiveContainer>
+
+                              <div className="h-[250px] w-full pt-2">
+                                <ResponsiveContainer width="100%" height="100%">
+                                  {selectedAgent.dataTables[0].chartType === 'line' ? (
+                                    <LineChart
+                                      data={selectedAgent.dataTables[0].rows.map(r => ({
+                                        name: String(r[0]),
+                                        value: Number(r[1]) || 0
+                                      }))}
+                                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                                    >
+                                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(150, 150, 150, 0.15)" />
+                                      <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                                      <YAxis stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                                      <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-glow)', borderRadius: '10px', fontSize: '11px' }} />
+                                      <Line type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2.5} dot={{ r: 4, fill: '#10B981' }} activeDot={{ r: 6 }} />
+                                    </LineChart>
+                                  ) : (
+                                    <BarChart
+                                      data={selectedAgent.dataTables[0].rows.map(r => ({
+                                        name: String(r[0]),
+                                        value: Number(r[1]) || 0
+                                      }))}
+                                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                                    >
+                                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(150, 150, 150, 0.15)" />
+                                      <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                                      <YAxis stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                                      <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-glow)', borderRadius: '10px', fontSize: '11px' }} />
+                                      <Bar dataKey="value" fill="#10B981" radius={[4, 4, 0, 0]}>
+                                        {selectedAgent.dataTables[0].rows.map((_, index) => (
+                                          <Cell 
+                                            key={`cell-${index}`} 
+                                            fill={['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#06B6D4', '#EC4899'][index % 6]} 
+                                          />
+                                        ))}
+                                      </Bar>
+                                    </BarChart>
+                                  )}
+                                </ResponsiveContainer>
                               </div>
+                            </div>
+                          )}
+
+                          {/* Precision Scientific Parameters Table */}
+                          {selectedAgent.scientificParameters && selectedAgent.scientificParameters.length > 0 && (
+                            <div className="space-y-2.5">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <Sliders className="w-3.5 h-3.5 text-blue-500" />
+                                <span>{isArabic ? 'المتغيرات الكيميائية والتشغيلية المحددة بدقة:' : 'Precision Chemical & Kinetic Parameters:'}</span>
+                              </h4>
                               
-                              <div className="space-y-4 mb-6">
-                                <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Resource Efficiency</span>
-                                {result.lifeCycleAssessment.resourceEfficiency.map((res, idx) => (
-                                  <div key={idx} className="flex justify-between items-center text-xs">
-                                     <span className="text-[var(--text-secondary)] w-1/4">{res.resource}</span>
-                                     <span className="text-[var(--text-secondary)] font-mono w-1/4 text-center line-through opacity-70">{res.convMethod}</span>
-                                     <span className="text-[var(--accent-emerald)] dark:text-emerald-400 font-mono font-bold w-1/4 text-center">{res.thisStudy}</span>
-                                     <span className="bg-emerald-500/20 text-[var(--accent-emerald)] dark:text-emerald-400 px-2 py-0.5 rounded w-1/4 text-center">-{res.saving}</span>
+                              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                                <table className="w-full text-xs text-start">
+                                  <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-mono">
+                                    <tr>
+                                      <th className="p-3 font-semibold">{isArabic ? 'المتغير' : 'Parameter'}</th>
+                                      <th className="p-3 font-semibold">{isArabic ? 'القيمة المثلى' : 'Optimal Value'}</th>
+                                      <th className="p-3 font-semibold">{isArabic ? 'الوحدة' : 'Unit'}</th>
+                                      <th className="p-3 font-semibold">{isArabic ? 'الأثر العلمي على التفاعل' : 'Scientific Impact'}</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                                    {selectedAgent.scientificParameters.map((p, pIdx) => (
+                                      <tr key={pIdx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td className="p-3 font-semibold text-slate-900 dark:text-white">{p.name}</td>
+                                        <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                          {p.optimalValue} {p.tolerance ? `(±${p.tolerance})` : ''}
+                                        </td>
+                                        <td className="p-3 font-mono text-slate-500 dark:text-slate-400">{p.scientificUnit}</td>
+                                        <td className="p-3 text-slate-600 dark:text-slate-300 leading-relaxed">{p.impact}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Key Empirical Evidences & Citations */}
+                          {selectedAgent.keyEvidences && selectedAgent.keyEvidences.length > 0 && (
+                            <div className="space-y-2.5">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <BookOpen className="w-3.5 h-3.5 text-purple-500" />
+                                <span>{isArabic ? 'الأدلة العلمية الموثقة من أوراق بحثية محكمة:' : 'Audited Empirical Evidences & Literature Citations:'}</span>
+                              </h4>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                {selectedAgent.keyEvidences.map((evidence, eIdx) => (
+                                  <div
+                                    key={eIdx}
+                                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                                    <span>{evidence}</span>
                                   </div>
                                 ))}
                               </div>
+                            </div>
+                          )}
 
-                              <div className="bg-emerald-900/30 p-4 rounded-xl border border-emerald-500/30 flex justify-between items-center">
-                                <div>
-                                  <span className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest block mb-1">Net GHG Reduction</span>
-                                  <span className="text-xl font-bold text-[var(--accent-emerald)] dark:text-emerald-400 font-mono">{result.lifeCycleAssessment.netGhgPosition.reductionAchieved}</span>
-                                </div>
-                                <div className="text-right">
-                                  <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">EU RED III</span>
-                                  <span className={`text-xs font-bold uppercase ${result.lifeCycleAssessment.netGhgPosition.euRedIIIMet ? 'text-[var(--accent-emerald)] dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
-                                    {result.lifeCycleAssessment.netGhgPosition.euRedIIIMet ? 'MET' : 'NOT MET'}
-                                  </span>
-                                </div>
+                          {/* Implementation Timeline */}
+                          {selectedAgent.timeline && selectedAgent.timeline.length > 0 && (
+                            <div className="border-t border-slate-100 dark:border-slate-800 pt-5 space-y-2.5">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <Calendar className="w-3.5 h-3.5 text-amber-500" />
+                                <span>{isArabic ? 'مراحل التنفيذ المخبري المقترحة:' : 'Implementation Milestones & Experimental Timeline:'}</span>
+                              </h4>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {selectedAgent.timeline.map((phase, pIdx) => (
+                                  <div
+                                    key={pIdx}
+                                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-xs space-y-1"
+                                  >
+                                    <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                      {phase.phase}
+                                    </div>
+                                    <div className="font-bold text-slate-900 dark:text-white">
+                                      {phase.duration}
+                                    </div>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                      {phase.description}
+                                    </p>
+                                  </div>
+                                ))}
                               </div>
-                          </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      )}
                     </div>
+                  )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* 🚀 RESEARCH PATHWAY */}
-                        <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                          <div className="bg-amber-600/10 px-8 py-6 border-b border-[var(--border-glow)]">
-                            <h3 className="text-amber-700 dark:text-amber-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                              <i className="fas fa-route mr-3 text-amber-700 dark:text-amber-400"></i>
-                              {isArabic ? 'مسار البحث' : 'Research Pathway'}
-                            </h3>
-                          </div>
-                          <div className="p-8 relative">
-                            <div className="absolute top-8 bottom-8 left-12 w-0.5 bg-[var(--border-glow)]"></div>
-                            
-                            <div className="relative pl-10 mb-8">
-                               <div className="absolute left-[-5px] top-1 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-[var(--bg-main)]"></div>
-                               <h4 className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Phase 1: Lab</h4>
-                               <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)] mt-2">
-                                 <div className="flex justify-between text-xs mb-2">
-                                   <span className="text-[var(--text-primary)] font-bold">{result.researchPathway.lab.scale}</span>
-                                   <span className="text-amber-700 dark:text-amber-400 font-mono">{result.researchPathway.lab.duration}</span>
-                                 </div>
-                                 <p className="text-sm text-[var(--text-secondary)]">{result.researchPathway.lab.goal}</p>
-                               </div>
-                            </div>
-                            
-                            <div className="relative pl-10 mb-8">
-                               <div className="absolute left-[-5px] top-1 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-[var(--bg-main)]"></div>
-                               <h4 className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Phase 2: Pilot</h4>
-                               <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)] mt-2">
-                                 <div className="flex justify-between text-xs mb-2">
-                                   <span className="text-[var(--text-primary)] font-bold">{result.researchPathway.pilot.scale}</span>
-                                   <span className="text-amber-700 dark:text-amber-400 font-mono">{result.researchPathway.pilot.duration}</span>
-                                 </div>
-                                 <p className="text-sm text-[var(--text-secondary)]">{result.researchPathway.pilot.goal}</p>
-                               </div>
-                            </div>
-                            
-                            <div className="relative pl-10">
-                               <div className="absolute left-[-5px] top-1 w-3 h-3 rounded-full bg-purple-500 ring-4 ring-[var(--bg-main)]"></div>
-                               <h4 className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Phase 3: Commercial</h4>
-                               <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)] mt-2">
-                                 <div className="flex justify-between text-xs mb-2">
-                                   <span className="text-[var(--text-primary)] font-bold">{result.researchPathway.commercial.scale}</span>
-                                   <span className="text-amber-700 dark:text-amber-400 font-mono">{result.researchPathway.commercial.timeline}</span>
-                                 </div>
-                                 <p className="text-sm text-[var(--text-secondary)]">{result.researchPathway.commercial.goal}</p>
-                               </div>
-                            </div>
-                          </div>
+                  {/* SECTION 2: STEP-BY-STEP BENCHTOP PROTOCOL CHECKLIST */}
+                  {activeSection === 'PROTOCOL' && (
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <CheckSquare className="w-4 h-4 text-emerald-500" />
+                            <span>{isArabic ? 'بروتوكول الإنقاذ المخبري خطوة بخطوة (SOP Interactive Checklist):' : 'Laboratory Rescue Standard Operating Procedure (SOP Checklist):'}</span>
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            {isArabic ? 'خطوات معملية محددة بالكميات والحرارة يمكنك التأشير عليها أثناء العمل في المختبر' : 'Reproducible step-by-step bench instructions with exact temperatures and reagents. Check off as you execute.'}
+                          </p>
                         </div>
 
-                        <div className="space-y-8">
-                            {/* 💰 FUNDING & COLLAB */}
-                            <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                              <div className="bg-indigo-500/10 px-8 py-6 border-b border-[var(--border-glow)]">
-                                <h3 className="text-indigo-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                                  <i className="fas fa-handshake mr-3 text-indigo-400"></i>
-                                  {isArabic ? 'التمويل والتعاون' : 'Funding & Collab'}
-                               </h3>
-                              </div>
-                              <div className="p-8 space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                                    <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">Best Fit Funder</span>
-                                    <span className="font-bold text-[var(--text-primary)]">{result.fundingMatch.bestFit}</span>
-                                  </div>
-                                  <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                                    <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">Grant Type</span>
-                                    <span className="font-bold text-[var(--text-primary)]">{result.fundingMatch.grantType}</span>
-                                  </div>
-                                </div>
-                                <div className="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30">
-                                  <span className="text-[10px] text-indigo-400 uppercase tracking-widest block mb-2">Funding Frame</span>
-                                  <span className="text-sm font-medium text-[var(--text-secondary)] italic">"{result.fundingMatch.frameItAs}"</span>
-                                </div>
-                                
-                                <div className="border-t border-[var(--border-glow)] pt-6">
-                                   <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-3">Recommended Collaboration</span>
-                                   <ul className="space-y-3">
-                                      <li className="flex items-start text-sm"><i className="fas fa-university text-[var(--text-secondary)] mr-3 mt-1 w-4"></i> <span className="font-medium text-[var(--text-primary)]">{result.recommendedCollaboration.internal}</span></li>
-                                      <li className="flex items-start text-sm"><i className="fas fa-globe text-[var(--text-secondary)] mr-3 mt-1 w-4"></i> <span className="font-medium text-[var(--text-primary)]">{result.recommendedCollaboration.external}</span></li>
-                                      <li className="flex items-start text-sm"><i className="fas fa-industry text-[var(--text-secondary)] mr-3 mt-1 w-4"></i> <span className="font-medium text-[var(--text-primary)]">{result.recommendedCollaboration.industry}</span></li>
-                                   </ul>
-                                </div>
-                              </div>
-                            </div>
+                        <button
+                          type="button"
+                          onClick={handleCopyProtocol}
+                          className="px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                        >
+                          {copiedProtocol ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedProtocol ? (isArabic ? 'تم النسخ!' : 'Copied!') : (isArabic ? 'نسخ الخطوات للمذكرة' : 'Copy SOP to Notebook')}</span>
+                        </button>
+                      </div>
 
-                            {/* ⚠️ LIMITATIONS & REVIEWS */}
-                            <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                              <div className="bg-red-600/10 px-8 py-4 border-b border-[var(--border-glow)]">
-                                <h3 className="text-red-700 dark:text-red-400 font-bold text-sm uppercase tracking-widest flex items-center">
-                                  <i className="fas fa-triangle-exclamation mr-3 text-red-700 dark:text-red-400"></i>
-                                  {isArabic ? 'القيود والثقة' : 'Limitations & Confidence'}
-                               </h3>
-                              </div>
-                              <div className="p-8 space-y-6">
-                                <div className="space-y-3">
-                                  {result.limitations.map((lim, i) => (
-                                    <div key={i} className="bg-[var(--bg-main)] p-3 rounded-xl border border-[var(--border-glow)] flex gap-3">
-                                      <i className="fas fa-radiation text-red-700 dark:text-red-400 mt-1 shrink-0"></i>
-                                      <div>
-                                        <div className="text-sm font-bold text-[var(--text-primary)]">{lim.limitation}</div>
-                                        <div className="text-xs text-[var(--text-secondary)] mt-1">Mitigation: {lim.mitigation}</div>
+                      {Array.isArray(result.stepByStepLabProtocol) && result.stepByStepLabProtocol.length > 0 ? (
+                        <div className="space-y-3.5">
+                          {result.stepByStepLabProtocol.map((step) => {
+                            const isDone = !!completedSteps[step.stepNumber];
+                            return (
+                              <div
+                                key={step.stepNumber}
+                                onClick={() => handleToggleStep(step.stepNumber)}
+                                className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                                  isDone
+                                    ? 'bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-500/40 opacity-80'
+                                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
+                                }`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <button
+                                    type="button"
+                                    className="mt-0.5 text-emerald-600 dark:text-emerald-400"
+                                  >
+                                    {isDone ? (
+                                      <CheckSquare className="w-5 h-5 fill-emerald-100 dark:fill-emerald-950 text-emerald-600" />
+                                    ) : (
+                                      <Square className="w-5 h-5 text-slate-400" />
+                                    )}
+                                  </button>
+
+                                  <div className="space-y-1 flex-grow">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                        Step {step.stepNumber}.
+                                      </span>
+                                      <h4 className={`text-sm font-bold text-slate-900 dark:text-white ${isDone ? 'line-through text-slate-400' : ''}`}>
+                                        {step.title}
+                                      </h4>
+                                    </div>
+
+                                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                      {step.instructions}
+                                    </p>
+
+                                    {step.criticalNotice && (
+                                      <div className="mt-2 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
+                                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                                        <span>
+                                          <strong>{isArabic ? 'تنبيه معملي حرج: ' : 'Critical Precaution: '}</strong>
+                                          {step.criticalNotice}
+                                        </span>
                                       </div>
-                                    </div>
-                                  ))}
-                                </div>
-                                <div className="flex gap-2">
-                                  <div className="flex-1 bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-center">
-                                    <div className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">HIGH Confidence</div>
-                                    <div className="text-xs text-[var(--text-primary)]">{result.dataConfidence.high}</div>
-                                  </div>
-                                  <div className="flex-1 bg-amber-600/10 p-3 rounded-lg border border-amber-500/20 text-center">
-                                    <div className="text-[10px] text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1">LOW Confidence</div>
-                                    <div className="text-xs text-[var(--text-primary)]">{result.dataConfidence.low}</div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            );
+                          })}
                         </div>
+                      ) : (
+                        <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
+                          {isArabic ? 'راجع التقرير الاستشاري الكامل لعرض كافة خطوات البروتوكول المعملي.' : 'Please refer to the full Advisory Report for the complete step-by-step bench protocol.'}
+                        </div>
+                      )}
                     </div>
+                  )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* 📚 LITERATURE LANDSCAPE */}
-                      <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                        <div className="bg-sky-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                          <h3 className="text-sky-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                            <i className="fas fa-book-reader mr-3 text-sky-400"></i>
-                            {isArabic ? 'المشهد الأدبي للبحث' : 'Literature Landscape'}
-                          </h3>
-                        </div>
-                        <div className="p-8 space-y-6">
-                           <div className="grid grid-cols-3 gap-2">
-                             <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 block uppercase font-black"><i className="fas fa-check mr-1"></i> Established</span>
-                               <ul className="mt-2 space-y-1">
-                                 {result.literatureLandscape.established.map((v,i) => <li key={i} className="text-[10px] text-[var(--text-secondary)] leading-tight">{v}</li>)}
-                               </ul>
-                             </div>
-                             <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-amber-700 dark:text-amber-400 block uppercase font-black"><i className="fas fa-exclamation-triangle mr-1"></i> Contested</span>
-                               <ul className="mt-2 space-y-1">
-                                 {result.literatureLandscape.contested.map((v,i) => <li key={i} className="text-[10px] text-[var(--text-secondary)] leading-tight">{v}</li>)}
-                               </ul>
-                             </div>
-                             <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-red-700 dark:text-red-400 block uppercase font-black"><i className="fas fa-question-circle mr-1"></i> Unknown (Gap)</span>
-                               <ul className="mt-2 space-y-1">
-                                 {result.literatureLandscape.unknown.map((v,i) => <li key={i} className="text-[10px] text-[var(--text-secondary)] leading-tight">{v}</li>)}
-                               </ul>
-                             </div>
-                           </div>
-
-                           <div>
-                             <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Key Research Groups Worldwide</span>
-                             <div className="space-y-2">
-                               {result.literatureLandscape.keyResearchGroupsWorldwide.map((group, i) => (
-                                 <div key={i} className="flex flex-col bg-[var(--bg-main)] px-3 py-2 rounded-lg border border-[var(--border-glow)]">
-                                    <span className="text-xs font-bold text-[var(--text-primary)]">{group.group}</span>
-                                    <span className="text-[10px] text-sky-400">{group.focus}</span>
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-
-                           <div className="flex flex-col md:flex-row gap-4">
-                             <div className="flex-1">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Target Journals</span>
-                               <div className="space-y-2">
-                                 {result.literatureLandscape.targetJournals.map((journal, i) => (
-                                   <div key={i} className="flex justify-between items-center text-xs">
-                                      <span className="text-[var(--text-secondary)]">{journal.journal}</span>
-                                      <span className="bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded text-[10px] font-bold">IF {journal.impactFactor}</span>
-                                   </div>
-                                 ))}
-                               </div>
-                             </div>
-                             <div className="flex-1">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Query Terms</span>
-                               <div className="flex flex-wrap gap-1">
-                                 {result.literatureLandscape.searchTerms.map((term, i) => (
-                                   <span key={i} className="px-2 py-0.5 bg-gray-500/10 text-[var(--text-secondary)] border border-gray-500/20 rounded string text-[10px]">
-                                     {term}
-                                   </span>
-                                 ))}
-                               </div>
-                             </div>
-                           </div>
-                        </div>
+                  {/* SECTION 3: RESEARCHER TROUBLESHOOTING MATRIX */}
+                  {activeSection === 'DIAGNOSTICS' && (
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5">
+                      <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-emerald-500" />
+                          <span>{isArabic ? 'مصفوفة تشخيص الأعطال المعملية واستكشاف الأخطاء:' : 'Researcher Laboratory Troubleshooting & Rescue Matrix:'}</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {isArabic ? 'تحديد العَرَض المعملي، سببه الجذري، الفحص الآلي المطلوب (GC-MS, XRD..)، والإجراء المعملي التصحيحي المباشر' : 'Direct mapping of observed symptoms to root causes, instrumental assays, and corrective bench steps.'}
+                        </p>
                       </div>
 
-                      {/* 🎯 RESEARCH OUTPUT PLAN */}
-                      <div className="bg-[var(--card-bg)] shadow-card rounded-3xl border border-[var(--border-glow)] overflow-hidden">
-                        <div className="bg-fuchsia-600/20 px-8 py-6 border-b border-[var(--border-glow)]">
-                          <h3 className="text-fuchsia-400 font-bold text-lg uppercase tracking-widest flex items-center">
-                            <i className="fas fa-bullseye mr-3 text-fuchsia-400"></i>
-                            {isArabic ? 'خطة الإنتاج البحثي' : 'Research Output Plan'}
-                          </h3>
+                      {Array.isArray(result.researcherTroubleshootingMatrix) && result.researcherTroubleshootingMatrix.length > 0 ? (
+                        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                          <table className="w-full text-xs text-start">
+                            <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-mono">
+                              <tr>
+                                <th className="p-3 font-semibold">{isArabic ? 'العَرَض الملاحظ' : 'Observed Symptom'}</th>
+                                <th className="p-3 font-semibold">{isArabic ? 'المسبب العلمي' : 'Root Cause Mechanism'}</th>
+                                <th className="p-3 font-semibold">{isArabic ? 'الفحص المطلوب (GC-MS, XRD..)' : 'Diagnostic Assay'}</th>
+                                <th className="p-3 font-semibold">{isArabic ? 'الإجراء التصحيحي المعملي' : 'Laboratory Corrective Action'}</th>
+                                <th className="p-3 font-semibold">{isArabic ? 'المعيار المتوقع' : 'Target Benchmark'}</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                              {result.researcherTroubleshootingMatrix.map((item, idx) => (
+                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                  <td className="p-3 font-bold text-rose-600 dark:text-rose-400 align-top">
+                                    {item.symptom}
+                                  </td>
+                                  <td className="p-3 text-slate-600 dark:text-slate-300 align-top leading-relaxed">
+                                    {item.rootCause}
+                                  </td>
+                                  <td className="p-3 font-mono text-blue-600 dark:text-blue-400 font-semibold align-top whitespace-nowrap">
+                                    {item.diagnosticAssay}
+                                  </td>
+                                  <td className="p-3 text-emerald-800 dark:text-emerald-300 font-medium bg-emerald-50/40 dark:bg-emerald-950/20 align-top leading-relaxed">
+                                    {item.correctiveAction}
+                                  </td>
+                                  <td className="p-3 font-mono text-slate-900 dark:text-white font-bold align-top whitespace-nowrap">
+                                    {item.expectedBenchmark}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        <div className="p-8 space-y-6">
-                           <div>
-                             <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-2">Publications Pipeline</span>
-                             <div className="space-y-2">
-                               {result.researchOutputPlan.publications.map((pub, i) => (
-                                 <div key={i} className="flex flex-col bg-[var(--bg-main)] p-3 rounded-lg border border-fuchsia-500/30 border-l-4">
-                                    <span className="text-xs font-bold text-[var(--text-primary)]">{pub.topic}</span>
-                                    <div className="flex justify-between mt-1 text-[10px]">
-                                      <span className="text-fuchsia-400">{pub.journal} (IF {pub.targetIF})</span>
-                                      <span className="text-[var(--text-secondary)] font-mono">{pub.timeline}</span>
-                                    </div>
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-
-                           <div className="grid grid-cols-2 gap-4">
-                             <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">Target Conference</span>
-                               <span className="font-bold text-[var(--text-primary)] text-xs block">{result.researchOutputPlan.conference.name}</span>
-                               <span className="text-[10px] text-amber-700 dark:text-amber-400 font-mono mt-1 block">{result.researchOutputPlan.conference.deadline} | {result.researchOutputPlan.conference.location}</span>
-                             </div>
-                             <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)]">
-                               <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest block mb-1">IP & Patents</span>
-                               <span className="font-bold text-[var(--text-primary)] text-xs block">Potential: {result.researchOutputPlan.intellectualProperty.patentPotential}</span>
-                               <span className="text-[10px] text-fuchsia-400 mt-1 block">Contact: {result.researchOutputPlan.intellectualProperty.contact}</span>
-                             </div>
-                           </div>
-
-                           <div className="pt-4 border-t border-[var(--border-glow)]">
-                             <div className="grid grid-cols-3 gap-3 text-center">
-                               <div className="flex flex-col">
-                                 <span className="text-2xl font-black text-fuchsia-400">{result.researchOutputPlan.capacityBuilding.mscTrained + result.researchOutputPlan.capacityBuilding.phdTrained}</span>
-                                 <span className="text-[10px] text-[var(--text-secondary)] uppercase block">Students Trained</span>
-                               </div>
-                               <div className="flex flex-col">
-                                 <span className="text-2xl font-black text-fuchsia-400">{result.researchOutputPlan.kpis.citationsTarget}</span>
-                                 <span className="text-[10px] text-[var(--text-secondary)] uppercase block">Citation Target</span>
-                               </div>
-                               <div className="flex flex-col">
-                                 <span className="text-2xl font-black text-fuchsia-400">{result.researchOutputPlan.kpis.industryEngaged ? 'YES' : 'NO'}</span>
-                                 <span className="text-[10px] text-[var(--text-secondary)] uppercase block">Industry Pilot</span>
-                               </div>
-                             </div>
-                           </div>
+                      ) : (
+                        <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
+                          {isArabic ? 'مصفوفة الأعطال غير متوفرة في هذه النسخة.' : 'Troubleshooting matrix not available.'}
                         </div>
-                      </div>
+                      )}
                     </div>
-                  </motion.div>
+                  )}
+
+                  {/* SECTION 4: FULL ADVISORY REPORT & MERMAID FLOWCHART */}
+                  {activeSection === 'REPORT' && (
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-6">
+                      <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                            {isArabic ? 'التقرير الاستشاري النخبوي ومخطط سير العمليات' : 'Comprehensive Scientific Advisory Report & Flowchart'}
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            {isArabic ? 'تقرير استشاري شامل يتضمن التفاعلات الكيميائية ومخطط التدفق التفاعلي Mermaid' : 'Includes mathematical mass balances, kinetic equations, and interactive Mermaid diagram.'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={downloadPDF}
+                          className="px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{isArabic ? 'تصدير PDF' : 'Export PDF'}</span>
+                        </button>
+                      </div>
+
+                      {result.consultingReportMarkdown ? (
+                        <div className="prose dark:prose-invert max-w-none text-xs sm:text-sm">
+                          <CustomMarkdown>{result.consultingReportMarkdown}</CustomMarkdown>
+                        </div>
+                      ) : (
+                        <div className="text-center py-10 text-xs text-slate-500">
+                          {isArabic ? 'التقرير المفصل غير متوفر.' : 'Detailed markdown report not available.'}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                </div>
               </motion.div>
             )}
+
           </motion.div>
         ) : (
-          <motion.div 
-            key="history"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="bg-[var(--card-bg)] shadow-card  rounded-3xl  border border-[var(--border-glow)] overflow-hidden"
+          /* HISTORY PANEL */
+          <motion.div
+            key="history-panel"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden"
           >
-          <div className="bg-[var(--bg-main)] border-b border-[var(--border-glow)] px-8 py-6 flex justify-between items-center">
-            <h3 className="text-[var(--text-primary)] font-bold text-lg">{language === 'Arabic' ? "سجل التحديات" : "Challenge History"}</h3>
-            <button 
-              onClick={onClear}
-              className="text-xs font-black text-red-700 dark:text-red-400 uppercase tracking-widest hover:text-red-700 dark:text-red-400 transition"
-            >
-              Clear All
-            </button>
-          </div>
-          <div className="p-8">
-            {history.length === 0 ? (
-              <div className="text-center py-12">
-                <i className="fas fa-folder-open text-[var(--text-secondary)] text-5xl mb-4"></i>
-                <p className="text-[var(--text-secondary)] font-medium">No history found. Generate your first solution!</p>
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/40">
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                  {isArabic ? 'سجل الأبحاث والدراسات السابقة' : 'Research Diagnostic History'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {isArabic ? 'انقر على أي دراسة لاسترجاع تشخيصها، مخططاتها البيانية، وبروتوكولها المعملي' : 'Click any study to restore its multi-agent diagnostic breakdown, charts, and bench SOP.'}
+                </p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {history.map((entry) => (
-                  <div 
-                    key={entry.id}
-                    onClick={() => handleSelectFromHistory(entry)}
-                    className="p-6 rounded-2xl border border-[var(--border-glow)] hover:border-blue-500 dark:border-blue-400/50 hover:bg-[var(--bg-main)] transition cursor-pointer group bg-[var(--bg-main)]"
-                  >
-                    <div className="flex justify-between items-start">
+
+              {history.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onClear}
+                  className="text-xs font-semibold text-rose-500 hover:text-rose-600 transition-colors"
+                >
+                  {isArabic ? 'مسح السجل' : 'Clear All'}
+                </button>
+              )}
+            </div>
+
+            <div className="p-5 sm:p-6">
+              {history.length === 0 ? (
+                <div className="text-center py-12 text-slate-400">
+                  <FlaskConical className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                    {isArabic ? 'لا توجد أبحاث محفوظة في السجل.' : 'No research history found.'}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {isArabic ? 'قم بتشغيل أول دراسة علمية ليتم أرشفتها هنا تلقائياً.' : 'Execute your first scientific challenge to archive it here.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {history.map((entry) => (
+                    <div
+                      key={entry.id}
+                      onClick={() => {
+                        setResult(entry.fullData as any);
+                        setTopic(entry.topic);
+                        setViewMode('SOLVER');
+                        setActiveSection('AGENTS');
+                      }}
+                      className="p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 bg-slate-50 dark:bg-slate-800/30 hover:bg-emerald-50/20 dark:hover:bg-emerald-950/10 transition-all cursor-pointer flex justify-between items-center group"
+                    >
                       <div>
-                        <h4 className="font-bold text-[var(--text-primary)] group-hover:text-blue-700 dark:text-blue-400 transition">{entry.topic}</h4>
-                        <p className="text-xs text-[var(--text-secondary)] mt-1">{entry.timestamp}</p>
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          {entry.topic}
+                        </h4>
+                        <span className="text-[11px] text-slate-400 mt-1 inline-block font-mono">
+                          {entry.timestamp}
+                        </span>
                       </div>
-                      <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-blue-700 dark:text-blue-400 transition"></i>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 };

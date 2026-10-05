@@ -4,18 +4,36 @@ import { LOCATIONS, TECHNOLOGY_CATEGORIES, BIOFUEL_FEEDSTOCKS, translateTerm } f
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Tooltip, useMap, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { EV_CHARGING_STATIONS, EvChargingStation, EV_STATION_OPERATORS } from './evStationsData';
+import { VoltOmanResult, VoltOmanChargingStop } from './types';
 
 interface Props {
   language: 'English' | 'Arabic';
   theme?: 'dark' | 'light';
+  onNavigateToTab?: (tab: string) => void;
+  defaultEvStationsLayer?: boolean;
+  onSelectStationForEnergyZone?: (station: EvChargingStation) => void;
+  onSelectStationForRoute?: (station: EvChargingStation) => void;
+  stationsData?: EvChargingStation[];
+  voltOmanResult?: VoltOmanResult | null;
+  activeVoltOmanRoute?: {
+    routeNameEn: string;
+    routeNameAr: string;
+    highwayCorridor: string;
+    distanceKm: number;
+    vehicleModelName: string;
+    batteryCapacityKwh: number;
+    ambientTempC: number;
+    initialSocPct: number;
+  };
 }
 
 const ZONES = [
   { id: 'sohar', nameEn: 'Sohar Freezone', nameAr: 'ميناء وصحار الحرة', lat: 24.4601, lng: 56.6111, color: '#10b981', descEn: 'Industrial Synergy & Export', descAr: 'مركز الصناعات الثقيلة والتصدير', isPort: true },
   { id: 'muscat', nameEn: 'Mina Al Sultan Qaboos', nameAr: 'مسقط (ميناء السلطان قابوس)', lat: 23.6262, lng: 58.5645, color: '#3b82f6', descEn: 'Capital Logistical Hub', descAr: 'العاصمة والمركز اللوجستي', isPort: true },
-  { id: 'duqm', nameEn: 'SEZAD Duqm', nameAr: 'المنطقة الاقتصادية بالدقم', lat: 19.6437, lng: 57.7027, color: '#f59e0b', descEn: 'Green Hydrogen Capital', descAr: 'عاصمة الهيدروجين الأخضر', isPort: true },
-  { id: 'salalah', nameEn: 'Salalah Freezone', nameAr: 'صلالة الحرة', lat: 16.9470, lng: 53.9780, color: '#f43f5e', descEn: 'Global Shipping Lane', descAr: 'بوابة خطوط الشحن العالمية', isPort: true },
-  { id: 'nizwa', nameEn: 'Nizwa Industrial City', nameAr: 'مدينة نزوى الصناعية', lat: 22.9333, lng: 57.5333, color: '#8b5cf6', descEn: 'Internal Trade Hub', descAr: 'مركز التجارة الداخلية', isPort: false },
+  { id: 'duqm', nameEn: 'SEZAD Duqm', nameAr: 'المنطقة الاقتصادية بالدقم', lat: 19.6437, lng: 57.7027, color: '#f59e0b', descEn: 'Green Hydrogen Capital & EV OEM', descAr: 'عاصمة الهيدروجين وتصنيع المركبات', isPort: true },
+  { id: 'salalah', nameEn: 'Salalah Freezone', nameAr: 'صلالة الحرة', lat: 16.9470, lng: 53.9780, color: '#f43f5e', descEn: 'Global Shipping Lane & EV Terminus', descAr: 'بوابة خطوط الشحن ومحطة المسار الجنوبي', isPort: true },
+  { id: 'nizwa', nameEn: 'Nizwa Industrial City', nameAr: 'مدينة نزوى الصناعية', lat: 22.9333, lng: 57.5333, color: '#8b5cf6', descEn: 'Internal Trade Hub & Mountain Gateway', descAr: 'مركز التجارة الداخلية وبوابة الجبل', isPort: false },
   { id: 'sur', nameEn: 'Sur Industrial City', nameAr: 'مدينة صور الصناعية', lat: 22.5667, lng: 59.5289, color: '#06b6d4', descEn: 'LNG & Fertilizer Export', descAr: 'تصدير الغاز الطبيعي المسال', isPort: true },
   { id: 'buraimi', nameEn: 'Al Buraimi Industrial City', nameAr: 'مدينة البريمي الصناعية', lat: 24.2500, lng: 55.7500, color: '#ec4899', descEn: 'Border Logistical Gateway', descAr: 'بوابة لوجستية حدودية', isPort: false }
 ];
@@ -102,19 +120,94 @@ const createRawMaterialIcon = (color: string, iconClass: string) => {
   });
 };
 
+// Helper to match an Oman Oil EV station with a VoltOman calculated itinerary stop
+const matchStationWithItinerary = (station: EvChargingStation, itinerary?: VoltOmanChargingStop[]): VoltOmanChargingStop | null => {
+  if (!itinerary || itinerary.length === 0) return null;
+  const sNameEn = station.nameEn.toLowerCase();
+  const sNameAr = station.nameAr;
+
+  for (const stop of itinerary) {
+    const stopEn = stop.stationNameEn.toLowerCase();
+    if (sNameEn.includes(stopEn) || stopEn.includes(sNameEn)) return stop;
+    if (sNameAr.includes(stop.stationNameAr) || stop.stationNameAr.includes(sNameAr)) return stop;
+
+    // Match by key landmark name
+    const keywords = ['haima', 'ghaba', 'adam', 'thumrait', 'sohar', 'barka', 'suwaiq', 'saham', 'ghaftain', 'qatbit', 'salalah', 'duqm', 'nizwa', 'samail', 'bidbid', 'sur', 'ibra', 'mouj', 'wave', 'airport', 'rusayl', 'amerat', 'shinas'];
+    for (const kw of keywords) {
+      if (sNameEn.includes(kw) && stopEn.includes(kw)) {
+        return stop;
+      }
+    }
+  }
+  return null;
+};
+
+// Modern EV Charging Station Pin with OOMCO branding and active VoltOman itinerary highlight
+const createEvStationIcon = (
+  status: EvChargingStation['status'], 
+  powerKw: number, 
+  isVoltOmanStop = false,
+  stopNumber?: number
+) => {
+  if (isVoltOmanStop) {
+    return L.divIcon({
+      className: 'bg-transparent border-0',
+      html: `<div style="position:relative; text-align:center; color:#f59e0b; font-size:44px; text-shadow: 0 0 14px rgba(245,158,11,0.95); line-height:44px; height: 44px; margin-top: -16px;">
+          <div style="position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:46px; height:46px; border-radius:50%; border:2px dashed #f59e0b; animation:spin 4s linear infinite; pointer-events:none;"></div>
+          <i class="fas fa-location-dot"></i>
+          <span style="position:absolute; top:7px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:900; color:#0f172a; background:#fbbf24; border-radius:50%; width:19px; height:19px; line-height:19px; display:inline-block; box-shadow:0 0 8px #fbbf24;">#${stopNumber || 1}</span>
+          <span style="position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:#020617; color:#fbbf24; font-size:9px; font-weight:900; font-family:monospace; padding:1px 5px; border-radius:4px; border:1px solid #f59e0b; white-space:nowrap; box-shadow:0 2px 10px rgba(0,0,0,0.8);">⚡ VoltOman #${stopNumber}</span>
+        </div>`,
+      iconSize: [46, 60],
+      iconAnchor: [23, 44],
+      popupAnchor: [0, -44]
+    });
+  }
+
+  let color = '#10b981'; // Emerald for operational OOMCO
+  if (status === 'UNDER_CONSTRUCTION_2025_2026') {
+    color = '#f59e0b'; // Amber
+  } else if (status === 'PLANNED_2027_PIPELINE') {
+    color = '#06b6d4'; // Cyan
+  }
+
+  return L.divIcon({
+    className: 'bg-transparent border-0',
+    html: `<div style="position:relative; text-align:center; color:${color}; font-size:38px; text-shadow: 0 3px 8px rgba(0,0,0,0.8); line-height:38px; height: 38px; margin-top: -12px;">
+        <i class="fas fa-location-dot"></i>
+        <i class="fas fa-bolt" style="position:absolute; top:7px; left:50%; transform:translateX(-50%); font-size:13px; color:#fff;"></i>
+        <span style="position:absolute; bottom:-12px; left:50%; transform:translateX(-50%); background:#020617; color:${color}; font-size:9px; font-weight:800; font-family:monospace; padding:1px 4px; border-radius:4px; border:1px solid ${color}; white-space:nowrap;">OOMCO ${powerKw}kW</span>
+      </div>`,
+    iconSize: [38, 52],
+    iconAnchor: [19, 40],
+    popupAnchor: [0, -40]
+  });
+};
+
 const MapResizer = ({ isFullScreen }: { isFullScreen: boolean }) => {
   const map = useMap();
   React.useEffect(() => {
     const timeout = setTimeout(() => {
       map.invalidateSize();
-    }, 100); // small delay to allow CSS transitions to apply
+    }, 100);
     return () => clearTimeout(timeout);
   }, [isFullScreen, map]);
   return null;
 };
 
-export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
+export const GisMap: React.FC<Props> = ({ 
+  language, 
+  theme = "dark", 
+  onNavigateToTab,
+  defaultEvStationsLayer = true,
+  onSelectStationForEnergyZone,
+  onSelectStationForRoute,
+  stationsData,
+  voltOmanResult,
+  activeVoltOmanRoute
+}) => {
   const isArabic = language === 'Arabic';
+  const baseStations = stationsData || EV_CHARGING_STATIONS;
   const [source, setSource] = React.useState<string>('sohar');
   const [destination, setDestination] = React.useState<string>('duqm');
   const [feedstock, setFeedstock] = React.useState<string>(BIOFUEL_FEEDSTOCKS[0]);
@@ -122,7 +215,14 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
   const [dieselPrice, setDieselPrice] = React.useState<number>(0.250);
   const [isFullScreen, setIsFullScreen] = React.useState<boolean>(false);
   const [selectedMaterialType, setSelectedMaterialType] = React.useState<string | null>(null);
+  const [showOnlyVoltOmanStops, setShowOnlyVoltOmanStops] = React.useState<boolean>(false);
+  const [selectedRegionFilter, setSelectedRegionFilter] = React.useState<string>('ALL');
   const [routeGeometry, setRouteGeometry] = React.useState<[number, number][] | null>(null);
+
+  // EV Charging Layer State (All stations through 2027)
+  const [showEvStations, setShowEvStations] = React.useState<boolean>(defaultEvStationsLayer);
+  const [evStatusFilter, setEvStatusFilter] = React.useState<'ALL' | 'OPERATIONAL' | 'CONSTRUCTION_2025_2026' | 'PIPELINE_2027' | 'FREE_ZONES_ONLY'>('ALL');
+  const [selectedEvOperator, setSelectedEvOperator] = React.useState<string>('ALL');
 
   React.useEffect(() => {
     const sourceZone = ZONES.find(z => z.id === source);
@@ -207,92 +307,311 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
     };
   }, [feedstock, weight, destination, source, dieselPrice]);
 
-  const sourceZone = ZONES.find(z => z.id === source);
-  const destZone = ZONES.find(z => z.id === destination);
-  
-  // Set the map center specifically around the center of Oman
+  // Filtered EV Charging Stations (Exclusive Oman Oil Network across Oman through 2027)
+  const filteredEvStations = React.useMemo(() => {
+    if (!showEvStations) return [];
+    return baseStations.filter(st => {
+      // If user toggled to show only stops on the active VoltOman itinerary
+      if (showOnlyVoltOmanStops) {
+        const isMatched = matchStationWithItinerary(st, voltOmanResult?.chargingItinerary);
+        if (!isMatched) return false;
+      }
+
+      // Status filter
+      if (evStatusFilter === 'OPERATIONAL' && st.status !== 'OPERATIONAL') return false;
+      if (evStatusFilter === 'CONSTRUCTION_2025_2026' && st.status !== 'UNDER_CONSTRUCTION_2025_2026') return false;
+      if (evStatusFilter === 'PIPELINE_2027' && st.status !== 'PLANNED_2027_PIPELINE') return false;
+      if (evStatusFilter === 'FREE_ZONES_ONLY' && !st.isFreeZoneHub) return false;
+
+      // Region / Governorate filter
+      if (selectedRegionFilter !== 'ALL') {
+        const gov = st.governorateEn.toLowerCase();
+        if (selectedRegionFilter === 'muscat' && !gov.includes('muscat')) return false;
+        if (selectedRegionFilter === 'batinah' && !gov.includes('batinah')) return false;
+        if (selectedRegionFilter === 'dakhiliyah' && !gov.includes('dakhiliyah')) return false;
+        if (selectedRegionFilter === 'wusta' && !gov.includes('wusta')) return false;
+        if (selectedRegionFilter === 'dhofar' && !gov.includes('dhofar')) return false;
+        if (selectedRegionFilter === 'sharqiyah' && !gov.includes('sharqiyah')) return false;
+        if (selectedRegionFilter === 'dhahirah_buraimi' && !gov.includes('dhahirah') && !gov.includes('buraimi')) return false;
+        if (selectedRegionFilter === 'musandam_mazunah' && !gov.includes('musandam') && !gov.includes('mazunah')) return false;
+      }
+
+      return true;
+    });
+  }, [showEvStations, evStatusFilter, selectedRegionFilter, showOnlyVoltOmanStops, voltOmanResult, baseStations]);
+
   const centerOfOman: [number, number] = [21.00, 57.00];
 
-  // Restrict map tightly to Oman bounds
   const omanBounds = L.latLngBounds(
-    L.latLng(16.50, 52.00), // SouthWest bound
-    L.latLng(26.50, 59.90)  // NorthEast bound
+    L.latLng(16.50, 52.00),
+    L.latLng(26.50, 59.90)
   );
 
   return (
     <div className="w-full max-w-7xl mx-auto text-[var(--text-secondary)] font-sans relative z-0 pb-32" dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className="mb-8 border-b border-[var(--border-glow)] pb-6 text-center md:text-start">
-        <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] flex justify-center md:justify-start items-center">
-          <i className="fas fa-map-marked-alt text-[var(--accent-emerald)] dark:text-emerald-400 mx-3"></i>
-          {isArabic ? 'خريطة عُمان الاستراتيجية اللوجستية' : 'Oman Strategic Logistics Map'}
-        </h2>
-        <p className="text-[var(--text-secondary)] text-sm md:text-base mt-3 max-w-3xl font-medium leading-relaxed">
-          {isArabic 
-            ? 'تخطيط المسارات اللوجستية على شبكة الطرق الفعلية، حساب تكاليف النقل لقطاع الطاقة، وتقدير الانبعاثات بين المناطق الصناعية والحرة في السلطنة لاستثمارات مجدية.' 
-            : 'Plan logical routes on the actual road network, compute energy transport costs, and estimate logistics operations between Oman’s free zones.'}
-        </p>
+      
+      {/* Title & Real-time Layer Banner (Exclusively Oman Oil Company Network) */}
+      <div className="mb-6 border-b border-[var(--border-glow)] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              {isArabic ? 'شبكة شركة النفط العمانية (OOMCO EV) الحصرية' : 'Exclusive Oman Oil Company (OOMCO EV) Network'}
+            </span>
+            <span className="text-xs font-mono text-slate-400">
+              {baseStations.length} {isArabic ? 'محطة شحن سريعة حتى 2027 في كافة أنحاء عُمان' : 'Fast-Charging Hubs across All Oman until 2027'}
+            </span>
+          </div>
+
+          <h2 className="text-2xl md:text-3xl font-black text-[var(--text-primary)] flex items-center gap-2.5">
+            <i className="fas fa-map-location-dot text-emerald-500"></i>
+            <span>
+              {isArabic 
+                ? 'خريطة GIS لمحطات شحن شركة النفط العمانية (OOMCO EV) وربط برنامج VoltOman' 
+                : 'Oman Oil Company (OOMCO EV) GIS Map & VoltOman Results Link'}
+            </span>
+          </h2>
+
+          <p className="text-[var(--text-secondary)] text-xs md:text-sm mt-1 max-w-3xl leading-relaxed">
+            {isArabic 
+              ? 'تغطية جغرافية حصرية لكافة محطات شحن شركة النفط العمانية للتسويق (نفط عُمان / OOMCO) العاملة وقيد التجهيز وخطة 2027 في مسقط، الباطنة، الداخلية، الوسطى، ظفار، الشرقية، الظاهرة، البريمي ومسندم، مع ربط تفاعلي مباشر بحسابات ومحطات برنامج VoltOman.' 
+              : 'Comprehensive geographic coverage of all Oman Oil Marketing Company (OOMCO EV) charging stations across all governorates of Oman through 2027, dynamically linked to VoltOman calculation results and route feasibility.'}
+          </p>
+        </div>
+
+        {/* Quick Navigate Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          {onNavigateToTab && (
+            <>
+              <button
+                onClick={() => onNavigateToTab('PROPOSAL')}
+                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-400 hover:bg-slate-800 text-xs font-mono font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg"
+              >
+                <i className="fas fa-bolt-lightning text-amber-400"></i>
+                <span>{isArabic ? 'محرك VoltOman' : 'VoltOman Engine'}</span>
+              </button>
+              <button
+                onClick={() => onNavigateToTab('ZONES')}
+                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-amber-500/40 text-amber-400 hover:bg-slate-800 text-xs font-mono font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg"
+              >
+                <i className="fas fa-city text-cyan-400"></i>
+                <span>{isArabic ? 'قاعدة بيانات الطاقة' : 'Energy Zones DB'}</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
+      {/* Active VoltOman Engine Results Integration Bar */}
+      {voltOmanResult && (
+        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950/40 border border-emerald-500/40 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
+              <i className="fa-solid fa-bolt-lightning text-amber-400 animate-pulse"></i>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500 text-slate-950">
+                  {isArabic ? 'رابط نتائج برنامج VoltOman نشط' : 'VoltOman Results Linked'}
+                </span>
+                <span className="text-xs font-bold text-white">
+                  {activeVoltOmanRoute?.vehicleModelName || 'EV'} • {isArabic ? activeVoltOmanRoute?.routeNameAr : activeVoltOmanRoute?.routeNameEn}
+                </span>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+                  {activeVoltOmanRoute?.distanceKm || voltOmanResult.telemetry.distanceKm} km
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1">
+                <span className="text-amber-400 font-bold">{isArabic ? voltOmanResult.verdictTitleAr : voltOmanResult.verdictTitleEn}</span>
+                {' · '}
+                <span className="font-mono text-slate-400">
+                  {isArabic 
+                    ? `صافي الاستهلاك: ${voltOmanResult.telemetry.totalNetEnergyKwh.toFixed(1)} ك.و.س (${voltOmanResult.telemetry.effectiveEfficiencyKwhPerKm.toFixed(3)} ك.و.س/كم)` 
+                    : `Net Energy: ${voltOmanResult.telemetry.totalNetEnergyKwh.toFixed(1)} kWh (${voltOmanResult.telemetry.effectiveEfficiencyKwhPerKm.toFixed(3)} kWh/km)`}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <button
+              onClick={() => setShowOnlyVoltOmanStops(!showOnlyVoltOmanStops)}
+              className={`px-3 py-1.5 rounded-xl font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border ${
+                showOnlyVoltOmanStops 
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20' 
+                  : 'bg-slate-900 text-amber-400 border-amber-500/40 hover:bg-slate-800'
+              }`}
+            >
+              <i className="fa-solid fa-filter"></i>
+              <span>
+                {isArabic 
+                  ? `عرض محطات مسار VoltOman فقط (${voltOmanResult.chargingItinerary.length})` 
+                  : `VoltOman Route Stops Only (${voltOmanResult.chargingItinerary.length})`}
+              </span>
+            </button>
+
+            {onNavigateToTab && (
+              <button
+                onClick={() => onNavigateToTab('PROPOSAL')}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 hover:text-white hover:bg-slate-800 text-xs font-mono font-bold cursor-pointer flex items-center gap-1.5"
+              >
+                <i className="fa-solid fa-gauge-high text-emerald-400"></i>
+                <span>{isArabic ? 'لوحة القيادة' : 'Cockpit'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+
+
       <div className="flex flex-col gap-8 relative z-0">
+        
         {/* Real Geographic Map UI */}
         <div className={
            isFullScreen 
             ? "fixed inset-0 z-[9000] bg-[var(--bg-main)] p-2 md:p-6 flex flex-col" 
-            : "w-full rounded-[2rem] border border-[var(--border-glow)] relative h-[500px] md:h-[700px] shadow-2xl overflow-hidden z-10"
+            : "w-full rounded-[2rem] border border-[var(--border-glow)] relative h-[520px] md:h-[720px] shadow-2xl overflow-hidden z-10"
         }>
-          <div className={`absolute z-[9999] flex flex-row gap-2 pointer-events-auto ${isFullScreen ? 'top-6 right-6 md:top-10 md:right-10' : 'top-4 right-4'}`}>
+          
+          {/* Top Right Controls (Fullscreen & Quick Layer Info) */}
+          <div className={`absolute z-[9999] flex flex-row items-center gap-2 pointer-events-auto ${isFullScreen ? 'top-6 right-6 md:top-10 md:right-10' : 'top-4 right-4'}`}>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-slate-800 text-xs font-mono text-slate-200 shadow-xl">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>{filteredEvStations.length} {isArabic ? 'محطة ظاهرة' : 'Stations Active'}</span>
+            </div>
+
             <button 
               onClick={() => setIsFullScreen(!isFullScreen)}
-              className="bg-white text-gray-800 shadow-xl p-3 md:p-4 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors pointer-events-auto flex flex-col items-center justify-center min-w-[50px] min-h-[50px] font-bold text-[10px]"
+              className="bg-white text-gray-800 shadow-xl p-3 md:p-3.5 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors pointer-events-auto flex items-center justify-center font-bold text-xs cursor-pointer"
               title={isArabic ? 'تكبير/تصغير الخريطة' : 'Toggle Full Screen'}
             >
-              <i className={isFullScreen ? 'fas fa-compress text-xl mb-1' : 'fas fa-expand text-xl mb-1'}></i>
-              {isFullScreen && <span>{isArabic ? 'تصغير' : 'Close'}</span>}
+              <i className={isFullScreen ? 'fas fa-compress text-base' : 'fas fa-expand text-base'}></i>
             </button>
           </div>
 
-          {/* Floating Map Filter Panel (Visible in both modes) */}
-          <div className={`absolute z-[9999] pointer-events-auto ${isFullScreen ? 'top-6 left-6 md:top-10 md:left-10' : 'bottom-6 left-6'} max-w-[280px] w-full`} dir={isArabic ? 'rtl' : 'ltr'}>
-            <div className="bg-white/95 backdrop-blur-md shadow-2xl border border-gray-200 p-4 rounded-2xl flex flex-col gap-3">
-              <h3 className="text-xs font-black text-gray-800 uppercase tracking-widest flex items-center gap-2 mb-1">
-                <i className="fas fa-filter text-[var(--accent-emerald)]"></i>
-                {isArabic ? 'تصفية الخريطة' : 'Map Filters'}
-              </h3>
+          {/* Floating Map Filter Panel */}
+          <div className={`absolute z-[9999] pointer-events-auto ${isFullScreen ? 'top-6 left-6 md:top-10 md:left-10' : 'top-4 left-4'} max-w-[310px] w-full`} dir={isArabic ? 'rtl' : 'ltr'}>
+            <div className="bg-slate-950/95 backdrop-blur-md shadow-2xl border border-slate-800 p-4 rounded-2xl flex flex-col gap-3 text-slate-200">
               
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <i className="fas fa-layer-group text-emerald-400"></i>
+                  {isArabic ? 'طبقات خريطة عُمان الذكية' : 'GIS Map Layers & Filters'}
+                </h3>
+              </div>
+
+              {/* EV CHARGING STATIONS TOGGLE & FILTER */}
+              <div className="space-y-2 p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-300">
+                    <input
+                      type="checkbox"
+                      checked={showEvStations}
+                      onChange={(e) => setShowEvStations(e.target.checked)}
+                      className="accent-emerald-500 rounded cursor-pointer h-4 w-4"
+                    />
+                    <span>{isArabic ? 'محطات شحن المركبات (EV)' : 'EV Charging Stations'}</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-emerald-400 font-bold px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40">
+                    2024–2027
+                  </span>
+                </div>
+
+                {showEvStations && (
+                  <div className="space-y-2 pt-1 border-t border-slate-800 text-xs">
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1 font-mono">
+                        {isArabic ? 'حالة المحطات والجدول الزمني:' : 'Station Status & Timeline:'}
+                      </label>
+                      <select
+                        value={evStatusFilter}
+                        onChange={(e) => setEvStatusFilter(e.target.value as any)}
+                        className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg px-2.5 py-1.5 text-xs font-sans outline-none cursor-pointer focus:border-emerald-500"
+                      >
+                        <option value="ALL">{isArabic ? `جميع المحطات حتى 2027 (${baseStations.length})` : `All Stations until 2027 (${baseStations.length})`}</option>
+                        <option value="OPERATIONAL">{isArabic ? `🟢 قائمة وعاملة حالياً (${baseStations.filter(s => s.status === 'OPERATIONAL').length})` : `🟢 Operational Existing (${baseStations.filter(s => s.status === 'OPERATIONAL').length})`}</option>
+                        <option value="CONSTRUCTION_2025_2026">{isArabic ? `🟡 قيد التجهيز 2025-2026 (${baseStations.filter(s => s.status === 'UNDER_CONSTRUCTION_2025_2026').length})` : `🟡 Under Construction 2025-26 (${baseStations.filter(s => s.status === 'UNDER_CONSTRUCTION_2025_2026').length})`}</option>
+                        <option value="PIPELINE_2027">{isArabic ? `🔵 خطة 2027 الميجاواط (${baseStations.filter(s => s.status === 'PLANNED_2027_PIPELINE').length})` : `🔵 2027 Megawatt Pipeline (${baseStations.filter(s => s.status === 'PLANNED_2027_PIPELINE').length})`}</option>
+                        <option value="FREE_ZONES_ONLY">{isArabic ? `🏢 محطات المناطق الحرة فقط (${baseStations.filter(s => s.isFreeZoneHub).length})` : `🏢 Free Zone Hubs Only (${baseStations.filter(s => s.isFreeZoneHub).length})`}</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1 font-mono">
+                        {isArabic ? 'المحافظة والمنطقة في سلطنة عُمان:' : 'Governorate / Region across Oman:'}
+                      </label>
+                      <select
+                        value={selectedRegionFilter}
+                        onChange={(e) => setSelectedRegionFilter(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg px-2.5 py-1.5 text-xs font-sans outline-none cursor-pointer focus:border-emerald-500"
+                      >
+                        <option value="ALL">{isArabic ? `جميع أنحاء سلطنة عُمان (${baseStations.length})` : `All Regions of Oman (${baseStations.length})`}</option>
+                        <option value="muscat">{isArabic ? `محافظة مسقط (${baseStations.filter(s => s.governorateEn.includes('Muscat')).length})` : `Muscat Governorate (${baseStations.filter(s => s.governorateEn.includes('Muscat')).length})`}</option>
+                        <option value="batinah">{isArabic ? `شمال وجنوب الباطنة (${baseStations.filter(s => s.governorateEn.includes('Batinah')).length})` : `Al Batinah North & South (${baseStations.filter(s => s.governorateEn.includes('Batinah')).length})`}</option>
+                        <option value="dakhiliyah">{isArabic ? `محافظة الداخلية (${baseStations.filter(s => s.governorateEn.includes('Dakhiliyah')).length})` : `Al Dakhiliyah (${baseStations.filter(s => s.governorateEn.includes('Dakhiliyah')).length})`}</option>
+                        <option value="wusta">{isArabic ? `الوسطى وطريق صلالة (${baseStations.filter(s => s.governorateEn.includes('Wusta') || s.governorateEn.includes('Adam')).length})` : `Al Wusta & Highway (${baseStations.filter(s => s.governorateEn.includes('Wusta') || s.governorateEn.includes('Adam')).length})`}</option>
+                        <option value="dhofar">{isArabic ? `محافظة ظفار (${baseStations.filter(s => s.governorateEn.includes('Dhofar')).length})` : `Dhofar Governorate (${baseStations.filter(s => s.governorateEn.includes('Dhofar')).length})`}</option>
+                        <option value="sharqiyah">{isArabic ? `محافظة الشرقية (${baseStations.filter(s => s.governorateEn.includes('Sharqiyah')).length})` : `Al Sharqiyah (${baseStations.filter(s => s.governorateEn.includes('Sharqiyah')).length})`}</option>
+                        <option value="dhahirah_buraimi">{isArabic ? `الظاهرة والبريمي (${baseStations.filter(s => s.governorateEn.includes('Dhahirah') || s.governorateEn.includes('Buraimi')).length})` : `Al Dhahirah & Buraimi (${baseStations.filter(s => s.governorateEn.includes('Dhahirah') || s.governorateEn.includes('Buraimi')).length})`}</option>
+                        <option value="musandam_mazunah">{isArabic ? `مسندم والمزيونة (${baseStations.filter(s => s.governorateEn.includes('Musandam') || s.governorateEn.includes('Mazunah')).length})` : `Musandam & Al Mazunah (${baseStations.filter(s => s.governorateEn.includes('Musandam') || s.governorateEn.includes('Mazunah')).length})`}</option>
+                      </select>
+                    </div>
+
+                    {/* Legend */}
+                    <div className="pt-2 border-t border-slate-800 text-[10px] font-mono grid grid-cols-3 gap-1">
+                      <div className="flex items-center gap-1 text-emerald-400">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        <span>{isArabic ? 'عاملة' : 'Active'}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-amber-400">
+                        <span className="h-2 w-2 rounded-full bg-amber-400"></span>
+                        <span>2025-26</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-cyan-400">
+                        <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
+                        <span>2027 MCS</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Feedstocks / Materials Layer */}
               <div>
-                <label className="block text-[10px] font-bold text-gray-500 mb-1">{isArabic ? 'المواد الخام' : 'Raw Materials'}</label>
-                <select value={selectedMaterialType || ''} onChange={(e) => setSelectedMaterialType(e.target.value === '' ? null : e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg px-3 py-2 text-xs font-medium focus:ring-1 focus:ring-[#8b5cf6] outline-none cursor-pointer">
-                  <option value="">{isArabic ? 'إخفاء الكل' : 'Hide All'}</option>
-                  <option value="all">{isArabic ? 'إظهار الكل' : 'Show All'}</option>
+                <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  {isArabic ? 'مصادر الطاقة والمواد الخام:' : 'Feedstocks & Renewable Sites:'}
+                </label>
+                <select 
+                  value={selectedMaterialType || ''} 
+                  onChange={(e) => setSelectedMaterialType(e.target.value === '' ? null : e.target.value)} 
+                  className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                >
+                  <option value="">{isArabic ? 'إخفاء المواد الخام' : 'Hide Feedstocks'}</option>
+                  <option value="all">{isArabic ? 'إظهار جميع المصادر' : 'Show All Feedstocks'}</option>
                   {MATERIAL_CATEGORIES.map(cat => (
                     <option key={`map-cat-${cat.id}`} value={cat.id}>{isArabic ? cat.labelAr : cat.labelEn}</option>
                   ))}
                 </select>
               </div>
-              
-              {!isFullScreen && (
-                <p className="text-[9px] text-[var(--text-muted)] mt-1 leading-tight">
-                  <i className="fas fa-info-circle mr-1"></i>
-                  {isArabic ? 'اختر موقع المصدر والوجهة من القائمة بالأسفل لحساب المسار.' : 'Select origin and destination from the panel below to calculate routes.'}
-                </p>
-              )}
 
               {isFullScreen && (
-                <>
-                  <div className="mt-1">
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wide">{isArabic ? 'نقطة الانطلاق' : 'Origin'}</label>
-                    <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg px-3 py-2 text-xs font-medium focus:ring-1 focus:ring-[#3b82f6] outline-none cursor-pointer">
+                <div className="pt-2 border-t border-slate-800 space-y-2">
+                  <div>
+                    <label className="block text-[10px] font-mono text-slate-400 mb-1 uppercase">{isArabic ? 'نقطة الانطلاق' : 'Origin'}</label>
+                    <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1 text-xs cursor-pointer">
                       {ZONES.map(z => <option key={`f-src-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
                     </select>
                   </div>
-                  <div className="mt-1">
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wide">{isArabic ? 'نقطة الوصول' : 'Destination'}</label>
-                    <select value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg px-3 py-2 text-xs font-medium focus:ring-1 focus:ring-[#f59e0b] outline-none cursor-pointer">
+                  <div>
+                    <label className="block text-[10px] font-mono text-slate-400 mb-1 uppercase">{isArabic ? 'نقطة الوصول' : 'Destination'}</label>
+                    <select value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1 text-xs cursor-pointer">
                       {ZONES.map(z => <option key={`f-dst-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
                     </select>
                   </div>
-                </>
+                </div>
               )}
+
             </div>
           </div>
 
@@ -302,33 +621,228 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
             minZoom={5}
             maxBounds={omanBounds}
             maxBoundsViscosity={1.0}
-            style={{ height: '100%', width: '100%', background: '#f8fafc', borderRadius: isFullScreen ? '1rem' : '0' }}
+            style={{ height: '100%', width: '100%', background: '#090d16', borderRadius: isFullScreen ? '1rem' : '0' }}
             zoomControl={false}
           >
             <ZoomControl position="bottomright" />
             <MapResizer isFullScreen={isFullScreen} />
+            
+            {/* High-contrast Esri Dark Gray / World Street Map */}
             <TileLayer
               attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
             />
-            {ZONES.filter(z => z.id === source || z.id === destination).map(z => (
-              <Marker key={z.id} position={[z.lat, z.lng]} icon={createCustomIcon(z.color, z.isPort ? 'fa-anchor' : 'fa-building')}>
+
+            {/* Strategic Free Zones and Logistics Cities */}
+            {ZONES.map(z => (
+              <Marker key={z.id} position={[z.lat, z.lng]} icon={createCustomIcon(z.color, z.isPort ? 'fa-anchor' : 'fa-industry')}>
                 <Popup className="custom-popup">
-                  <div className="bg-white shadow-xl border border-gray-100 px-4 py-3 rounded-xl text-center" dir={isArabic ? 'rtl' : 'ltr'}>
-                    <p className="text-sm font-black text-slate-800 m-0">{isArabic ? z.nameAr : z.nameEn}</p>
-                    <p className="text-[10px] text-slate-500 m-0 mt-1 uppercase tracking-widest">{isArabic ? z.descAr : z.descEn}</p>
+                  <div className="bg-slate-950 text-slate-100 p-3.5 rounded-xl border border-slate-800 shadow-2xl min-w-[220px]" dir={isArabic ? 'rtl' : 'ltr'}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: z.color }}></span>
+                      <p className="text-sm font-black text-white m-0">{isArabic ? z.nameAr : z.nameEn}</p>
+                    </div>
+                    <p className="text-xs text-slate-400 m-0 mt-1 uppercase tracking-wider">{isArabic ? z.descAr : z.descEn}</p>
+                    
+                    {onNavigateToTab && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800">
+                        <button
+                          onClick={() => onNavigateToTab('ZONES')}
+                          className="w-full text-center px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 text-[11px] font-bold text-amber-400 border border-amber-500/30 cursor-pointer transition-colors"
+                        >
+                          <i className="fas fa-arrow-up-right-from-square mr-1"></i>
+                          {isArabic ? 'استكشف في قاعدة بيانات الطاقة' : 'View in Energy Zones DB'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </Popup>
               </Marker>
             ))}
 
+            {/* EV Charging Stations Layer (Exclusively Oman Oil Company Network across Oman) */}
+            {showEvStations && filteredEvStations.map(station => {
+              const matchedStop = matchStationWithItinerary(station, voltOmanResult?.chargingItinerary);
+              const isVoltStop = Boolean(matchedStop);
+
+              return (
+                <Marker
+                  key={station.id}
+                  position={[station.lat, station.lng]}
+                  icon={createEvStationIcon(station.status, station.powerKw, isVoltStop, matchedStop?.stopIndex)}
+                >
+                  <Popup className="custom-popup">
+                    <div className="bg-slate-950 text-slate-100 p-4 rounded-2xl border border-slate-800 shadow-2xl min-w-[280px] max-w-[340px] font-sans" dir={isArabic ? 'rtl' : 'ltr'}>
+                      
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold bg-slate-900 border border-slate-700 text-slate-300">
+                          {isArabic ? (station.governorateAr || station.zoneNameAr) : (station.governorateEn || station.zoneNameEn)}
+                        </span>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                          station.status === 'OPERATIONAL' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' :
+                          station.status === 'UNDER_CONSTRUCTION_2025_2026' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                          'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 animate-pulse'
+                        }`}>
+                          {station.status === 'OPERATIONAL' ? (isArabic ? '🟢 عاملة 2024' : '🟢 Active 2024') :
+                           station.status === 'UNDER_CONSTRUCTION_2025_2026' ? (isArabic ? '🟡 تجهيز 2025-26' : '🟡 Const. 2025-26') :
+                           (isArabic ? '🔵 خطة 2027' : '🔵 Pipeline 2027')}
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm font-extrabold text-white leading-tight mb-1">
+                        {isArabic ? station.nameAr : station.nameEn}
+                      </h4>
+
+                      <div className="text-xs text-emerald-400 font-bold mb-3 flex items-center gap-1.5">
+                        <i className="fa-solid fa-bolt-lightning text-amber-400 text-xs"></i>
+                        <span>{isArabic ? station.operatorNameAr : station.operatorNameEn}</span>
+                      </div>
+
+                      {/* Technical Specs Grid */}
+                      <div className="grid grid-cols-2 gap-1.5 p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono mb-2.5">
+                        <div>
+                          <span className="text-[9px] text-slate-400 block">{isArabic ? 'القدرة القصوى' : 'Max Power'}</span>
+                          <span className="text-white font-bold text-xs">{station.powerKw} kW DC</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 block">{isArabic ? 'المنافذ المتاحة' : 'Live Availability'}</span>
+                          <span className="text-emerald-400 font-bold">{station.availablePortsNow} / {station.portsCount} {isArabic ? 'متاح' : 'Ports'}</span>
+                        </div>
+                        <div className="col-span-2 pt-1 border-t border-slate-800">
+                          <span className="text-[9px] text-slate-400 block">{isArabic ? 'المقابس والتعرفة' : 'Connectors & Tariff'}</span>
+                          <span className="text-slate-200">
+                            {station.connectorTypes.join(' · ')} | <strong className="text-amber-400">{station.tariffOmrPerKwh.toFixed(3)} OMR/kWh</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* VOLTOMAN PROGRAM DIRECT RESULTS LINKAGE */}
+                      {isVoltStop && matchedStop ? (
+                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-950/70 via-slate-900 to-emerald-950/60 border border-amber-500/50 text-[10px] space-y-1.5 mb-2.5 shadow-lg">
+                          <div className="flex items-center justify-between text-amber-400 font-bold">
+                            <span className="flex items-center gap-1.5">
+                              <i className="fa-solid fa-bolt-lightning animate-pulse text-amber-300"></i>
+                              <span>{isArabic ? `محطة شحن معتمدة بمسار VoltOman (#${matchedStop.stopIndex})` : `VoltOman Route Charging Stop #${matchedStop.stopIndex}`}</span>
+                            </span>
+                            <span className="text-[9px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40">
+                              +{matchedStop.energyAddedKwh.toFixed(1)} kWh
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-1.5 font-mono text-[10px] pt-1 border-t border-amber-500/20">
+                            <div>
+                              <span className="text-slate-400 block">{isArabic ? 'نسبة الوصول المتوقعة:' : 'Est. Arrival SOC:'}</span>
+                              <strong className="text-emerald-400 text-xs">~{matchedStop.arrivalSocPct}%</strong>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">{isArabic ? 'نسبة المغادرة المستهدفة:' : 'Target SOC:'}</span>
+                              <strong className="text-cyan-400 text-xs">~{matchedStop.targetDepartureSocPct}%</strong>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">{isArabic ? 'مدة الشحن المطلوبة:' : 'Dwell Time:'}</span>
+                              <strong className="text-white text-xs">{matchedStop.chargingTimeMins} {isArabic ? 'دقيقة' : 'mins'}</strong>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">{isArabic ? 'التكلفة التقديرية:' : 'Session Cost:'}</span>
+                              <strong className="text-amber-300 text-xs">{matchedStop.estimatedCostOmr.toFixed(3)} OMR</strong>
+                            </div>
+                          </div>
+
+                          <div className="text-[9px] text-slate-300 pt-1 border-t border-amber-500/20 flex items-center justify-between">
+                            <span>{isArabic ? 'الحالة الحرارية:' : 'Thermal State:'}</span>
+                            <span className={matchedStop.isMiddayDerated ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+                              {matchedStop.isMiddayDerated 
+                                ? (isArabic ? '⚠️ تقييد ذروة الحرارة (65%)' : '⚠️ Peak Derated (65%)') 
+                                : (isArabic ? '✅ قدرة كاملة 100%' : '✅ 100% Full Speed')}
+                            </span>
+                          </div>
+                        </div>
+                      ) : activeVoltOmanRoute && (
+                        <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono space-y-1 mb-2.5">
+                          <div className="flex items-center justify-between text-slate-300">
+                            <span className="text-slate-400">{isArabic ? 'توافق مركبة VoltOman:' : 'VoltOman Vehicle:'}</span>
+                            <span className="text-emerald-400 font-bold">{activeVoltOmanRoute.vehicleModelName?.split(' ')[0]}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-slate-300">
+                            <span className="text-slate-400">{isArabic ? 'شحن تقديري (20%-80%):' : 'Est. Charge (20-80%):'}</span>
+                            <span className="text-white font-bold">
+                              ~{Math.round((activeVoltOmanRoute.batteryCapacityKwh * 0.60) / Math.min(station.powerKw, 250) * 60)} {isArabic ? 'دقيقة' : 'mins'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Energy Zones DB Linkage & Clean Energy Profile */}
+                      {station.energyZoneLink && (
+                        <div className="p-2 rounded-xl bg-slate-900/90 border border-emerald-500/25 text-[10px] space-y-1 mb-2.5">
+                          <div className="flex items-center justify-between font-bold text-emerald-400">
+                            <span className="flex items-center gap-1">
+                              <i className="fa-solid fa-solar-panel text-amber-400"></i>
+                              <span>{station.energyZoneLink.totalCleanPowerMw} MW {isArabic ? 'طاقة نظيفة' : 'Clean Grid'}</span>
+                            </span>
+                            <span className="text-[9px] font-mono text-slate-400">
+                              {isArabic ? station.energyZoneLink.zoneTypeAr : station.energyZoneLink.zoneTypeEn}
+                            </span>
+                          </div>
+                          <div className="text-slate-300 text-[9px] line-clamp-1">
+                            <strong className="text-white">{isArabic ? 'شركات مرتبطة:' : 'Key Partner:'}</strong> {station.energyZoneLink.linkedCompanies.slice(0, 2).join(', ')}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Free Zone Synergy Note */}
+                      <p className="text-[10px] text-slate-300 leading-relaxed italic bg-slate-900/60 p-2 rounded-lg border border-slate-800 mb-2.5">
+                        "{isArabic ? station.freeZoneSynergyAr : station.freeZoneSynergyEn}"
+                      </p>
+
+                      {/* Direct Links to Energy Zones DB & VoltOman */}
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                        <button
+                          onClick={() => {
+                            if (onSelectStationForEnergyZone) {
+                              onSelectStationForEnergyZone(station);
+                            } else if (onNavigateToTab) {
+                              onNavigateToTab('ZONES');
+                            }
+                          }}
+                          className="px-2 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold cursor-pointer transition-colors text-center flex items-center justify-center gap-1"
+                          title={isArabic ? 'عرض ملف منطقة الطاقة' : 'Inspect Energy Zone in DB'}
+                        >
+                          <i className="fas fa-building-columns"></i>
+                          <span>{isArabic ? 'ملف منطقة الطاقة' : 'Energy Zone DB'}</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            if (onSelectStationForRoute) {
+                              onSelectStationForRoute(station);
+                            } else if (onNavigateToTab) {
+                              onNavigateToTab('PROPOSAL');
+                            }
+                          }}
+                          className="px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold cursor-pointer transition-colors text-center flex items-center justify-center gap-1"
+                          title={isArabic ? 'حساب الاستهلاك للمحطة في VoltOman' : 'Simulate Route in VoltOman'}
+                        >
+                          <i className="fas fa-bolt-lightning"></i>
+                          <span>{isArabic ? 'حساب المسار (Volt)' : 'Route in VoltOman'}</span>
+                        </button>
+                      </div>
+
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+
+            {/* Raw materials markers if enabled */}
             {selectedMaterialType && RAW_MATERIALS.filter(r => selectedMaterialType === 'all' || r.type === selectedMaterialType).map(r => (
               <Marker key={r.id} position={[r.lat, r.lng]} icon={createRawMaterialIcon(r.color, r.icon)}>
                 <Popup className="custom-popup">
                   <div className="bg-white shadow-xl border border-gray-100 px-4 py-3 rounded-xl text-center" dir={isArabic ? 'rtl' : 'ltr'}>
                     <div className="flex items-center justify-center gap-2 mb-1">
                       <i className={`fas ${r.icon} text-xs`} style={{ color: r.color }}></i>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest m-0">{isArabic ? r.typeAr : r.typeEn}</span>
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest m-0">{isArabic ? r.typeAr : r.typeEn}</span>
                     </div>
                     <p className="text-sm font-black text-slate-800 m-0 leading-tight">{isArabic ? r.nameAr : r.nameEn}</p>
                   </div>
@@ -336,200 +850,85 @@ export const GisMap: React.FC<Props> = ({ language, theme = "dark" }) => {
               </Marker>
             ))}
             
-            {/* White background glow for the line to make it visible on all backgrounds */}
+            {/* Route geometry line */}
             {routeGeometry && routeGeometry.length > 0 && (
               <Polyline 
                 positions={routeGeometry} 
                 pathOptions={{ 
                   color: '#ffffff', 
-                  weight: 12, 
+                  weight: 10, 
                   opacity: 0.9,
                   lineJoin: 'round'
                 }} 
               />
             )}
-
-            {/* Dark background border for contrast */}
             {routeGeometry && routeGeometry.length > 0 && (
               <Polyline 
                 positions={routeGeometry} 
                 pathOptions={{ 
-                  color: '#1e293b', 
-                  weight: 8, 
-                  opacity: 0.9,
-                  lineJoin: 'round'
-                }} 
-              />
-            )}
-
-            {/* Main brightly colored line */}
-            {routeGeometry && routeGeometry.length > 0 && (
-              <Polyline 
-                positions={routeGeometry} 
-                pathOptions={{ 
-                  color: '#8B5CF6', /* Vivid Violet to stand out from green roads/lands */
+                  color: '#10b981', 
                   weight: 5, 
                   opacity: 1,
                   lineJoin: 'round',
-                  dashArray: '10, 15',
+                  dashArray: '8, 12',
                 }} 
               />
             )}
           </MapContainer>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 relative z-10 w-full">
-          <div className="w-full lg:w-1/2 bg-[var(--card-bg)] shadow-card border border-[var(--border-glow)] p-6 md:p-8 rounded-3xl">
-            <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 border-b border-[var(--border-glow)] pb-4 flex items-center gap-3">
-              <i className="fas fa-sliders-h text-[var(--accent-emerald)]"></i>
-              {isArabic ? 'إدخال بيانات الشحنة والموقع' : 'LOGISTIC PARAMETERS'}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-[11px] font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">{isArabic ? 'المادة الخام المستهدفة' : 'FEEDSTOCK MATERIAL'}</label>
-                  <select 
-                    value={feedstock} 
-                    onChange={(e) => setFeedstock(e.target.value)} 
-                    className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-4 py-3 text-xs md:text-sm font-medium focus:ring-2 focus:ring-[var(--accent-emerald)] outline-none transition-all"
-                  >
-                    {BIOFUEL_FEEDSTOCKS.map(f => <option key={f} value={f}>{isArabic ? translateTerm(f) : f}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">{isArabic ? 'الوزن (طن متري)' : 'WEIGHT (METRIC TONS)'}</label>
-                  <input 
-                    type="number" 
-                    value={weight} 
-                    onChange={(e) => setWeight(Number(e.target.value))} 
-                    className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-4 py-3 text-xs md:text-sm font-medium outline-none focus:ring-2 focus:ring-[var(--accent-emerald)] transition-all" 
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-[11px] font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">{isArabic ? 'نقطة الانطلاق (المصدر)' : 'LOGISTIC ORIGIN'}</label>
-                  <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-4 py-3 text-xs md:text-sm font-medium focus:ring-2 focus:ring-[#3b82f6] outline-none transition-all">
-                    {ZONES.map(z => <option key={`src-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">{isArabic ? 'نقطة الوصول (المصنع/الميناء)' : 'DESTINATION'}</label>
-                  <select value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-4 py-3 text-xs md:text-sm font-medium focus:ring-2 focus:ring-[#f59e0b] outline-none transition-all">
-                    {ZONES.map(z => <option key={`dst-${z.id}`} value={z.id}>{isArabic ? z.nameAr : z.nameEn}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[var(--bg-main)]/50 p-5 rounded-2xl border border-[var(--border-glow)]">
-               <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-3 tracking-widest">
-                 {isArabic ? 'مؤشر سعر الديزل لتسعير النقل (ر.ع/لتر)' : 'DIESEL PRICE INDEX (OMR/L)'}
-               </label>
-               <input 
-                 type="range" 
-                 min="0.200" 
-                 max="0.400" 
-                 step="0.005"
-                 value={dieselPrice} 
-                 onChange={(e) => setDieselPrice(Number(e.target.value))}
-                 className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-400 transition-all"
-               />
-               <div className="flex justify-between mt-3 text-[11px] font-black text-[var(--text-secondary)]">
-                 <span>{language === "Arabic" ? "0.200 ر.ع." : "0.200 OMR"}</span>
-                 <span className="bg-[var(--accent-emerald)] text-white dark:text-emerald-950 px-3 py-1 rounded-md shadow-md">{dieselPrice.toFixed(3)} OMR</span>
-                 <span>{language === "Arabic" ? "0.400 ر.ع." : "0.400 OMR"}</span>
-               </div>
-            </div>
+        {/* LOGISTICS CALCULATOR & FREIGHT SUMMARY */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-glow)] space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              {isArabic ? 'نقطة الانطلاق (المصدر)' : 'Origin Logistics Node'}
+            </h4>
+            <select
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-3 py-2 text-xs font-bold"
+            >
+              {ZONES.map(z => (
+                <option key={`src-${z.id}`} value={z.id}>
+                  {isArabic ? z.nameAr : z.nameEn}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="w-full lg:w-1/2 bg-[var(--card-bg)] shadow-card border border-[var(--border-glow)] p-6 md:p-8 rounded-3xl flex flex-col justify-between">
-            <div>
-              <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 border-b border-[var(--border-glow)] pb-4 flex items-center gap-3">
-                <i className="fas fa-file-invoice-dollar text-[#3b82f6]"></i>
-                {isArabic ? 'التقديرات اللوجستية المفصلة' : 'Detailed Logistics Output'}
-              </h3>
-              
-              {results ? (
-                <div className="space-y-4">
-                  <div className="p-5 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)]">
-                    <h4 className="text-sm font-black text-[var(--text-primary)] mb-3">
-                       {isArabic 
-                         ? `مسار التحليل: من ${sourceZone?.nameAr} إلى ${destZone?.nameAr}`
-                         : `Route Analysis: ${sourceZone?.nameEn} to ${destZone?.nameEn}`}
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold">
-                      <div className="flex items-center gap-2 text-[var(--text-primary)] bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-glow)]">
-                        <i className="fas fa-route text-[var(--text-secondary)]"></i>
-                        <span className="text-[var(--text-secondary)] flex-1">{isArabic ? 'المسافة:' : 'Distance:'}</span>
-                        <span>{results.distance} km</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[var(--text-primary)] bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-glow)]">
-                        <i className="fas fa-clock text-[var(--text-secondary)]"></i>
-                        <span className="text-[var(--text-secondary)] flex-1">{isArabic ? 'وقت السفر:' : 'Travel Time:'}</span>
-                        <span>{results.travelTime} hrs</span>
-                      </div>
-                    </div>
-                  </div>
+          <div className="p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-glow)] space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              {isArabic ? 'نقطة الوصول (الوجهة)' : 'Destination Terminal'}
+            </h4>
+            <select
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              className="w-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[var(--text-primary)] rounded-xl px-3 py-2 text-xs font-bold"
+            >
+              {ZONES.map(z => (
+                <option key={`dest-${z.id}`} value={z.id}>
+                  {isArabic ? z.nameAr : z.nameEn}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                  <div className="space-y-2 mt-4 px-1">
-                     <div className="flex justify-between py-2 border-b border-[var(--border-glow)] border-dashed">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium"><i className="fas fa-truck text-[var(--text-muted)] w-5"></i> {isArabic ? 'تكلفة الشحن الأساسية:' : 'Base Freight:'}</span>
-                        <span className="text-xs font-bold text-[var(--text-primary)]">{results.baseFreight.toFixed(2)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
-                     </div>
-                     <div className="flex justify-between py-2 border-b border-[var(--border-glow)] border-dashed">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium"><i className="fas fa-gas-pump text-rose-600 dark:text-rose-400 w-5"></i> {isArabic ? 'رسوم الوقود (مؤشر متغير):' : 'Fuel Surcharge:'}</span>
-                        <span className="text-xs font-bold text-rose-600 dark:text-rose-400">{results.fuelSurcharge.toFixed(2)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
-                     </div>
-                     <div className="flex justify-between py-2 border-b border-[var(--border-glow)] border-dashed">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium"><i className="fas fa-shield-alt text-[#3b82f6] w-5"></i> {isArabic ? `مناولة خاصة (${results.category.typeAr}):` : `Special Handling (${results.category.typeEn}):`}</span>
-                        <span className="text-xs font-bold text-[#3b82f6]">{results.specialHandling.toFixed(2)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
-                     </div>
-                     {results.portFees > 0 && (
-                       <div className="flex justify-between py-2 border-b border-[var(--border-glow)] border-dashed">
-                          <span className="text-xs text-[var(--text-secondary)] font-medium"><i className="fas fa-anchor text-[#8b5cf6] w-5"></i> {isArabic ? 'رسوم الموانئ العمانية:' : 'Oman Port Fees:'}</span>
-                          <span className="text-xs font-bold text-[#8b5cf6]">{results.portFees.toFixed(2)} {language === "Arabic" ? "ر.ع." : "OMR"}</span>
-                       </div>
-                     )}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-[var(--text-secondary)] text-sm py-12 flex-1">
-                  <i className="fas fa-map-signs text-4xl mb-4 opacity-50"></i>
-                  {isArabic ? 'يرجى اختيار مسار لحساب التكاليف' : 'Please select a valid route to calculate costs'}
-                </div>
-              )}
+          <div className="p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-glow)] flex flex-col justify-between">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              {isArabic ? 'مسافة المسار اللوجستي' : 'Route Distance'}
+            </span>
+            <div className="text-2xl font-black font-mono text-emerald-400">
+              {results?.distance || 0} <span className="text-xs text-slate-400">km</span>
             </div>
-            
-            {results && (
-              <div className="mt-8 space-y-4">
-                <div className="p-5 bg-gradient-to-r from-[var(--accent-emerald)] to-emerald-600 rounded-2xl flex justify-between items-center text-white shadow-lg overflow-hidden relative">
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[20px] -mr-16 -mt-16 pointer-events-none"></div>
-                   <span className="text-xs md:text-sm font-black uppercase tracking-wider relative z-10">{isArabic ? 'إجمالي الميزانية اللوجستية' : 'Total Logistic Budget'}</span>
-                   <span className="text-3xl font-black relative z-10 drop-shadow-md">{results.total.toFixed(2)} <span className="text-lg opacity-80 font-bold">{language === "Arabic" ? "ر.ع." : "OMR"}</span></span>
-                </div>
-
-                <div className="p-4 bg-blue-50 dark:bg-[#3b82f6]/10 rounded-2xl border border-blue-200 dark:border-blue-500/20">
-                   <p className="text-[11px] font-black text-[#3b82f6] uppercase mb-2 flex items-center gap-2"><i className="fas fa-lightbulb"></i> {isArabic ? 'توصية استراتيجية:' : 'STRATEGIC ADVICE:'}</p>
-                   <p className="text-xs text-blue-900 dark:text-blue-100 font-medium leading-relaxed">
-                     {results.discountEligible 
-                        ? isArabic 
-                           ? `لتوفير حوالي 15%، فكر في زيادة الكمية لأكثر من 500 طن للحصول على خصم الشحنات الضخمة وتقليل تكلفة العودة الفارغة للناقلات.`
-                           : `To save up to 15%, consider increasing volume to >500 tons to qualify for bulk discount and eliminate backhaul penalties.`
-                        : isArabic
-                           ? `المنافسة اللوجستية قوية الآن. لتقليل التكاليف الإضافية بنسبة 10%، يفضل تقريب منشأة الإنتاج من موقع التجميع في ${sourceZone?.nameAr}.`
-                           : `Logistics operations look optimized. To save an additional 10%, consider consolidating shipments near ${sourceZone?.nameEn}.`
-                     }
-                   </p>
-                </div>
-              </div>
-            )}
+            <div className="text-[11px] font-mono text-slate-400">
+              ~{results?.travelTime || 0} {isArabic ? 'ساعات قيادة' : 'driving hours'}
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );
 };
 
+export default GisMap;

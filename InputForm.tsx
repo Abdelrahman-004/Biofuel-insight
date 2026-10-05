@@ -41,14 +41,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   const [projectName, setProjectName] = React.useState('Green Oman Energy Project');
   const [location, setLocation] = React.useState(LOCATIONS[0]);
   const [category, setCategory] = React.useState<'Biofuel' | 'Renewable Energy'>('Biofuel');
-  const [feedstock, setFeedstock] = React.useState(BIOFUEL_FEEDSTOCKS[0]);
+  const [feedstock, setFeedstock] = React.useState(BIOFUEL_FEEDSTOCKS.find(f => f.includes('Cooking') || f.includes('UCO')) || BIOFUEL_FEEDSTOCKS[0]);
   const [projectScale, setProjectScale] = React.useState<'Small' | 'Medium' | 'Large'>('Medium');
   const [production, setProduction] = React.useState<string | number>(1500);
   const [capacity, setCapacity] = React.useState<string | number>(1000);
-  const [budget, setBudget] = React.useState<string | number>(15000000);
+  const [budget, setBudget] = React.useState<string | number>(1500000);
   const [sellingPrice, setSellingPrice] = React.useState<string | number>(1200);
   const [electricityCost, setElectricityCost] = React.useState<string | number>(0.05);
-  const [laborCost, setLaborCost] = React.useState<string | number>(500000);
+  const [laborCost, setLaborCost] = React.useState<string | number>(95000);
   const [co2Source, setCo2Source] = React.useState(CO2_SOURCES[0]);
   const [advancedParams, setAdvancedParams] = React.useState<Record<string, string | number>>({});
 
@@ -103,11 +103,15 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   // Update feedstock when category changes
   React.useEffect(() => {
     if (category === 'Biofuel') {
-      setFeedstock(BIOFUEL_FEEDSTOCKS[0]);
+      if (!BIOFUEL_FEEDSTOCKS.includes(feedstock)) {
+        setFeedstock(BIOFUEL_FEEDSTOCKS[0]);
+      }
     } else {
-      setFeedstock(RENEWABLE_ENERGY_TYPES[0]);
+      if (!RENEWABLE_ENERGY_TYPES.includes(feedstock)) {
+        setFeedstock(RENEWABLE_ENERGY_TYPES[0]);
+      }
     }
-  }, [category]);
+  }, [category, feedstock]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,11 +148,12 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
         </h2>
       </div>
       <div className="px-6 pt-4 flex flex-wrap gap-2">
-        <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
+        <span className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest w-full mb-1">{isArabic ? 'جرب مثال:' : 'Try an Example:'}</span>
         {[
-          { name: "Duqm Algae Bio-Hub", loc: "Duqm", cat: "Biofuel", fs: "Algae", prod: 5000, bud: 25000000 },
-          { name: "Salalah Wind Phase 2", loc: "Salalah", cat: "Renewable Energy", fs: "Wind", prod: 150000, bud: 45000000 },
-          { name: "Muscat Solar Rooftop", loc: "Muscat", cat: "Renewable Energy", fs: "Solar", prod: 2500, bud: 1200000 }
+          { name: "Khazaen UCO Biodiesel", loc: "Muscat - Rusayl Industrial Estate", cat: "Biofuel", fs: "Waste Cooking Oil", prod: 1500, bud: 1500000 },
+          { name: "Duqm Algae Bio-Hub", loc: "Duqm Free Zone (OPAZ)", cat: "Biofuel", fs: "Algae", prod: 5000, bud: 8500000 },
+          { name: "Salalah Wind Phase 2", loc: "Salalah Free Zone", cat: "Renewable Energy", fs: "Wind", prod: 150000, bud: 45000000 },
+          { name: "Muscat Solar Industrial", loc: "Muscat - Rusayl Industrial Estate", cat: "Renewable Energy", fs: "Solar", prod: 2500, bud: 1200000 }
         ].map((ex, i) => (
           <button
             key={i}
@@ -161,7 +166,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               setProduction(ex.prod);
               setBudget(ex.bud);
             }}
-            className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#10B981] hover:shadow-md transition-all"
+            className="px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-lg text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[#10B981] hover:shadow-md transition-all"
           >
             {ex.name}
           </button>
@@ -175,7 +180,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             transition={{ delay: 0.1 }}
             className="md:col-span-2"
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'اسم المشروع' : 'Project Name'}</label>
             <input 
               type="text" 
               value={projectName}
@@ -190,7 +195,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الموقع الاستراتيجي' : 'Strategic Location'}</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الموقع الاستراتيجي' : 'Strategic Location'}</label>
             <select 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
@@ -208,7 +213,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'حجم الاستثمار' : 'Project Scale'}</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'حجم الاستثمار' : 'Project Scale'}</label>
             <select 
               value={projectScale}
               onChange={(e) => setProjectScale(e.target.value as 'Small' | 'Medium' | 'Large')}
@@ -225,7 +230,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'نوع التكنولوجيا' : 'Technology Category'}</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'نوع التكنولوجيا' : 'Technology Category'}</label>
             <select 
               value={category}
               onChange={(e) => setCategory(e.target.value as any)}
@@ -240,7 +245,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
               {category === 'Biofuel' ? (isArabic ? 'المادة الخام الأساسية' : 'Primary Feedstock') : (isArabic ? 'نوع الطاقة' : 'Energy Type')}
             </label>
             <select 
@@ -263,7 +268,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             className="grid grid-cols-1 gap-6"
           >
             <div>
-              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'مصدر ثاني أكسيد الكربون' : 'CO2 Source'}</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'مصدر ثاني أكسيد الكربون' : 'CO2 Source'}</label>
               <select 
                 value={co2Source}
                 onChange={(e) => setCo2Source(e.target.value)}
@@ -294,12 +299,12 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             
             {/* Global Financial Parameters */}
             <div>
-              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الخصم / الفائدةالسنوية (%)' : 'Discount Rate / Cost of Capital (%)'}</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الخصم / الفائدةالسنوية (%)' : 'Discount Rate / Cost of Capital (%)'}</label>
               <input type="number" step="0.1" className={inputClasses} placeholder="8" 
                 onChange={e => setAdvancedParams({...advancedParams, 'Discount Rate (%)': e.target.value})} />
             </div>
             <div>
-              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'عمر المشروع (سنوات)' : 'Project Lifespan (Years)'}</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'عمر المشروع (سنوات)' : 'Project Lifespan (Years)'}</label>
               <input type="number" step="1" className={inputClasses} placeholder="20" 
                 onChange={e => setAdvancedParams({...advancedParams, 'Project Lifespan (Years)': e.target.value})} />
             </div>
@@ -308,27 +313,27 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Solar') || feedstock.includes('شمسية')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة الألواح (%)' : 'Panel Efficiency (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة الألواح (%)' : 'Panel Efficiency (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="21" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Panel Efficiency (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معامل الأداء (PR %)' : 'Performance Ratio (PR %)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معامل الأداء (PR %)' : 'Performance Ratio (PR %)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="75" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Performance Ratio (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل التدهور السنوي للألواح (%)' : 'Annual Degradation Rate (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل التدهور السنوي للألواح (%)' : 'Annual Degradation Rate (%)'}</label>
                   <input type="number" step="0.01" className={inputClasses} placeholder="0.5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Annual Degradation Rate (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'الإشعاع الشمسي (kWh/m2/day)' : 'Daily Irradiance (kWh/m2/day)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'الإشعاع الشمسي (kWh/m2/day)' : 'Daily Irradiance (kWh/m2/day)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="5.5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Daily Irradiance (kWh/m2/day)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الصيانة السنوية (دولار/kW)' : 'O&M Cost (USD/kW/year)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الصيانة السنوية (دولار/kW)' : 'O&M Cost (USD/kW/year)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="15" 
                     onChange={e => setAdvancedParams({...advancedParams, 'O&M Cost (USD/kW/year)': e.target.value})} />
                 </div>
@@ -339,17 +344,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Wind') || feedstock.includes('رياح')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'متوسط سرعة الرياح (m/s)' : 'Average Wind Speed (m/s)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'متوسط سرعة الرياح (m/s)' : 'Average Wind Speed (m/s)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="6.5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Average Wind Speed (m/s)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معامل سعة التوربين (%)' : 'Capacity Factor (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معامل سعة التوربين (%)' : 'Capacity Factor (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="35" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Capacity Factor (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الصيانة والمشتريات (USD/kW/yr)' : 'O&M Cost (USD/kW/yr)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الصيانة والمشتريات (USD/kW/yr)' : 'O&M Cost (USD/kW/yr)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="42" 
                     onChange={e => setAdvancedParams({...advancedParams, 'O&M Cost (USD/kW/yr)': e.target.value})} />
                 </div>
@@ -360,17 +365,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Hydrogen') || feedstock.includes('هيدروجين')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة المحلل الكهربائي (%)' : 'Electrolyzer Efficiency (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة المحلل الكهربائي (%)' : 'Electrolyzer Efficiency (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="65" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Electrolyzer Efficiency (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'ساعات التشغيل الجاهزة (ساعة/سنة)' : 'Operating Hours (hrs/yr)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'ساعات التشغيل الجاهزة (ساعة/سنة)' : 'Operating Hours (hrs/yr)'}</label>
                   <input type="number" step="1" className={inputClasses} placeholder="4000" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Operating Hours (hrs/yr)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'استهلاك المياه (لتر/كجم H2)' : 'Water Consumption (L/kg H2)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'استهلاك المياه (لتر/كجم H2)' : 'Water Consumption (L/kg H2)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="9" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Water Consumption (L/kg H2)': e.target.value})} />
                 </div>
@@ -381,17 +386,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Algae') || feedstock.includes('طحالب')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'محتوى الدهون/الزيت (%)' : 'Lipid Content (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'محتوى الدهون/الزيت (%)' : 'Lipid Content (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="35" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Lipid Content (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل نمو الكتلة الحيوية (kg/m2/day)' : 'Biomass Growth Rate (kg/m2/day)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل نمو الكتلة الحيوية (kg/m2/day)' : 'Biomass Growth Rate (kg/m2/day)'}</label>
                   <input type="number" step="0.01" className={inputClasses} placeholder="0.025" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Biomass Growth (kg/m2/day)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الحصاد والتجفيف (USD/ton)' : 'Harvest & Drying Cost (USD/ton)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الحصاد والتجفيف (USD/ton)' : 'Harvest & Drying Cost (USD/ton)'}</label>
                   <input type="number" step="1" className={inputClasses} placeholder="150" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Harvesting Cost (USD/ton)': e.target.value})} />
                 </div>
@@ -402,17 +407,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Used') || feedstock.includes('Cooking') || feedstock.includes('مستعمل') || feedstock.includes('UCO')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الأحماض الدهنية الحرة (FFA %)' : 'Free Fatty Acid (FFA %)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الأحماض الدهنية الحرة (FFA %)' : 'Free Fatty Acid (FFA %)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'FFA (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة جمع الزيت (USD/ton)' : 'UCO Collection Cost (USD/ton)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة جمع الزيت (USD/ton)' : 'UCO Collection Cost (USD/ton)'}</label>
                   <input type="number" step="1" className={inputClasses} placeholder="600" 
                     onChange={e => setAdvancedParams({...advancedParams, 'UCO Collection Cost (USD/ton)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة التحويل/الأسترة (%)' : 'Esterification Conversion (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة التحويل/الأسترة (%)' : 'Esterification Conversion (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="95" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Conversion Efficiency (%)': e.target.value})} />
                 </div>
@@ -423,17 +428,17 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {(feedstock.includes('Date') || feedstock.includes('نوى') || feedstock.includes('تمر')) && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل استخراج الزيت العضوي (%)' : 'Seed Oil Content (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'معدل استخراج الزيت العضوي (%)' : 'Seed Oil Content (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="8" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Seed Oil Content (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة استخلاص الزيت (USD/ton)' : 'Extraction Cost (USD/ton)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة استخلاص الزيت (USD/ton)' : 'Extraction Cost (USD/ton)'}</label>
                   <input type="number" step="1" className={inputClasses} placeholder="85" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Extraction Cost (USD/ton)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'قيمة المنتج الجانبي (العلف الحيواني) (USD/ton)' : 'Co-product (Feed) Value (USD/ton)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'قيمة المنتج الجانبي (العلف الحيواني) (USD/ton)' : 'Co-product (Feed) Value (USD/ton)'}</label>
                   <input type="number" step="1" className={inputClasses} placeholder="120" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Co-product Feed Value (USD/ton)': e.target.value})} />
                 </div>
@@ -444,12 +449,12 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             {category === 'Biofuel' && !feedstock.includes('Algae') && !feedstock.includes('طحالب') && !feedstock.includes('Used') && !feedstock.includes('Cooking') && !feedstock.includes('مستعمل') && !feedstock.includes('Date') && !feedstock.includes('نوى') && !feedstock.includes('تمر') && (
               <>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة الاستخراج (%)' : 'Extraction Efficiency (%)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'كفاءة الاستخراج (%)' : 'Extraction Efficiency (%)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="20" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Extraction Efficiency (%)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة استهلاك المياه (دولار/m3)' : 'Water Cost (USD/m3)'}</label>
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة استهلاك المياه (دولار/m3)' : 'Water Cost (USD/m3)'}</label>
                   <input type="number" step="0.1" className={inputClasses} placeholder="0.5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'Water Cost (USD/m3)': e.target.value})} />
                 </div>
@@ -465,7 +470,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45 }}
             >
-              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
                 {isArabic ? 'قدرة المحطة' : 'Installed Capacity'} (kW)
               </label>
               <input 
@@ -482,7 +487,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
               {isArabic ? 'الإنتاج المستهدف' : 'Target Production'} ({category === 'Biofuel' ? (isArabic ? 'طن/سنة' : 'Tons/Year') : (isArabic ? 'ميجاوات/سنة' : 'MWh/Year')})
             </label>
             <input 
@@ -498,7 +503,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'ميزانية المستثمر' : 'Investor Budget'} (USD)</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'ميزانية المستثمر' : 'Investor Budget'} (USD)</label>
             <input 
               type="number" 
               value={budget}
@@ -515,7 +520,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
               {isArabic ? 'سعر البيع/التعريفة' : 'Selling Price / Tariff'} (USD/{category === 'Biofuel' ? (isArabic ? 'طن' : 'ton') : 'MWh'})
             </label>
             <input 
@@ -530,7 +535,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
             <input 
               type="number" step="0.01"
               value={electricityCost}
@@ -544,7 +549,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
             >
-              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تكلفة العمالة/سنة' : 'Labor Cost/Yr'} (USD)</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تكلفة العمالة/سنة' : 'Labor Cost/Yr'} (USD)</label>
               <input 
                 type="number" 
                 value={laborCost}

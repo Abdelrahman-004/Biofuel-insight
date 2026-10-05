@@ -1,14 +1,11 @@
+import { Logo } from "./Logo";
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProposalInput, ProposalResult, ProposalHistoryEntry } from './types';
 import { generateProposal } from './geminiService';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { CustomMarkdown } from './CustomMarkdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
 
 const renderSectionContent = (content: string | string[] | undefined) => {
   if (!content) return null;
@@ -18,8 +15,7 @@ const renderSectionContent = (content: string | string[] | undefined) => {
         {content.map((item, idx) => (
           <li key={idx} className="pl-1">
             <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex]}
+              remarkPlugins={[remarkGfm]}
               components={{p: 'span'}}
             >
               {item}
@@ -31,12 +27,7 @@ const renderSectionContent = (content: string | string[] | undefined) => {
   }
   return (
     <div className="text-[var(--text-secondary)] leading-relaxed space-y-4 markdown-body text-sm font-sans">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
-      >
-        {content}
-      </ReactMarkdown>
+      <CustomMarkdown>{content}</CustomMarkdown>
     </div>
   );
 };
@@ -106,7 +97,7 @@ const autoDict: Record<string, string> = {
 };
 const tt = (key: string | undefined, lang: string) => { if(!key) return key; return lang === 'Arabic' ? (autoDict[key] || key) : key; };
 
-export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = ({ language = 'Arabic' }) => {
+export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic', onAnalysisRequest?: <T>(fn: () => Promise<T>) => Promise<T>, userPlan?: string, onUpgrade?: () => void }> = ({ language = 'Arabic', onAnalysisRequest, userPlan, onUpgrade }) => {
   const [inputs, setInputs] = useState<ProposalInput>({
     projectName: '',
     feedstock: '',
@@ -145,8 +136,14 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('GENERATING');
+    setResult(null);
     try {
-      const res = await generateProposal(inputs);
+      const processCall = async () => await generateProposal(inputs);
+      const res = onAnalysisRequest ? await onAnalysisRequest(processCall) : await processCall();
+      if (!res) {
+        setStatus('IDLE');
+        return;
+      }
       setResult(res);
       setStatus('COMPLETED');
       setHistory(prev => [{
@@ -163,21 +160,9 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
   };
 
   const downloadPDF = async () => {
-    const element = document.getElementById('proposal-report');
-    if (!element) return;
     
-    try {
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Proposal_${inputs.projectName || 'Project'}_${new Date().getTime()}.pdf`);
-    } catch (err) {
-      console.error("Error generating PDF:", err);
-    }
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('proposal-report', `${"OMAN_ECOSYNC_Proposal_"}${inputs.projectName || "Project"}_${new Date().getTime()}.pdf`);
   };
 
     
@@ -196,7 +181,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
           <form onSubmit={handleGenerate} className="space-y-4">
             
             <div className="bg-[var(--bg-main)] p-3 rounded-xl border border-[var(--border-glow)] mb-4">
-              <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">اللغة / Language</label>
+              <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">اللغة / Language</label>
               <select 
                 name="language" 
                 value={inputs.language} 
@@ -209,7 +194,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'اسم المشروع' : 'Project Name'}</label>
+              <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'اسم المشروع' : 'Project Name'}</label>
               <input 
                 type="text" 
                 name="projectName" 
@@ -222,7 +207,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'الجهة المانحة / المستثمر' : 'Target Audience'}</label>
+              <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'الجهة المانحة / المستثمر' : 'Target Audience'}</label>
               <select 
                 name="targetAudience" 
                 value={inputs.targetAudience} 
@@ -238,7 +223,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'المادة الخام' : 'Feedstock'}</label>
+                <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'المادة الخام' : 'Feedstock'}</label>
                 <input 
                   type="text" 
                   name="feedstock" 
@@ -251,7 +236,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'نوع المشروع/الوقود' : 'Project / Energy Type'}</label>
+                <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'نوع المشروع/الوقود' : 'Project / Energy Type'}</label>
                 <select 
                   name="biofuelType" 
                   value={inputs.biofuelType} 
@@ -271,7 +256,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'حجم الإنتاج / القدرة' : 'Target Capacity'}</label>
+                <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'حجم الإنتاج / القدرة' : 'Target Capacity'}</label>
                 <input 
                   type="text" 
                   name="capacity" 
@@ -283,7 +268,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'الميزانية' : 'Estimated Budget'}</label>
+                <label className="block text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? 'الميزانية' : 'Estimated Budget'}</label>
                 <input 
                   type="text" 
                   name="budget" 
@@ -330,10 +315,10 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   className="p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] cursor-pointer hover:bg-[var(--bg-main)] hover:border-#8B5CF6 transition-colors"
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-[var(--text-secondary)] truncate pr-2">{entry.projectName}</span>
+                    <span className="text-sm font-bold text-[var(--text-secondary)] truncate pr-2">{entry.projectName}</span>
                   </div>
-                  <div className="text-[10px] text-[#8B5CF6] font-bold truncate mb-1">{entry.targetAudience}</div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">{entry.timestamp}</div>
+                  <div className="text-xs md:text-sm text-[#8B5CF6] font-bold truncate mb-1">{entry.targetAudience}</div>
+                  <div className="text-xs md:text-sm text-[var(--text-secondary)]">{entry.timestamp}</div>
                 </div>
               ))}
             </div>
@@ -387,12 +372,12 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
 
           {status === 'COMPLETED' && result && (
             <motion.div 
-              key="completed"
+              key={`${result.id || result.timestamp || Date.now()}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className={`flex ${language === 'Arabic' ? 'justify-end' : 'justify-end'} mb-4`}>
+              <div className={`flex ${language === 'Arabic' ? 'justify-end' : 'justify-end'} mb-4 no-print`}>
                 <button 
                   onClick={downloadPDF}
                   className="bg-[var(--card-bg)] shadow-card hover:bg-[var(--bg-main)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-colors shadow-card"
@@ -402,13 +387,13 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
               </div>
 
               
-              <div id="proposal-report" className="bg-[var(--card-bg)] shadow-card p-10 rounded-3xl border border-[var(--border-glow)] prose prose-invert max-w-none relative">
+              <div id="proposal-report" className="bg-[var(--card-bg)] shadow-card p-10 rounded-3xl border border-[var(--border-glow)] prose dark:prose-invert max-w-none relative print-container">
                 {/* PDF BRANDING HEADER */}
-                <div className="absolute top-8 left-8 right-8 flex justify-between items-start opacity-30 select-none pointer-events-none">
-                  <div className="flex items-center space-x-2 grayscale">
-                    <i className="fas fa-leaf text-2xl"></i>
+                <div className="absolute top-8 left-8 right-8 flex justify-between items-start select-none pointer-events-none mb-10 print-only">
+                  <div className="flex items-center space-x-2">
+                    <i className="fas fa-leaf text-2xl text-[var(--accent-emerald)]"></i>
                     <span className="text-xl font-black tracking-tighter text-[var(--text-primary)]">
-                      {language === 'Arabic' ? <>عُمَان <span className="text-[#8B5CF6]">إيكوسينك</span></> : <>OMAN <span className="text-[#8B5CF6]">ECOSYNC</span></>}
+                      {language === 'Arabic' ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
                     </span>
                   </div>
                   <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right text-[var(--text-secondary)]">
@@ -422,7 +407,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   <p className="text-sm font-bold text-[#8B5CF6] uppercase tracking-widest">
                     {language === 'Arabic' ? 'أُعد خصيصاً لـ: ' : 'Prepared for: '} <span className="text-[var(--text-secondary)]">{inputs.targetAudience}</span>
                   </p>
-                  <p className="text-xs text-[var(--text-secondary)] mt-2">{language === 'Arabic' ? 'تاريخ الإصدار: ' : 'Generated on '}{result.timestamp}</p>
+                  <p className="text-sm text-[var(--text-secondary)] mt-2">{language === 'Arabic' ? 'تاريخ الإصدار: ' : 'Generated on '}{result.timestamp}</p>
                 </div>
 
                 <div className="space-y-8">
@@ -524,25 +509,25 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       <div className="bg-[var(--card-bg)] shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'رأس المال المطلوب' : 'CAPEX'}</div>
-                        <div className="text-lg font-black text-emerald-500">{result.financialModel?.totalCapex}</div>
+                        <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'رأس المال المطلوب' : 'CAPEX'}</div>
+                        <div className="text-lg font-black text-[var(--accent-emerald)]">{result.financialModel?.totalCapex}</div>
                       </div>
                       <div className="bg-[var(--card-bg)] shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'التشغيل السنوي' : 'OPEX'}</div>
+                        <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'التشغيل السنوي' : 'OPEX'}</div>
                         <div className="text-lg font-black text-[var(--text-primary)]">{result.financialModel?.annualOpex}</div>
                       </div>
                       <div className="bg-[var(--card-bg)] shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'معدل العائد' : 'ROI'}</div>
-                        <div className="text-lg font-black text-emerald-500">{result.financialModel?.roiPercentage}</div>
+                        <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'معدل العائد' : 'ROI'}</div>
+                        <div className="text-lg font-black text-[var(--accent-emerald)]">{result.financialModel?.roiPercentage}</div>
                       </div>
                       <div className="bg-[var(--card-bg)] shadow-card p-4 rounded-xl border border-[var(--border-glow)]">
-                        <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'فترة الاسترداد' : 'Payback'}</div>
+                        <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'فترة الاسترداد' : 'Payback'}</div>
                         <div className="text-lg font-black text-[#8B5CF6]">{result.financialModel?.paybackPeriod}</div>
                       </div>
                     </div>
 
                     <h3 className="font-bold text-[var(--text-primary)] mb-2 mt-4">{language === 'Arabic' ? 'جدول العوائد للاستثمار' : 'Installment & Return Schedule'}</h3>
-                    <div className="overflow-x-auto text-[10px] sm:text-xs">
+                    <div className="overflow-x-auto text-xs md:text-sm sm:text-xs">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="border-b border-[var(--border-glow)] text-[var(--text-secondary)] uppercase tracking-wider">
@@ -604,11 +589,11 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                     <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                         <div>
-                          <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'أطنان CO2 المستثناة' : 'Tons Saved'}</div>
+                          <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'أطنان CO2 المستثناة' : 'Tons Saved'}</div>
                           <div className="text-xl font-black text-[var(--accent-emerald)] dark:text-emerald-400">{result.carbonCreditPotential?.estimatedTonsSaved}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'القيمة النقدية التقديرية' : 'Est. Monetary Value Range'}</div>
+                          <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold uppercase">{language === 'Arabic' ? 'القيمة النقدية التقديرية' : 'Est. Monetary Value Range'}</div>
                           <div className="text-xl font-black text-[#8B5CF6]">{result.carbonCreditPotential?.monetaryValueRange}</div>
                         </div>
                       </div>
@@ -619,13 +604,13 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                    {/* 13. Investment Proposal */}
                    <section className="bg-amber-600/5 border border-amber-500/20 p-6 rounded-2xl">
                     <h2 className={`text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-4`}>
-                      <div className="w-12 h-12 rounded-xl bg-amber-600/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-amber-600/10 flex items-center justify-center text-[var(--accent-emerald)] border border-amber-500/20 shrink-0">
                         <i className="fas fa-hand-holding-usd text-xl"></i>
                       </div>
                       <span className="leading-tight">13. {language === 'Arabic' ? 'صيغة الاستثمار المعروضة' : 'Investment Proposal Offer'}</span>
                     </h2>
                     <div className="space-y-4 text-sm md:text-base">
-                      <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'المبلغ المطلوب:' : 'Requested Amount:'}</span> <span className="font-black text-amber-500">{result.investmentProposal?.requestedAmount}</span></div>
+                      <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'المبلغ المطلوب:' : 'Requested Amount:'}</span> <span className="font-black text-[var(--accent-emerald)]">{result.investmentProposal?.requestedAmount}</span></div>
                       <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'طريقة السداد:' : 'Repayment Strategy:'}</span> <span className="text-[var(--text-primary)]">{result.investmentProposal?.repaymentStrategy}</span></div>
                       <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'الهيكل وحقوق الملكية:' : 'Equity Structure:'}</span> <span className="text-[var(--text-primary)]">{result.investmentProposal?.equityStructure}</span></div>
                       <div className="flex flex-col md:flex-row md:justify-between"><span className="font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? 'العوائد للمستثمر:' : 'Investor Returns:'}</span> <span className="text-[#10B981]">{result.investmentProposal?.investorReturns}</span></div>
@@ -681,11 +666,11 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                   {/* Recommendations & Partners */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <section>
-                      <h2 className="text-sm font-black text-amber-500 mb-4 flex items-center"><i className="fas fa-lightbulb mr-2"></i>{language === 'Arabic' ? 'توصيات لزيادة فرصة القبول' : 'Recommendations for Approval'}</h2>
+                      <h2 className="text-sm font-black text-[var(--accent-emerald)] mb-4 flex items-center"><i className="fas fa-lightbulb mr-2"></i>{language === 'Arabic' ? 'توصيات لزيادة فرصة القبول' : 'Recommendations for Approval'}</h2>
                         {renderSectionContent(result.fundingRecommendations)}
                     </section>
                     <section>
-                      <h2 className="text-sm font-black text-emerald-500 mb-4 flex items-center"><i className="fas fa-handshake mr-2"></i>{language === 'Arabic' ? 'الشركاء والجهات المقترحة' : 'Suggested Partners in Oman/GCC'}</h2>
+                      <h2 className="text-sm font-black text-[var(--accent-emerald)] mb-4 flex items-center"><i className="fas fa-handshake mr-2"></i>{language === 'Arabic' ? 'الشركاء والجهات المقترحة' : 'Suggested Partners in Oman/GCC'}</h2>
                         {renderSectionContent(result.strategicPartners)}
                     </section>
                   </div>
@@ -698,7 +683,7 @@ export const ProposalGenerator: React.FC<{ language?: 'English' | 'Arabic' }> = 
                           <div key={idx} className="bg-[var(--bg-main)] shadow-card p-4 rounded-xl border border-[var(--border-glow)] flex flex-col md:flex-row md:items-center">
                             <div className="flex-shrink-0 mr-4 mb-2 md:mb-0 w-40 md:border-r border-[var(--border-glow)]">
                                <div className="font-black text-[#8B5CF6] text-sm">{phase.phase}</div>
-                               <div className="text-xs text-[var(--text-secondary)]">{phase.duration}</div>
+                               <div className="text-sm text-[var(--text-secondary)]">{phase.duration}</div>
                             </div>
                             <div className="flex-1 pl-0 md:pl-4">
                                 {renderSectionContent(phase.milestones)}

@@ -27,6 +27,14 @@ service cloud.firestore {
         && data.name is string && data.name.size() > 0 && data.name.size() <= 200;
     }
 
+    function isValidUsage(data) {
+      return data.keys().hasAll(['analysisCount', 'planType', 'lastReset'])
+        && data.analysisCount is number && data.analysisCount >= 0
+        && data.planType is string && (data.planType == 'free' || data.planType == 'researcher' || data.planType == 'investor' || data.planType == 'enterprise')
+        && data.lastReset is string && data.lastReset.size() <= 50
+        && (!data.keys().hasAny(['planExpiry']) || data.planExpiry == null || (data.planExpiry is string && data.planExpiry.size() <= 50));
+    }
+
     function isValidProject(data) {
       return data.keys().hasAll(['titleEn', 'titleAr', 'type', 'location', 'fundingRequired', 'trl', 'authorId', 'authorName', 'status', 'createdAt'])
         && data.titleEn is string && data.titleEn.size() > 0 && data.titleEn.size() <= 200
@@ -65,6 +73,30 @@ service cloud.firestore {
         incoming().diff(existing()).affectedKeys().hasOnly(['name', 'institution', 'fundingCapacity', 'isVerified', 'role'])
       );
       allow delete: if false; // Users shouldn't be deleted via client side normally
+
+      // Usage subcollection - Secure plan types and quotas against unauthorized client privilege escalation
+      match /usage/{docId} {
+        // Allow user to read own usage record only
+        allow read: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(docId);
+        
+        // Client can only initialize default free plan
+        allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(docId)
+          && isValidUsage(incoming())
+          && incoming().planType == 'free'
+          && incoming().planExpiry == null
+          && incoming().analysisCount == 0;
+          
+        // Client CANNOT modify planType or planExpiry (strictly reserved for backend Stripe Webhook Admin SDK)
+        // Client can only increment analysisCount or update lastReset
+        allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(docId)
+          && isValidUsage(incoming())
+          && incoming().planType == existing().planType
+          && incoming().planExpiry == existing().planExpiry
+          && incoming().diff(existing()).affectedKeys().hasOnly(['analysisCount', 'lastReset'])
+          && (incoming().analysisCount == existing().analysisCount + 1 || incoming().analysisCount == 0);
+          
+        allow delete: if false;
+      }
     }
 
     match /projects/{projectId} {

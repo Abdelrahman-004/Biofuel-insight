@@ -41,12 +41,28 @@
         "createdAt": { "type": "timestamp" }
       },
       "required": ["titleEn", "titleAr", "type", "location", "fundingRequired", "trl", "authorId", "authorName", "status", "createdAt"]
+    },
+    "Usage": {
+      "title": "Usage",
+      "description": "User subscription plan and analysis quota tracking.",
+      "type": "object",
+      "properties": {
+        "analysisCount": { "type": "number" },
+        "planType": { "type": "string", "enum": ["free", "researcher", "investor", "enterprise"] },
+        "planExpiry": { "type": "string" },
+        "lastReset": { "type": "string" }
+      },
+      "required": ["analysisCount", "planType", "lastReset"]
     }
   },
   "firestore": {
     "users/{userId}": {
       "schema": { "$ref": "#/entities/User" },
       "description": "Stores user profiles."
+    },
+    "users/{userId}/usage/{docId}": {
+      "schema": { "$ref": "#/entities/Usage" },
+      "description": "Stores user usage quota and subscription plan details."
     },
     "projects/{projectId}": {
       "schema": { "$ref": "#/entities/Project" },

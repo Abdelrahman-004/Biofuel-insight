@@ -1,5 +1,7 @@
+import { Logo } from "./Logo";
 
 import * as React from 'react';
+import { CustomMarkdown } from './CustomMarkdown';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const autoDict: Record<string, string> = {
@@ -66,6 +68,25 @@ const autoDict: Record<string, string> = {
   "Mitigation Strategies:": "استراتيجيات التخفيف:"
 };
 const tt = (key: string | undefined, lang: string) => { if(!key) return key; return lang === 'Arabic' ? (autoDict[key] || key) : key; };
+
+const getFeedstockMetrics = (feedstock: string) => {
+  const fs = (feedstock || '').toLowerCase();
+  
+  if (fs.includes('algae') || fs.includes('طحالب')) return { yield: 0.80, byproduct: "Biomass", byproductAr: "كتلة حيوية", byproductYield: 0.20 };
+  if (fs.includes('date') || fs.includes('نوى') || fs.includes('تمر')) return { yield: 0.15, byproduct: "Animal Feed", byproductAr: "علف حيواني", byproductYield: 0.85 };
+  if (fs.includes('animal') || fs.includes('دهون') || fs.includes('fat')) return { yield: 0.85, byproduct: "Glycerin", byproductAr: "جلسرين", byproductYield: 0.10 };
+  if (fs.includes('agri') || fs.includes('مخلفات') || fs.includes('residue')) return { yield: 0.30, byproduct: "Biochar", byproductAr: "فحم حيوي", byproductYield: 0.25 };
+  if (fs.includes('biogas') || fs.includes('غاز')) return { yield: 0.60, byproduct: "Digestate", byproductAr: "مخلفات هضم", byproductYield: 0.35 };
+  if (fs.includes('bioethanol') || fs.includes('إيثانول')) return { yield: 0.40, byproduct: "DDGS", byproductAr: "حبوب مقطرة", byproductYield: 0.30 };
+  if (fs.includes('jatropha') || fs.includes('جاتروفا')) return { yield: 0.35, byproduct: "Seed Cake", byproductAr: "كسب البذور", byproductYield: 0.60 };
+  if (fs.includes('municipal') || fs.includes('solid') || fs.includes('نفايات')) return { yield: 0.25, byproduct: "Ash", byproductAr: "رماد", byproductYield: 0.15 };
+  if (fs.includes('sewage') || fs.includes('sludge') || fs.includes('صرف') || fs.includes('حمأة')) return { yield: 0.45, byproduct: "Biosolids", byproductAr: "مواد صلبة حيوية", byproductYield: 0.50 };
+  if (fs.includes('fish') || fs.includes('سمك')) return { yield: 0.90, byproduct: "Glycerin", byproductAr: "جلسرين", byproductYield: 0.08 };
+  
+  // Default (UCO)
+  return { yield: 0.93, byproduct: "Glycerin", byproductAr: "جلسرين", byproductYield: 0.10 };
+};
+
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend
 } from 'recharts';
@@ -74,14 +95,22 @@ import { BioFuelAnalysis } from './types';
 interface DashboardProps {
   data: BioFuelAnalysis;
   language?: 'English' | 'Arabic';
+  userPlan?: string;
+  onUpgrade?: () => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English' }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English', userPlan, onUpgrade }) => {
   const [showReport, setShowReport] = React.useState(false);
   
   
   const isArabic = language === 'Arabic';
   const t = (en: string, ar: string) => isArabic ? ar : en;
+
+  const downloadPDF = async () => {
+    
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('dashboard-report', `${"OMAN_ECOSYNC_Feasibility_Analysis_"}${new Date().getTime()}.pdf`);
+  };
 
   const costData = [
     { name: t('Min Invest', 'الحد الأدنى للاستثمار'), value: data?.EconomicFeasibility?.EstimatedInvestmentUSD?.Minimum || 0 },
@@ -109,11 +138,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       ["Feedstock/Energy Type", data.ProjectAnalyzer?.Feedstock || "N/A"],
       ["Feasibility Score", data.FinalFeasibilityScore || 0],
       ["Economic Assessment", data.EconomicFeasibility?.Assessment || "N/A"],
-      ["Payback Period", `${data.EconomicFeasibility?.PaybackPeriodYears || 0} years`],
+      ["Payback Period", data.EconomicFeasibility?.isOperatingDeficit ? "N/A (Deficit)" : (data.EconomicFeasibility?.PaybackFormatted || `${data.EconomicFeasibility?.PaybackPeriodYears || 0} years`)],
       ["Carbon Emissions", `${data.EnvironmentalImpact?.CarbonEmissions_kgCO2_per_liter || 0} kg/L`],
       ["Water Usage", `${data.EnvironmentalImpact?.WaterUsage_liters_per_liter || 0} L/L`]
     ];
-    let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -152,22 +181,68 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       transition={{ duration: 0.5 }}
       className="space-y-8 pb-20"
     >
-      {/* Budget Adequacy Warning */}
+      {/* Budget Adequacy & Capital Advisory Banner */}
       <AnimatePresence>
-        {isBudgetInsufficient && (
+        {budgetAdequacyRatio < 0.85 ? (
           <motion.div 
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="bg-[var(--bg-main)] border-l-4 border-red-500 dark:border-red-600/30 p-4 rounded-xl flex items-center mb-4 shadow-sm dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30"
+            className={`border-l-4 p-4 rounded-xl flex items-center mb-4 shadow-sm ${
+              budgetAdequacyRatio < 0.60 
+                ? "bg-red-50/90 border-red-500 text-red-900 dark:bg-red-950/40 dark:border-red-500 dark:text-red-200"
+                : "bg-amber-50/90 border-amber-500 text-amber-900 dark:bg-amber-950/40 dark:border-amber-500 dark:text-amber-200"
+            }`}
           >
-            <i className="fas fa-exclamation-triangle text-red-700 dark:text-red-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
+            <i className={`fas ${budgetAdequacyRatio < 0.60 ? "fa-exclamation-triangle text-red-600 dark:text-red-400" : "fa-circle-exclamation text-amber-600 dark:text-amber-400"} mr-4 text-xl rtl:ml-4 rtl:mr-0`}></i>
             <div>
-              <p className="text-red-800 dark:text-red-300 font-black text-sm uppercase">{language === 'Arabic' ? 'تم اكتشاف نقص شديد في التمويل' : 'Severe Underfunding Detected'}</p>
-              <p className="text-red-700 dark:text-red-200/80 text-xs font-medium">
+              <p className="font-black text-sm uppercase">
                 {language === 'Arabic' 
-                 ? `ميزانية المستثمر تغطي ${(budgetAdequacyRatio * 100).toFixed(1)}% فقط من النفقات الرأسمالية المطلوبة، يرجى الاستثمار أو البحث عن حلول أخرى.`
-                 : `The investor budget is only ${(budgetAdequacyRatio * 100).toFixed(1)}% of the required realistic CAPEX. Consider scaling down production or securing additional funding.`}
+                  ? (budgetAdequacyRatio < 0.60 ? 'تنبيه: فجوة تمويلية رأسمالية ملحوظة' : 'ملاحظة استثمارية: هامش تمويلي مطلوب')
+                  : (budgetAdequacyRatio < 0.60 ? 'Capital Shortfall Advisory' : 'Moderate Funding Gap Advisory')}
+              </p>
+              <p className="text-xs font-medium mt-0.5 opacity-90">
+                {language === 'Arabic' 
+                  ? `ميزانية المستثمر تغطي ${(budgetAdequacyRatio * 100).toFixed(1)}% من النفقات الرأسمالية الواقعية المقدرة ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}). الفجوة التقديرية: $${(data.EconomicFeasibility?.FundingGapUSD || 0).toLocaleString()}، ويُنصح بطلب تمويل ميسر من بنك التنمية العماني أو إشراك شركاء استراتيجيين.`
+                  : `Investor budget covers ${(budgetAdequacyRatio * 100).toFixed(1)}% of required realistic CAPEX ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}). Funding gap is $${(data.EconomicFeasibility?.FundingGapUSD || 0).toLocaleString()}; consider soft loans via Oman Development Bank or strategic co-equity.`}
+              </p>
+            </div>
+          </motion.div>
+        ) : budgetAdequacyRatio < 1.0 ? (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-blue-50/80 border-l-4 border-blue-500 p-4 rounded-xl flex items-center mb-4 shadow-sm dark:bg-blue-950/30 dark:border-blue-400 text-blue-900 dark:text-blue-200"
+          >
+            <i className="fas fa-circle-info text-blue-600 dark:text-blue-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
+            <div>
+              <p className="font-black text-sm uppercase">
+                {language === 'Arabic' ? 'تغطية تمويلية جيدة مع هامش احتياطي طفيف' : 'Good Capital Coverage with Minor Contingency Buffer'}
+              </p>
+              <p className="text-xs font-medium mt-0.5 opacity-90">
+                {language === 'Arabic' 
+                  ? `ميزانية المستثمر تغطي ${(budgetAdequacyRatio * 100).toFixed(1)}% من التكاليف الرأسمالية ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}). يوصى بتأمين احتياطي طوارئ بنسبة ${(100 - budgetAdequacyRatio * 100).toFixed(1)}% لتغطية أي تباينات مرحلية.`
+                  : `The investor budget covers ${(budgetAdequacyRatio * 100).toFixed(1)}% of benchmark CAPEX ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}). Securing a modest ${(100 - budgetAdequacyRatio * 100).toFixed(1)}% contingency reserve is recommended.`}
+              </p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-emerald-50/80 border-l-4 border-emerald-500 p-4 rounded-xl flex items-center mb-4 shadow-sm dark:bg-emerald-950/30 dark:border-emerald-400 text-emerald-900 dark:text-emerald-200"
+          >
+            <i className="fas fa-circle-check text-emerald-600 dark:text-emerald-400 mr-4 text-xl rtl:ml-4 rtl:mr-0"></i>
+            <div>
+              <p className="font-black text-sm uppercase">
+                {language === 'Arabic' ? `ملاءة رأسمالية ممتازة (تغطية بنسبة ${(budgetAdequacyRatio * 100).toFixed(0)}%)` : `Optimal Capital Coverage (${(budgetAdequacyRatio * 100).toFixed(0)}% Funded)`}
+              </p>
+              <p className="text-xs font-medium mt-0.5 opacity-90">
+                {language === 'Arabic' 
+                  ? `الميزانية المخصصة تغطي التكاليف الرأسمالية الواقعية المقدرة ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}) بالكامل مع وجود فائض مالي مريح لرأس المال العامل والاحتياطيات التشغيلية.`
+                  : `The investor budget fully covers benchmark CAPEX ($${(data.EconomicFeasibility?.RealisticRequiredCAPEX || 0).toLocaleString()}) with an adequate capital buffer for working capital and ramp-up.`}
               </p>
             </div>
           </motion.div>
@@ -189,20 +264,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               className="max-w-5xl mx-auto bg-[var(--card-bg)] shadow-card  rounded-3xl  overflow-hidden border border-[var(--border-glow)]"
             >
             {/* Header */}
-            <div className="bg-[var(--card-bg)] shadow-card px-8 py-6 flex justify-between items-center border-b border-[var(--border-glow)]">
+            <div className="bg-[var(--card-bg)] shadow-card px-8 py-6 flex justify-between items-center border-b border-[var(--border-glow)] no-print">
               <div>
                 <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">{t("Official Investment-Grade Report", "التقرير الرسمي للجدوى الاستثمارية")}</h2>
                 <p className="text-[var(--text-secondary)] text-xs font-medium uppercase tracking-widest mt-1">Project: {data?.ProjectAnalyzer?.ProjectName || 'Unnamed'}</p>
               </div>
-              <button 
-                onClick={() => setShowReport(false)}
-                className="w-10 h-10 rounded-full bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/10 text-[var(--text-primary)] flex items-center justify-center hover:bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/20 transition"
-              >
-                <i className="fas fa-times"></i>
-              </button>
+              <div className="flex space-x-3 rtl:space-x-reverse">
+                <button 
+                  onClick={downloadPDF}
+                  className="px-4 py-2 bg-emerald-700 dark:bg-emerald-600 text-sm font-bold rounded-lg hover:bg-[var(--accent-emerald)] transition flex items-center shadow-card"
+                >
+                  <i className="fas fa-file-pdf mr-2 rtl:ml-2 rtl:mr-0"></i>{t("Download PDF", "تحميل PDF")}
+                </button>
+                <button 
+                  onClick={() => setShowReport(false)}
+                  className="w-10 h-10 rounded-full bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/10 text-[var(--text-primary)] flex items-center justify-center hover:bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/20 transition"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
             </div>
 
-            <div className="p-8 space-y-10">
+            <div id="dashboard-report" className="p-8 space-y-10 relative print-container">
+              {/* PDF BRANDING HEADER */}
+              <div className="absolute top-8 left-8 right-8 flex justify-between items-start select-none pointer-events-none pb-20 print-only">
+                <Logo className="h-8" isArabic={language === 'Arabic'} />
+                <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right text-[var(--text-secondary)]">
+                  {language === 'Arabic' ? 'التحليل الرسمي' : 'Official Analysis'}
+                </div>
+              </div>
               {/* AI Breakdown Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
@@ -216,19 +306,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Installed Capacity", "القدرة المثبتة")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Installed Capacity", "القدرة المثبتة")}</p>
                       <p className="text-sm font-black text-[var(--text-secondary)] ">{data?.TechnicalAI?.InstalledCapacity || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Energy Output", "إنتاج الطاقة")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Energy Output", "إنتاج الطاقة")}</p>
                       <p className="text-sm font-black text-[var(--text-secondary)] ">{data?.TechnicalAI?.EnergyOutput || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Benchmark CAPEX", "النفقات الرأسمالية المعيارية")}</p>
-                      <p className="text-xs font-bold text-[var(--text-secondary)]">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Benchmark CAPEX", "النفقات الرأسمالية المعيارية")}</p>
+                      <p className="text-sm font-bold text-[var(--text-secondary)]">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("TRL Level", "مستوى الجاهزية التكنولوجية")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("TRL Level", "مستوى الجاهزية التكنولوجية")}</p>
                       <p className="text-sm font-black text-blue-700 dark:text-blue-400">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
                     </div>
                   </div>
@@ -244,23 +334,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Realistic CAPEX", "النفقات الرأسمالية الواقعية")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Realistic CAPEX", "النفقات الرأسمالية الواقعية")}</p>
                       <p className="text-sm font-black text-[var(--text-secondary)] ">{formatCurrency(data?.FinancialAI?.RealisticCAPEX || 0)}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</p>
                       <p className="text-sm font-black text-[var(--text-secondary)] ">{formatCurrency(data?.FinancialAI?.OPEX || 0)}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Payback Period", "فترة الاسترداد")}</p>
-                      <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.FinancialAI?.PaybackYears || 0} Years</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Payback Period", "فترة الاسترداد")}</p>
+                      <p className={`text-sm font-black ${data?.EconomicFeasibility?.isOperatingDeficit ? 'text-red-700 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                        {data?.EconomicFeasibility?.isOperatingDeficit 
+                          ? (isArabic ? 'غير متاح (عجز)' : 'N/A (Deficit)') 
+                          : (data?.EconomicFeasibility?.PaybackFormatted || `${data?.FinancialAI?.PaybackYears || 0} ${isArabic ? 'سنوات' : 'Years'}`)}
+                      </p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("IRR (Est.)", "معدل العائد الداخلي (تقديري)")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("IRR (Est.)", "معدل العائد الداخلي (تقديري)")}</p>
                       <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.FinancialAI?.IRR_Simplified || 'N/A'}</p>
                     </div>
                     <div className="col-span-2 p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase mb-1">{t("LCOE / Unit Cost", "التكلفة المستوية للطاقة / تكلفة الوحدة")}</p>
+                      <p className="text-xs md:text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase mb-1">{t("LCOE / Unit Cost", "التكلفة المستوية للطاقة / تكلفة الوحدة")}</p>
                       <p className="text-sm font-black text-emerald-800 dark:text-emerald-300">{data?.FinancialAI?.LCOE_or_CostPerTon || 'N/A'}</p>
                     </div>
                   </div>
@@ -276,8 +370,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   </div>
                   <div className="p-5 bg-[var(--card-bg)] shadow-card rounded-2xl text-[var(--text-primary)] space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-[var(--text-secondary)]">{t("Audit Classification", "تصنيف التدقيق")}</span>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                      <span className="text-sm text-[var(--text-secondary)]">{t("Audit Classification", "تصنيف التدقيق")}</span>
+                      <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-black uppercase ${
                         data?.AuditorAI?.Classification === 'Pass' ? 'bg-[var(--accent-emerald)] text-white' : 
                         data?.AuditorAI?.Classification === 'Needs Revision' ? 'bg-amber-600 text-black dark:text-amber-950 font-bold' : 'bg-red-700 text-white dark:bg-red-700 dark:bg-red-600'
                       }`}>
@@ -295,17 +389,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                       </div>
                     </div>
                     <div className="pt-4 border-t border-[var(--border-glow)]">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Stress Test Results", "نتائج اختبار تحمل الضغط")}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Stress Test Results", "نتائج اختبار تحمل الضغط")}</p>
                       <div className="grid grid-cols-1 gap-2">
-                        <div className="text-[10px] flex justify-between">
+                        <div className="text-xs md:text-sm flex justify-between">
                           <span className="text-[var(--text-secondary)]">{t("Revenue -10%", "الإيرادات -10%")}</span>
                           <span className="text-[var(--text-primary)] font-medium">{data?.AuditorAI?.StressTestResults?.RevenueMinus10 || 'N/A'}</span>
                         </div>
-                        <div className="text-[10px] flex justify-between">
+                        <div className="text-xs md:text-sm flex justify-between">
                           <span className="text-[var(--text-secondary)]">{t("OPEX +15%", "نفقات التشغيل +15%")}</span>
                           <span className="text-[var(--text-primary)] font-medium">{data?.AuditorAI?.StressTestResults?.OPEXPlus15 || 'N/A'}</span>
                         </div>
-                        <div className="text-[10px] flex justify-between">
+                        <div className="text-xs md:text-sm flex justify-between">
                           <span className="text-[var(--text-secondary)]">{t("Production -10%", "الإنتاج -10%")}</span>
                           <span className="text-[var(--text-primary)] font-medium">{data?.AuditorAI?.StressTestResults?.ProductionMinus10 || 'N/A'}</span>
                         </div>
@@ -325,13 +419,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Capital Adequacy", "كفاية رأس المال")}</p>
+                        <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Capital Adequacy", "كفاية رأس المال")}</p>
                         <p className={`text-sm font-black ${(data?.RiskAI?.CapitalAdequacyRatio || 0) >= 0.9 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
                           {data?.RiskAI?.CapitalAdequacyRatio?.toFixed(2) || '0.00'}
                         </p>
                       </div>
                       <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                        <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Risk Level", "مستوى الخطر")}</p>
+                        <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Risk Level", "مستوى الخطر")}</p>
                         <p className={`text-sm font-black ${
                           data?.RiskAI?.RiskClassification === 'Moderate' ? 'text-emerald-700 dark:text-emerald-400' : 
                           data?.RiskAI?.RiskClassification === 'Significant' ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'
@@ -342,17 +436,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)] space-y-3">
                       <div>
-                        <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Market Volatility", "تقلبات السوق")}</p>
-                        <p className="text-xs text-[var(--text-secondary)] font-medium">{data?.RiskAI?.MarketVolatility || 'N/A'}</p>
+                        <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Market Volatility", "تقلبات السوق")}</p>
+                        <p className="text-sm text-[var(--text-secondary)] font-medium">{data?.RiskAI?.MarketVolatility || 'N/A'}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Regulatory Risk", "المخاطر التنظيمية")}</p>
-                        <p className="text-xs text-[var(--text-secondary)] font-medium">{data?.RiskAI?.RegulatoryRisk || 'N/A'}</p>
+                        <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Regulatory Risk", "المخاطر التنظيمية")}</p>
+                        <p className="text-sm text-[var(--text-secondary)] font-medium">{data?.RiskAI?.RegulatoryRisk || 'N/A'}</p>
                       </div>
                       {data?.ProjectAnalyzer?.TechnologyCategory === 'Biofuel' && (
                         <div>
-                          <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Feedstock Stability", "استقرار المواد الخام")}</p>
-                          <p className="text-xs text-[var(--text-secondary)] font-medium">{data?.RiskAI?.FeedstockStability || 'N/A'}</p>
+                          <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Feedstock Stability", "استقرار المواد الخام")}</p>
+                          <p className="text-sm text-[var(--text-secondary)] font-medium">{data?.RiskAI?.FeedstockStability || 'N/A'}</p>
                         </div>
                       )}
                     </div>
@@ -362,17 +456,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               </div>
 
               {/* Footer */}
-              <div className="bg-[var(--bg-main)] -mx-8 -mb-8 p-8 border-t border-[var(--border-glow)] flex justify-between items-center">
+              <div className="bg-[var(--bg-main)] -mx-8 -mb-8 p-8 border-t border-[var(--border-glow)] flex justify-between items-center no-print">
                 <div className="flex items-center space-x-4">
                   <img src="https://picsum.photos/seed/oman/40/40" className="w-10 h-10 rounded-full grayscale opacity-50" referrerPolicy="no-referrer" />
                   <div>
-                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{t("Report Generated By", "أُنشئ التقرير بواسطة")}</p>
+                    <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">{t("Report Generated By", "أُنشئ التقرير بواسطة")}</p>
                     <p className="text-xs font-black text-[var(--text-secondary)]">{t("BioFuel Insight AI Engine v2.5", "محرك الذكاء الاصطناعي BioFuel Insight v2.5")}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => window.print()}
-                  className="px-6 py-2 bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] text-xs font-bold rounded-lg hover:bg-[var(--bg-main)] transition"
+                  className="px-6 py-2 bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] text-sm font-bold rounded-lg hover:bg-[var(--bg-main)] transition"
                 >
                   <i className="fas fa-print mr-2"></i>{t("Print Report", "طباعة التقرير")}</button>
               </div>
@@ -392,7 +486,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         <div>
           <div className="flex items-center space-x-3 mb-1">
             <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">{data?.ProjectAnalyzer?.ProjectName || tt('Project Analysis', language)}</h2>
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${getRiskColor(data?.RiskExposureLevel || 'N/A')}`}>
+            <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-black uppercase border ${getRiskColor(data?.RiskExposureLevel || 'N/A')}`}>
               {language === 'Arabic' ? `التعرض للمخاطر: ${tt(data?.RiskExposureLevel, language)}` : `${data?.RiskExposureLevel || 'N/A'} Risk Exposure`}
             </span>
           </div>
@@ -405,16 +499,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         <div className="flex space-x-3">
           <button 
             onClick={() => setShowReport(true)}
-            className="px-4 py-2 bg-emerald-700 dark:bg-emerald-600 text-xs font-bold rounded-lg hover:bg-[var(--accent-emerald)] transition flex items-center shadow-card"
+            className="px-4 py-2 bg-emerald-700 dark:bg-emerald-600 text-sm font-bold rounded-lg hover:bg-[var(--accent-emerald)] transition flex items-center shadow-card"
           >
             <i className="fas fa-file-contract mr-2 rtl:ml-2 rtl:mr-0"></i>{t("Official Report", "التقرير الرسمي")}</button>
           <button 
             onClick={exportToCSV}
-            className="px-4 py-2 bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] text-xs font-bold rounded-lg hover:bg-[var(--bg-main)] transition flex items-center shadow-card"
+            className="px-4 py-2 bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] text-sm font-bold rounded-lg hover:bg-[var(--bg-main)] transition flex items-center shadow-card"
           >
             <i className="fas fa-download mr-2 rtl:ml-2 rtl:mr-0"></i>{t("Export CSV", "تصدير CSV")}</button>
         </div>
       </motion.div>
+
+
 
       {/* Primary Investment Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -430,7 +526,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <div className="flex flex-col items-center py-4">
             <span className={`text-5xl font-black ${scoreAssets.color}`}>{data.FinalFeasibilityScore}%</span>
           </div>
-          <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-2">{t("Feasibility Score", "درجة الجدوى")}</p>
+          <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-2">{t("Feasibility Score", "درجة الجدوى")}</p>
           <p className="text-[8px] text-[var(--text-secondary)] text-center mt-1 italic px-2 leading-tight">{scoreAssets.description}</p>
         </motion.div>
         
@@ -440,14 +536,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           transition={{ delay: 0.3 }}
           className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
-          <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Investment Verdict", "قرار الاستثمار")}</div>
+          <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Investment Verdict", "قرار الاستثمار")}</div>
           <div className={`text-lg font-black leading-tight ${
             data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-700 dark:text-emerald-400' : 
             data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'
           }`}>
             {t("Rating:", "التقييم:")} {data.DynamicScores?.overallViabilityRating || 'N/A'}
           </div>
-          <div className="mt-2 text-[10px] font-bold text-[var(--text-secondary)] italic">{tt(data?.EconomicFeasibility?.InvestmentVerdict, language || 'Arabic')}</div>
+          <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">{tt(data?.EconomicFeasibility?.InvestmentVerdict, language || 'Arabic')}</div>
         </motion.div>
 
         <motion.div 
@@ -456,20 +552,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           transition={{ delay: 0.4 }}
           className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
-          <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Payback Period", "فترة الاسترداد")}</div>
-          <div className="text-3xl font-black text-[var(--text-secondary)] ">{data.EconomicFeasibility.PaybackPeriodYears} <span className="text-sm font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? "سنوات" : "Years"}</span></div>
-          <div className="mt-2 text-[10px] font-bold text-[var(--text-secondary)] italic">{language === 'Arabic' ? "عائد الاستثمار للمشروع" : "Project ROI"}</div>
+          <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Payback Period", "فترة الاسترداد")}</div>
+          {data.EconomicFeasibility?.isOperatingDeficit || (data.EconomicFeasibility.PaybackPeriodYears <= 0) ? (
+            <div className="text-2xl font-black text-red-700 dark:text-red-400">
+              {data.EconomicFeasibility?.PaybackFormatted || (isArabic ? "غير متاح (عجز)" : "N/A (Deficit)")}
+            </div>
+          ) : (
+            <div className="text-3xl font-black text-[var(--text-secondary)] ">
+              {data.EconomicFeasibility.PaybackPeriodYears} <span className="text-sm font-bold text-[var(--text-secondary)]">{language === 'Arabic' ? "سنوات" : "Years"}</span>
+            </div>
+          )}
+          <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">
+            {data.EconomicFeasibility?.isOperatingDeficit ? (language === 'Arabic' ? "عجز تشغيلي سنوي" : "Operating Cash Deficit") : (language === 'Arabic' ? "عائد الاستثمار للمشروع" : "Project ROI")}
+          </div>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
+          className="bg-[var(--card-bg)] shadow-card p-6 rounded-2xl border border-[var(--border-glow)] flex flex-col justify-center"
         >
-          <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Corporate Tax (Oman)", "ضريبة الشركات (عُمان)")}</div>
-          <div className="text-2xl font-black text-[var(--text-secondary)] ">15% <span className="text-[10px] text-[var(--text-secondary)]">{t("Applied", "مُطبقة")}</span></div>
-          <div className="mt-2 text-[8px] text-[var(--text-secondary)] italic">{t("Net Profit After Tax included in IRR", "يشمل معدل العائد الداخلي صافي الربح بعد الضريبة")}</div>
+          <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Corporate Tax (Oman)", "ضريبة الشركات (عُمان)")}</div>
+          <div className="text-2xl font-black text-[var(--text-primary)]">
+            {data.OmanLogic?.corporateTaxApplied?.includes("0%") ? (
+              <span className="text-emerald-700 dark:text-emerald-400">0% <span className="text-xs md:text-sm font-bold text-[var(--text-secondary)]">{t("Free Zone", "منطقة حرة")}</span></span>
+            ) : (
+              <span>15% <span className="text-xs md:text-sm font-bold text-[var(--text-secondary)]">{t("Applied", "مُطبقة")}</span></span>
+            )}
+          </div>
+          <div className="mt-2 text-[8px] text-[var(--text-secondary)] italic">
+            {data.OmanLogic?.corporateTaxApplied?.includes("0%") 
+              ? t("Statutory Free Zone exemption applied", "إعفاء ضريبي ساري للمناطق الاقتصادية الخاصة")
+              : t("Net Profit After Tax included in IRR", "يشمل معدل العائد الداخلي صافي الربح بعد الضريبة")}
+          </div>
         </motion.div>
       </div>
 
@@ -477,7 +593,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]">
            <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-widest mb-6 flex items-center">
-            <i className="fas fa-chart-pie mr-2 text-indigo-500"></i>{t("Dynamic AI Scoring", "التسجيل الديناميكي للذكاء الاصطناعي")}</h3>
+            <i className="fas fa-chart-pie mr-2 text-[var(--accent-emerald)]"></i>{t("Dynamic AI Scoring", "التسجيل الديناميكي للذكاء الاصطناعي")}</h3>
            <div className="space-y-6">
              {[
                { label: 'Economic stability', score: data.DynamicScores?.economicScore || 0, weight: '40%', color: 'from-blue-500 to-indigo-600' },
@@ -506,27 +622,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <i className="fas fa-search-plus mr-2 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("SWOT Intelligence Analyze", "تحليل ذكاء SWOT")}</h3>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <h4 className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase mb-2">{t("Strengths", "نقاط القوة")}</h4>
+              <h4 className="text-xs md:text-sm font-black text-emerald-700 dark:text-emerald-400 uppercase mb-2">{t("Strengths", "نقاط القوة")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-emerald-700 dark:text-emerald-400/50"></i> {s}</li>)}
+                {data.DynamicScores?.swotAnalysis.strengths.map((s, i) => <li key={i} className="text-sm text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-plus-circle mr-2 mt-1 text-emerald-700 dark:text-emerald-400/50"></i> {s}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase mb-2">{t("Opportunities", "الفرص")}</h4>
+              <h4 className="text-xs md:text-sm font-black text-blue-700 dark:text-blue-400 uppercase mb-2">{t("Opportunities", "الفرص")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-700 dark:text-blue-400/50"></i> {o}</li>)}
+                {data.DynamicScores?.swotAnalysis.opportunities.map((o, i) => <li key={i} className="text-sm text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-arrow-up mr-2 mt-1 text-blue-700 dark:text-blue-400/50"></i> {o}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase mb-2">{t("Weaknesses", "نقاط الضعف")}</h4>
+              <h4 className="text-xs md:text-sm font-black text-amber-700 dark:text-amber-400 uppercase mb-2">{t("Weaknesses", "نقاط الضعف")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-700 dark:text-amber-400/50"></i> {w}</li>)}
+                {data.DynamicScores?.swotAnalysis.weaknesses.map((w, i) => <li key={i} className="text-sm text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-minus-circle mr-2 mt-1 text-amber-700 dark:text-amber-400/50"></i> {w}</li>)}
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black text-red-700 dark:text-red-400 uppercase mb-2">{t("Threats", "التهديدات")}</h4>
+              <h4 className="text-xs md:text-sm font-black text-red-700 dark:text-red-400 uppercase mb-2">{t("Threats", "التهديدات")}</h4>
               <ul className="space-y-1">
-                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-[11px] text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-700 dark:text-red-400/50"></i> {t}</li>)}
+                {data.DynamicScores?.swotAnalysis.threats.map((t, i) => <li key={i} className="text-sm text-[var(--text-primary)] font-medium flex items-start"><i className="fas fa-exclamation-circle mr-2 mt-1 text-red-700 dark:text-red-400/50"></i> {t}</li>)}
               </ul>
             </div>
           </div>
@@ -540,23 +656,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <i className="fas fa-landmark mr-2 text-blue-700 dark:text-blue-400"></i>{t("Omani Localization Logic", "منطق التوطين العماني")}</h3>
           <div className="space-y-4">
             <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industry Tax (Oman)", "ضريبة الصناعة (عُمان)")}</p>
-              <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{data.OmanLogic?.corporateTaxApplied}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industry Tax (Oman)", "ضريبة الصناعة (عُمان)")}</p>
+              <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{data.OmanLogic?.corporateTaxApplied}</p>
             </div>
             <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
+                <p className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-400 uppercase mb-1">{t("Omanization Cost Allocation", "تخصيص تكلفة التعمين")}</p>
                 <p className="text-lg font-black text-blue-900">{data.OmanLogic?.omanizationCostEstimate.OMR} OMR / Year</p>
-                <p className="text-[10px] text-blue-700 dark:text-blue-400 italic">{t("35% Minimum Quota Applied", "الحد الأدنى مطبق بنسبة 35%")}</p>
+                <p className="text-xs md:text-sm text-blue-700 dark:text-blue-400 italic">{t("35% Minimum Quota Applied", "الحد الأدنى مطبق بنسبة 35%")}</p>
               </div>
               <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-3 rounded-xl shadow-sm text-center">
-                 <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{t("In USD", "بالدولار الأمريكي")}</p>
+                 <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase">{t("In USD", "بالدولار الأمريكي")}</p>
                  <p className="text-xs font-black text-[var(--text-primary)]">{data.OmanLogic?.omanizationCostEstimate.USD}</p>
               </div>
             </div>
             <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industrial Utility Tariffs", "تعرفة المرافق الصناعية")}</p>
-              <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">{data.OmanLogic?.utilityTariffDetails}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-2">{t("Industrial Utility Tariffs", "تعرفة المرافق الصناعية")}</p>
+              <p className="text-sm text-[var(--text-secondary)] italic leading-relaxed">{data.OmanLogic?.utilityTariffDetails}</p>
             </div>
           </div>
         </div>
@@ -572,8 +688,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 <div className="absolute left-3 w-2.5 h-2.5 rounded-full bg-[var(--accent-emerald)] border-2 border-white"></div>
                 <div>
                   <h4 className="text-xs font-black text-[var(--text-secondary)] ">{permit.name}</h4>
-                  <p className="text-[10px] text-[var(--text-secondary)] font-medium">{permit.description}</p>
-                  <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold italic mt-1 flex items-center">
+                  <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium">{permit.description}</p>
+                  <p className="text-xs md:text-sm text-emerald-700 dark:text-emerald-400 font-bold italic mt-1 flex items-center">
                     <i className="fas fa-clock mr-1"></i> {permit.estimatedTime}
                   </p>
                 </div>
@@ -581,20 +697,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             ))}
           </div>
           <div className="mt-4 p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-center">
-            <p className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase italic">Primary Authority: {data.LegalRoadmap?.authority}</p>
+            <p className="text-xs md:text-sm font-bold text-emerald-800 dark:text-emerald-300 uppercase italic">Primary Authority: {data.LegalRoadmap?.authority}</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Executive Summary */}
-        <div className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-slate-50 dark:from-indigo-900/40 dark:to-slate-900/40 p-8 rounded-3xl shadow-card text-[var(--text-primary)] border border-[var(--border-glow)]">
-           <h3 className="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center">
+        <div className="md:col-span-2 bg-[var(--card-bg)] p-8 rounded-3xl shadow-card text-[var(--text-primary)] border border-[var(--border-glow)]">
+           <h3 className="text-sm font-black text-[var(--accent-emerald)] uppercase tracking-widest mb-4 flex items-center">
             <i className="fas fa-scroll mr-2"></i>{t("Executive Summary (AI Generated)", "الملخص التنفيذي (من إنشاء الذكاء الاصطناعي)")}</h3>
-           <p className="text-lg font-light leading-relaxed mb-6 italic text-indigo-900 dark:text-indigo-100">
-             "{data.ExecutiveSummary}"
-           </p>
-           <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-3 rounded-xl border border-[var(--border-glow)] w-fit">
+           <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{data.ExecutiveSummary}</CustomMarkdown></div></div>
+           <div className="flex items-center space-x-3 text-xs md:text-sm font-black uppercase tracking-widest text-[var(--accent-emerald)] dark:text-emerald-400 bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-3 rounded-xl border border-[var(--border-glow)] w-fit">
               <i className="fas fa-flag text-sm"></i>
               <span>{t("Aligned with Oman Vision 2040 Economic Diversification", "متوافق مع التنويع الاقتصادي لرؤية عُمان 2040")}</span>
            </div>
@@ -604,14 +718,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         <div className="bg-[var(--card-bg)] shadow-card   border-[var(--border-glow)] hover:border-var(--accent-emerald) p-6 rounded-3xl border border-[var(--border-glow)] shadow-sm">
            <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-4 flex items-center">
             <i className="fas fa-robot mr-2 text-amber-700 dark:text-amber-400"></i>{t("Monte Carlo Summary", "ملخص مونت كارلو")}</h3>
-           <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
+           <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
              {data.AdvancedSensitivity?.monteCarloSummary}
            </p>
            <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)]">
              <p className="text-[9px] font-black text-amber-700 uppercase mb-2 tracking-widest">{t("Stress Test: 10% Market Price Drop", "اختبار الضغط: انخفاض سعر السوق بنسبة 10%")}</p>
              <div className="flex justify-between items-center">
                <div>
-                 <p className="text-xs font-bold text-[var(--text-secondary)]">{t("New Payback", "استرداد جديد")}</p>
+                 <p className="text-sm font-bold text-[var(--text-secondary)]">{t("New Payback", "استرداد جديد")}</p>
                  <p className="text-lg font-black text-amber-700 dark:text-amber-400">{data.AdvancedSensitivity?.sellingPriceDropImpact.newPaybackPeriod}</p>
                </div>
                <div className="text-right">
@@ -629,57 +743,143 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <div className="bg-[var(--card-bg)] shadow-card px-6 py-4 flex justify-between items-center">
             <h3 className="text-[var(--text-primary)] font-bold text-sm flex items-center">
               <i className="fas fa-file-invoice-dollar mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Financial Performance Metrics", "مقاييس الأداء المالي")}</h3>
-            <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{t("Industrial Benchmarks Applied", "تم تطبيق المعايير الصناعية")}</span>
+            <span className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase">{t("Industrial Benchmarks Applied", "تم تطبيق المعايير الصناعية")}</span>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Realistic Required CAPEX", "النفقات الرأسمالية المطلوبة الواقعية")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Realistic Required CAPEX", "النفقات الرأسمالية المطلوبة الواقعية")}</span>
                 <span className="text-sm font-black text-[var(--text-secondary)] ">{formatCurrency(data.EconomicFeasibility.RealisticRequiredCAPEX)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Investor Budget", "ميزانية المستثمر")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Investor Budget", "ميزانية المستثمر")}</span>
                 <span className="text-sm font-black text-[var(--text-secondary)] ">{formatCurrency(data.ProjectAnalyzer.PreliminaryBudgetUSD || 0)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Funding Gap", "فجوة التمويل")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Funding Gap", "فجوة التمويل")}</span>
                 <span className={`text-sm font-black ${data.EconomicFeasibility.FundingGapUSD > 0 ? 'text-red-700 dark:text-red-400' : 'text-[var(--accent-emerald)] dark:text-emerald-400'}`}>
                   {formatCurrency(data.EconomicFeasibility.FundingGapUSD)} ({data.EconomicFeasibility.FundingGapPercentage.toFixed(1)}%)
                 </span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">Installed Cost per {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'kg' : 'kW'}</span>
-                <span className="text-sm font-black text-[var(--text-secondary)] ">${data.EconomicFeasibility.InstalledCostPerUnit.toFixed(2)}/{data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'kg' : 'kW'}</span>
+                <span className="text-sm text-[var(--text-secondary)]">Installed Cost per {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'Ton' : 'kW'}</span>
+                <span className="text-sm font-black text-[var(--text-secondary)] ">${data.EconomicFeasibility.InstalledCostPerUnit.toFixed(2)}/{data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'Ton' : 'kW'}</span>
               </div>
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Annual Revenue", "الإيرادات السنوية")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Annual Revenue", "الإيرادات السنوية")}</span>
                 <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">{formatCurrency(data.EconomicFeasibility.AnnualRevenue)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</span>
                 <span className="text-sm font-black text-red-700 dark:text-red-400">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Gross Profit", "إجمالي الربح")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Gross Profit", "إجمالي الربح")}</span>
                 <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
                    {formatCurrency(data.EconomicFeasibility.GrossProfit)}
                 </span>
               </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                <span className="text-xs text-[var(--text-secondary)]">{t("Annual Production", "الإنتاج السنوي")}</span>
+                <span className="text-sm text-[var(--text-secondary)]">{t("Annual Production", "الإنتاج السنوي")}</span>
                 <span className="text-sm font-black text-[var(--text-secondary)] ">
                   {data.ProjectAnalyzer.ExpectedProduction?.toLocaleString()} {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'Tons' : 'MWh'}
                 </span>
               </div>
             </div>
           </div>
+
+          {/* Technical Production & Input Breakdown Details */}
+          <div className="px-6 pb-6 border-t border-[var(--border-glow)] pt-4">
+            {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? (
+              <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-xs space-y-3">
+                <div className="flex items-center gap-2 text-[var(--accent-emerald)] font-bold text-sm">
+                  <i className="fas fa-calculator text-base"></i>
+                  <span>{language === 'Arabic' ? "تفاصيل حساب وجدوى كميات الإنتاج واللقيم:" : "Production & Feedstock Feasibility Calculations Details:"}</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 text-[var(--text-secondary)]">
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "معدل الإنتاج اليومي المقدر:" : "Est. Daily Production Rate:"}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 300).toFixed(2)} {language === 'Arabic' ? "طن/يوم تشغيلي" : "Tons/operating day"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "معدل معالجة اللقيم الساعي:" : "Hourly Processing Rate:"}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 300 / 24).toFixed(3)} {language === 'Arabic' ? "طن/ساعة" : "Tons/hour"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? `اللقيم المطلوب سنويًا (بكفاءة تحويل ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}٪):` : `Required Feedstock Input/yr (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}% conversion):`}</span>
+                    <span className="font-bold text-[var(--accent-emerald)]">
+                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) / getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield).toLocaleString()} {language === 'Arabic' ? `طن/سنة من اللقيم` : `Tons/year Feedstock`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? `استعادة ${getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductAr} كمنتج ثانوي (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield) * 100)}٪):` : `Est. ${getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproduct} Byproduct Recovery (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield) * 100)}%):`}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) * getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield).toLocaleString()} {language === 'Arabic' ? `طن/سنة` : `Tons/year`}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-[var(--text-secondary)] italic leading-relaxed pt-1 flex items-start gap-1.5">
+                  <i className="fas fa-info-circle text-xs mt-0.5 text-blue-500"></i>
+                  <span>
+                    {language === 'Arabic' 
+                      ? `تم احتساب هذه المقاييس بناءً على معايير تشغيلية لبيئة عُمان (300 يوم تشغيلي سنويًا، كفاءة تحويل قياسية ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}٪، ونسبة استرداد للمنتج الثانوي).`
+                      : `These details are modeled on regional industrial benchmarks (300 operating days, ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}% conversion yield, and specific byproduct recovery).`}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-xs space-y-3">
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-bold text-sm">
+                  <i className="fas fa-charging-station text-base"></i>
+                  <span>{language === 'Arabic' ? "تفاصيل القدرة التشغيلية والتوليد السنوي:" : "Operational Capacity & Annual Generation Details:"}</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 text-[var(--text-secondary)]">
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "التوليد اليومي المقدر:" : "Est. Daily Generation:"}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 365).toFixed(2)} {language === 'Arabic' ? "ميجاوات/يوم" : "MWh/day"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "تجنب انبعاثات ثاني أكسيد الكربون سنويًا:" : "Est. CO2 Emissions Avoided/yr:"}</span>
+                    <span className="font-bold text-[var(--accent-emerald)] dark:text-emerald-400">
+                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) * 0.72).toLocaleString()} {language === 'Arabic' ? "طن CO₂/سنة" : "Tons CO₂/year"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "ساعات الذروة الشمسية/الرياح المقدرة:" : "Average Equivalent Peak Hours/day:"}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {(((data.ProjectAnalyzer.ExpectedProduction || 0) * 1000) / ((parseFloat(data.TechnicalAI.InstalledCapacity.replace(/[^0-9.]/g, '')) || 1000) * 365)).toFixed(2)} hrs/day
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
+                    <span>{language === 'Arabic' ? "عامل السعة المقدر:" : "Est. System Capacity Factor:"}</span>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      {(((data.ProjectAnalyzer.ExpectedProduction || 0) * 1000) / ((parseFloat(data.TechnicalAI.InstalledCapacity.replace(/[^0-9.]/g, '')) || 1000) * 8760) * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-[var(--text-secondary)] italic leading-relaxed pt-1 flex items-start gap-1.5">
+                  <i className="fas fa-info-circle text-xs mt-0.5 text-blue-500"></i>
+                  <span>
+                    {language === 'Arabic' 
+                      ? "تستند الحسابات إلى متوسط معدل الإشعاع الشمسي السنوي العالي في سلطنة عُمان (خاصة في الدقم ومسقط) أو سرعة الرياح في محافظة ظفار (سعة 35٪ كعامل سنوي) مع مراعاة تأثير درجات الحرارة المرتفعة على كفاءة الألواح."
+                      : "Calculations utilize high annual direct normal irradiance in Oman (Duqm/Muscat solar profile) or Dhofar wind monsoons (35% onshore capacity factor) adjusted for heat-induced degradation and local system performance ratios."}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           <div className="bg-[var(--bg-main)] p-4 border-t border-[var(--border-glow)]">
-            <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">
+            <div className="text-sm text-[var(--text-secondary)] italic leading-relaxed">
               <i className="fas fa-info-circle mr-2 text-blue-700 dark:text-blue-400"></i>
-              {data.Rationale}
-            </p>
+              <div className="markdown-body"><CustomMarkdown>{data.Rationale}</CustomMarkdown></div></div>
           </div>
         </div>
 
@@ -689,30 +889,102 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             <h3 className="text-[var(--text-primary)] font-bold text-sm flex items-center">
               <i className="fas fa-vial mr-3 text-amber-700 dark:text-amber-400"></i>{t("Sensitivity Stress Tests", "اختبارات تحمل الحساسية")}</h3>
           </div>
-          <div className="p-6 flex-grow space-y-6">
+          <div className="p-6 flex-grow space-y-4">
+            {/* Break-even banner if operating deficit */}
+            {data.SensitivityAnalysis.IsOperatingDeficit && data.SensitivityAnalysis.BreakEvenSellingPriceUSD && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs flex items-center justify-between text-amber-800 dark:text-amber-300">
+                <span className="font-bold flex items-center gap-1.5">
+                  <i className="fas fa-exclamation-triangle"></i>
+                  {t("Break-Even Offtake Price:", "سعر التعادل المطلوب للبيع:")}
+                </span>
+                <span className="font-black text-sm">
+                  ${data.SensitivityAnalysis.BreakEvenSellingPriceUSD.toFixed(0)}/{data.SensitivityAnalysis.BreakEvenUnit || 'unit'}
+                </span>
+              </div>
+            )}
+
+            {/* Stress Test 1: Price Drop */}
             <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Price Drop (-10%)", "انخفاض السعر (-10%)")}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[var(--text-secondary)]">Payback: {data.SensitivityAnalysis.PriceDrop10.PaybackPeriod.toFixed(1)} yrs</span>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.PriceDrop10.RiskLevel)}`}>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Price Drop (-10%)", "انخفاض السعر (-10%)")}</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-sm font-bold text-[var(--text-secondary)]">
+                    {t("Payback:", "الاسترداد:")} {data.SensitivityAnalysis.PriceDrop10.PaybackFormatted || (
+                      data.SensitivityAnalysis.PriceDrop10.PaybackPeriod !== null && data.SensitivityAnalysis.PriceDrop10.PaybackPeriod > 0
+                        ? `${data.SensitivityAnalysis.PriceDrop10.PaybackPeriod.toFixed(1)} ${t("yrs", "سنوات")}`
+                        : t("N/A (Deficit)", "غير متاح (عجز)")
+                    )}
+                  </span>
+                  {data.SensitivityAnalysis.PriceDrop10.EBITDA !== undefined && (
+                    <div className="text-xs text-[var(--text-secondary)] font-medium mt-1">
+                      EBITDA: ${data.SensitivityAnalysis.PriceDrop10.EBITDA.toLocaleString()}
+                      {data.SensitivityAnalysis.PriceDrop10.EBITDADelta !== undefined && (
+                        <span className={`ml-1.5 rtl:mr-1.5 font-bold ${data.SensitivityAnalysis.PriceDrop10.EBITDADelta >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
+                          ({data.SensitivityAnalysis.PriceDrop10.EBITDADelta >= 0 ? '+' : ''}${data.SensitivityAnalysis.PriceDrop10.EBITDADelta.toLocaleString()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className={`text-xs md:text-sm font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.PriceDrop10.RiskLevel)}`}>
                   {data.SensitivityAnalysis.PriceDrop10.RiskLevel}
                 </span>
               </div>
             </div>
+
+            {/* Stress Test 2: OPEX Increase */}
             <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("OPEX Increase (+15%)", "زيادة نفقات التشغيل (+15%)")}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[var(--text-secondary)]">Payback: {data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod.toFixed(1)} yrs</span>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.OPEXIncrease15.RiskLevel)}`}>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("OPEX Increase (+15%)", "زيادة نفقات التشغيل (+15%)")}</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-sm font-bold text-[var(--text-secondary)]">
+                    {t("Payback:", "الاسترداد:")} {data.SensitivityAnalysis.OPEXIncrease15.PaybackFormatted || (
+                      data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod !== null && data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod > 0
+                        ? `${data.SensitivityAnalysis.OPEXIncrease15.PaybackPeriod.toFixed(1)} ${t("yrs", "سنوات")}`
+                        : t("N/A (Deficit)", "غير متاح (عجز)")
+                    )}
+                  </span>
+                  {data.SensitivityAnalysis.OPEXIncrease15.EBITDA !== undefined && (
+                    <div className="text-xs text-[var(--text-secondary)] font-medium mt-1">
+                      EBITDA: ${data.SensitivityAnalysis.OPEXIncrease15.EBITDA.toLocaleString()}
+                      {data.SensitivityAnalysis.OPEXIncrease15.EBITDADelta !== undefined && (
+                        <span className={`ml-1.5 rtl:mr-1.5 font-bold ${data.SensitivityAnalysis.OPEXIncrease15.EBITDADelta >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
+                          ({data.SensitivityAnalysis.OPEXIncrease15.EBITDADelta >= 0 ? '+' : ''}${data.SensitivityAnalysis.OPEXIncrease15.EBITDADelta.toLocaleString()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className={`text-xs md:text-sm font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.OPEXIncrease15.RiskLevel)}`}>
                   {data.SensitivityAnalysis.OPEXIncrease15.RiskLevel}
                 </span>
               </div>
             </div>
+
+            {/* Stress Test 3: Production Drop */}
             <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Production Drop (-10%)", "انخفاض الإنتاج (-10%)")}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[var(--text-secondary)]">Payback: {data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod.toFixed(1)} yrs</span>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.ProductionDrop10.RiskLevel)}`}>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Production Drop (-10%)", "انخفاض الإنتاج (-10%)")}</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-sm font-bold text-[var(--text-secondary)]">
+                    {t("Payback:", "الاسترداد:")} {data.SensitivityAnalysis.ProductionDrop10.PaybackFormatted || (
+                      data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod !== null && data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod > 0
+                        ? `${data.SensitivityAnalysis.ProductionDrop10.PaybackPeriod.toFixed(1)} ${t("yrs", "سنوات")}`
+                        : t("N/A (Deficit)", "غير متاح (عجز)")
+                    )}
+                  </span>
+                  {data.SensitivityAnalysis.ProductionDrop10.EBITDA !== undefined && (
+                    <div className="text-xs text-[var(--text-secondary)] font-medium mt-1">
+                      EBITDA: ${data.SensitivityAnalysis.ProductionDrop10.EBITDA.toLocaleString()}
+                      {data.SensitivityAnalysis.ProductionDrop10.EBITDADelta !== undefined && (
+                        <span className={`ml-1.5 rtl:mr-1.5 font-bold ${data.SensitivityAnalysis.ProductionDrop10.EBITDADelta >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
+                          ({data.SensitivityAnalysis.ProductionDrop10.EBITDADelta >= 0 ? '+' : ''}${data.SensitivityAnalysis.ProductionDrop10.EBITDADelta.toLocaleString()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className={`text-xs md:text-sm font-black px-2 py-0.5 rounded ${getRiskColor(data.SensitivityAnalysis.ProductionDrop10.RiskLevel)}`}>
                   {data.SensitivityAnalysis.ProductionDrop10.RiskLevel}
                 </span>
               </div>
@@ -720,7 +992,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
             {/* Sensitivity Visualizer Chart */}
             <div className="pt-4 border-t border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-4">{t("Investment Sensitivity Visualizer", "متخيل حساسية الاستثمار")}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-4">{t("Investment Sensitivity Visualizer", "متخيل حساسية الاستثمار")}</p>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.SensitivityAnalysis.DataPoints}>
@@ -749,12 +1021,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-gradient-to-br from-indigo-50 to-slate-50 dark:from-indigo-900/40 dark:to-slate-900/40 rounded-2xl border border-indigo-800 shadow-card overflow-hidden"
+          className="bg-[var(--card-bg)] rounded-2xl border border-indigo-800 shadow-card overflow-hidden"
         >
           <div className="px-6 py-5 border-b border-[var(--border-glow)] flex items-center justify-between">
             <h3 className="text-[var(--text-primary)] font-bold text-lg flex items-center">
               <i className="fas fa-lightbulb text-amber-700 dark:text-amber-400 mr-3 text-xl"></i>{t("Expert Counsel & Actionable Recommendations", "مشورة الخبراء وتوصيات قابلة للتنفيذ")}</h3>
-            <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-300 dark:border-indigo-500/30">{t("Strategic Advisory", "استشارات استراتيجية")}</span>
+            <span className="text-xs md:text-sm font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-300 dark:border-indigo-500/30">{t("Strategic Advisory", "استشارات استراتيجية")}</span>
           </div>
           <div className="p-6 md:p-8">
             <p className="text-indigo-800 dark:text-indigo-200 text-sm mb-6 leading-relaxed">
@@ -802,7 +1074,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </p>
             <div className="grid grid-cols-2 gap-2">
               {data.EconomicFeasibility.EstimatedInvestmentUSD.MajorCosts?.map((cost, i) => (
-                <div key={i} className="text-[11px] font-bold text-[var(--text-secondary)] bg-[var(--bg-main)] px-3 py-2 rounded-lg flex items-center">
+                <div key={i} className="text-sm font-bold text-[var(--text-secondary)] bg-[var(--bg-main)] px-3 py-2 rounded-lg flex items-center">
                   <i className="fas fa-check-circle text-[var(--accent-emerald)] dark:text-emerald-400 mr-2"></i> {cost}
                 </div>
               ))}
@@ -820,11 +1092,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               <i className="fas fa-flag mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Oman Vision 2040 Alignment", "التوافق مع رؤية عُمان 2040")}</h3>
             <div className="space-y-6">
               <div>
-                <h4 className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Energy Diversification", "تنوع الطاقة")}</h4>
+                <h4 className="text-xs md:text-sm font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Energy Diversification", "تنوع الطاقة")}</h4>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{data.Vision2040Alignment.DiversificationContribution}</p>
               </div>
               <div>
-                <h4 className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Industrial Development", "التنمية الصناعية")}</h4>
+                <h4 className="text-xs md:text-sm font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{t("Industrial Development", "التنمية الصناعية")}</h4>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{data.Vision2040Alignment.IndustrialDevelopment}</p>
               </div>
             </div>
@@ -838,24 +1110,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <i className="fas fa-briefcase mr-3 text-blue-700 dark:text-blue-400"></i>{t("Investor Perspective AI", "الذكاء الاصطناعي من منظور المستثمر")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Return Potential", "إمكانات العائد")}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Return Potential", "إمكانات العائد")}</p>
             <p className="text-sm font-bold text-[var(--text-secondary)] ">{tt(data?.InvestorPerspective?.ReturnPotential, language || 'Arabic')}</p>
           </div>
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Capital Intensity", "كثافة رأس المال")}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Capital Intensity", "كثافة رأس المال")}</p>
             <p className="text-sm font-bold text-[var(--text-secondary)] ">{tt(data?.InvestorPerspective?.CapitalIntensity, language || 'Arabic')}</p>
           </div>
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Scalability Rating", "تقييم قابلية التوسع")}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Scalability Rating", "تقييم قابلية التوسع")}</p>
             <p className="text-sm font-bold text-[var(--text-secondary)] ">{tt(data?.InvestorPerspective?.ScalabilityRating, language || 'Arabic')}</p>
           </div>
           <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Market Demand", "طلب السوق")}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Market Demand", "طلب السوق")}</p>
             <p className="text-sm font-bold text-[var(--text-secondary)] ">{data.InvestorPerspective.MarketDemandAnalysis}</p>
           </div>
         </div>
         <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
-          <p className="text-xs text-[var(--text-primary)] flex items-start">
+          <p className="text-sm text-[var(--text-primary)] flex items-start">
             <i className="fas fa-info-circle mr-2 mt-0.5"></i>
             <span><span className="font-bold">Risk exposure:</span> {data.InvestorPerspective.RiskExposure}</span>
           </p>
@@ -870,7 +1142,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           <div className="space-y-4">
             {data.KeyRisks?.map((risk, i) => (
               <div key={i} className="p-4 rounded-xl border border-[var(--border-glow)] hover:border-amber-200 hover:bg-[var(--bg-main)]/20 transition group">
-                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                <span className={`text-xs md:text-sm font-black uppercase px-2 py-0.5 rounded ${
                   risk.Type === 'Technical' ? 'bg-purple-100 text-purple-700' :
                   risk.Type === 'Financial' ? 'bg-blue-100 text-blue-700' :
                   risk.Type === 'Regulatory' ? 'bg-amber-100 text-amber-700' :
@@ -879,7 +1151,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   {risk.Type} Risk
                 </span>
                 <h4 className="text-sm font-bold text-[var(--text-secondary)]  mb-2 mt-1">{risk.Description}</h4>
-                <div className="flex items-start text-xs text-[var(--text-secondary)]">
+                <div className="flex items-start text-sm text-[var(--text-secondary)]">
                   <i className="fas fa-lightbulb text-[var(--accent-emerald)] dark:text-emerald-400 mr-2 mt-0.5 shrink-0"></i>
                   <p><span className="font-bold text-emerald-700 dark:text-emerald-400 mr-1">{language === 'Arabic' ? "التخفيف:" : "Mitigation:"}</span> {risk.Mitigation}</p>
                 </div>
@@ -888,43 +1160,102 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
           </div>
         </div>
 
-        {/* Audit & Assumptions */}
         <div className="space-y-6">
-          <div className="bg-[var(--card-bg)] shadow-card p-8 rounded-2xl text-[var(--text-primary)] relative overflow-hidden">
-            <h3 className="text-xl font-bold mb-6 flex items-center">
-              <i className="fas fa-user-check mr-3 text-[var(--accent-emerald)] dark:text-emerald-400"></i>{t("Local Consistency Review", "مراجعة الاتساق المحلي")}</h3>
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase mb-6 ${
-              data.AuditAIReview.ConsistencyCheck === 'Passed' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-600 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400'
-            }`}>
-              Consistency: {data.AuditAIReview.ConsistencyCheck}
-            </div>
-            <div className="space-y-2">
-              {data.AuditAIReview.DataWarnings?.map((w, i) => (
-                <div key={i} className="text-xs text-[var(--text-secondary)] flex items-start">
-                  <i className="fas fa-circle-info text-amber-700 dark:text-amber-400 mr-2 mt-0.5 shrink-0"></i>
-                  {w}
+          {/* Oman Energy Sector Benchmark Reference */}
+          <div className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-2xl border border-[var(--border-glow)]">
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center">
+              <i className="fas fa-scale-balanced mr-3 text-blue-700 dark:text-blue-400"></i>
+              {language === 'Arabic' ? "المعايير المرجعية لسوق الطاقة المتجددة في عُمان" : "Oman Renewable Energy Market Benchmark Ranges"}
+            </h3>
+            <p className="text-xs text-[var(--text-secondary)] mb-4">
+              {language === 'Arabic'
+                ? "يتم التحقق من الأسعار والتعريفات المدخلة مقابل النطاقات السوقية الرسمية المعتمدة في سلطنة عُمان:"
+                : "Tariff and pricing entries are audited against verified market ranges established in Oman:"}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-sun text-amber-500"></i>
+                  <span>{language === 'Arabic' ? "الطاقة الشمسية (PPA)" : "Utility Solar PV"}</span>
                 </div>
-              ))}
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$15 – $30 / MWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Oman PPA Industrial Tariff</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-wind text-blue-500"></i>
+                  <span>{language === 'Arabic' ? "طاقة الرياح (PPA)" : "Onshore Wind"}</span>
+                </div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$20 – $35 / MWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dhofar / Duqm Wind Profile</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-gas-pump text-emerald-500"></i>
+                  <span>{language === 'Arabic' ? "الوقود الحيوي / الديزل الحيوي" : "Biofuel / Biodiesel"}</span>
+                </div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$700 – $1,300 / Ton</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">GCC Wholesale Offtake</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-atom text-purple-500"></i>
+                  <span>{language === 'Arabic' ? "الهيدروجين الأخضر" : "Green Hydrogen"}</span>
+                </div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$2.0 – $6.0 / kg</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Hydrom Production Cost</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-recycle text-teal-500"></i>
+                  <span>{language === 'Arabic' ? "تحويل النفايات إلى طاقة" : "Waste-to-Energy"}</span>
+                </div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$50 – $100 / MWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dual revenue (Power + Tipping)</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
+                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <i className="fas fa-bolt text-yellow-500"></i>
+                  <span>{language === 'Arabic' ? "تعريفة الشبكة الصناعية" : "Grid Industrial Tariff"}</span>
+                </div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$0.03 – $0.08 / kWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">$30 – $80 / MWh statutory</div>
+              </div>
             </div>
           </div>
 
-          <div className="bg-[var(--card-bg)] shadow-card  p-8 rounded-2xl  border border-[var(--border-glow)]">
-            <h3 className="text-lg font-bold text-[var(--text-secondary)]  mb-4 flex items-center">
-              <i className="fas fa-magnifying-glass mr-3 text-[var(--text-secondary)]"></i>{t("Model Assumptions & Transparency", "افتراضات النموذج والشفافية")}</h3>
-            <div className="grid grid-cols-2 gap-4">
+          {/* Model Assumptions & Transparency */}
+          <div className="bg-[var(--card-bg)] shadow-card p-6 md:p-8 rounded-2xl border border-[var(--border-glow)]">
+            <h3 className="text-lg font-bold text-[var(--text-secondary)] mb-4 flex items-center">
+              <i className="fas fa-magnifying-glass mr-3 text-[var(--text-secondary)]"></i>
+              {t("Model Assumptions & Transparency", "افتراضات النموذج والشفافية")}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Key Benchmarks", "المعايير الرئيسية")}</p>
-                <ul className="space-y-1">
+                <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Key Benchmarks", "المعايير الرئيسية")}</p>
+                <ul className="space-y-1.5">
                   {data.AnalysisAssumptions.BenchmarkSources?.map((s, i) => (
-                    <li key={i} className="text-[10px] text-[var(--text-secondary)]">• {s}</li>
+                    <li key={i} className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5">
+                      <span className="text-[var(--accent-emerald)] mt-0.5">•</span>
+                      <span>{s}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Analysis Limitations", "قيود التحليل")}</p>
-                <ul className="space-y-1">
+                <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("Analysis Limitations", "قيود التحليل")}</p>
+                <ul className="space-y-1.5">
                   {data.AnalysisAssumptions.ModelLimitations?.map((l, i) => (
-                    <li key={i} className="text-[10px] text-[var(--text-secondary)]">• {l}</li>
+                    <li key={i} className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5">
+                      <span className="text-amber-500 mt-0.5">•</span>
+                      <span>{l}</span>
+                    </li>
                   ))}
                 </ul>
               </div>

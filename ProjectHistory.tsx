@@ -43,7 +43,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
           {selectedIds.length > 0 && (
             <button 
               onClick={() => onCompare(selectedIds)}
-              className="bg-emerald-700 dark:bg-emerald-600 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
+              className="bg-emerald-700 dark:bg-emerald-600 text-xs font-black uppercase px-3 py-1.5 rounded-lg transition animate-pulse"
             >
               Compare ({selectedIds.length}) Selected
             </button>
@@ -61,9 +61,9 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
           <thead>
             <tr className="bg-[var(--bg-main)] border-b border-[var(--border-glow)]">
               <th className="px-6 py-3 w-10"></th>
-              <th className="px-6 py-3 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Project / Date</th>
-              <th className="px-6 py-3 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Domain & Feedstock</th>
-              <th className="px-6 py-3 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{language === 'Arabic' ? "الجدوى" : "Feasibility"}</th>
+              <th className="px-6 py-3 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Project / Date</th>
+              <th className="px-6 py-3 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Domain & Feedstock</th>
+              <th className="px-6 py-3 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">{language === 'Arabic' ? "الجدوى" : "Feasibility"}</th>
               <th className="px-6 py-3 text-right"></th>
             </tr>
           </thead>
@@ -85,10 +85,10 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
                 </td>
                 <td className="px-6 py-4">
                   <div className="font-bold text-[var(--text-secondary)]  text-sm">{entry.projectName}</div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">{entry.timestamp}</div>
+                  <div className="text-xs text-[var(--text-secondary)]">{entry.timestamp}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
                     entry.energyDomain === 'Hydrogen' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
                   }`}>
                     {entry.energyDomain}
@@ -97,7 +97,7 @@ export const ProjectHistory: React.FC<ProjectHistoryProps> = ({ language = 'Engl
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm font-black text-[var(--text-secondary)] ">{entry.score}%</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">{entry.level}</div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">{entry.level}</div>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <i className="fas fa-chevron-right text-[var(--text-secondary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 group-hover:translate-x-1 transition-all"></i>

@@ -1,7 +1,11 @@
+import { Logo } from "./Logo";
 
 import * as React from 'react';
+import { CustomMarkdown } from './CustomMarkdown';
 import { motion } from 'framer-motion';
 import { ResearchImplementationAnalysis } from './types';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const autoDict: Record<string, string> = {
   "N/A": "غير متوفر",
@@ -71,11 +75,20 @@ const tt = (key: string | undefined, lang: string) => { if(!key) return key; ret
 interface ResearchDashboardProps {
   data: ResearchImplementationAnalysis;
   language?: 'English' | 'Arabic';
+  userPlan?: string;
+  onUpgrade?: () => void;
 }
 
-export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, language = 'English' }) => {
+export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, language = 'English', userPlan, onUpgrade }) => {
     const isArabic = language === 'Arabic';
   const t = (en: string, ar: string) => isArabic ? ar : en;
+
+  const downloadPDF = async () => {
+    
+    const { downloadPDF: dp } = await import('./pdfUtils');
+    await dp('research-dashboard-report', `${"OMAN_ECOSYNC_Research_Analysis_"}${new Date().getTime()}.pdf`);
+  };
+
   const scoreColor = (score: number) => {
     if (score >= 80) return 'text-[var(--accent-emerald)] dark:text-emerald-400';
     if (score >= 60) return 'text-blue-700 dark:text-blue-400';
@@ -104,18 +117,41 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
   };
 
   return (
+    <div className="space-y-4">
+      <div className="flex justify-end max-w-7xl mx-auto no-print">
+        <button 
+          onClick={downloadPDF}
+          className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--border-glow)] text-[var(--accent-emerald)] text-sm font-bold rounded-lg hover:bg-[var(--bg-main)] transition flex items-center shadow-card"
+        >
+          <i className="fas fa-file-pdf mr-2 rtl:ml-2 rtl:mr-0"></i>{t("Download PDF", "تحميل PDF")}
+        </button>
+      </div>
+
     <motion.div 
+      id="research-dashboard-report"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-8 pb-20"
+      className="space-y-8 pb-20 relative p-8 bg-[var(--bg-main)] rounded-3xl print-container"
     >
+      {/* PDF BRANDING HEADER */}
+      <div className="absolute top-8 left-8 right-8 flex justify-between items-start select-none pointer-events-none pb-20 print-only">
+        <div className="flex items-center space-x-2">
+          <i className="fas fa-leaf text-2xl text-[var(--accent-emerald)]"></i>
+          <span className="text-xl font-black tracking-tighter text-[var(--text-primary)]">
+            {language === 'Arabic' ? <>عُمَان <span className="text-[var(--accent-emerald)]">إيكوسينك</span></> : <>OMAN <span className="text-[var(--accent-emerald)]">ECOSYNC</span></>}
+          </span>
+        </div>
+        <div className="text-[8px] font-black tracking-[0.2em] uppercase text-right text-[var(--text-secondary)]">
+          {language === 'Arabic' ? 'تحليل البحوث' : 'Research Analysis'}
+        </div>
+      </div>
       {/* Header & Feasibility Overview */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.1 }}
-        className="bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] p-8 rounded-3xl shadow-card border border-[var(--border-glow)] relative overflow-hidden"
+        className="bg-[var(--card-bg)] shadow-card text-[var(--text-primary)] p-8 rounded-3xl shadow-card border border-[var(--border-glow)] relative overflow-hidden mt-12"
       >
         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
           <i className="fas fa-microscope text-[12rem]"></i>
@@ -134,7 +170,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
               </div>
             </div>
             <div className="mt-4 md:mt-0 bg-blue-700 text-white dark:bg-blue-700 dark:bg-blue-600 px-6 py-3 rounded-2xl shadow-card flex flex-col items-center">
-              <span className="text-[10px] font-black uppercase tracking-tighter opacity-80">{language === 'Arabic' ? "درجة التنفيذ" : "Implementation Score"}</span>
+              <span className="text-xs md:text-sm font-black uppercase tracking-tighter opacity-80">{language === 'Arabic' ? "درجة التنفيذ" : "Implementation Score"}</span>
               <span className="text-3xl font-black">{data.ReadinessScore?.OverallScore || 'N/A'}</span>
             </div>
           </div>
@@ -144,21 +180,19 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
               <h3 className="text-blue-700 dark:text-blue-400 font-black uppercase text-xs tracking-widest mb-4 flex items-center">
                 <i className="fas fa-flask mr-2"></i> {language === 'Arabic' ? "نظرة عامة على الجدوى" : "Feasibility Overview"}
               </h3>
-              <p className="text-lg text-[var(--text-secondary)]  leading-relaxed italic">
-                {data.FeasibilityOverview || (language === 'Arabic' ? "لا توجد نظرة عامة متاحة." : "No overview available.")}
-              </p>
+              <div className="text-[var(--text-secondary)] mt-2"><div className="markdown-body"><CustomMarkdown>{data.FeasibilityOverview || (language === 'Arabic' ? "لا توجد نظرة عامة متاحة." : "No overview available.")}</CustomMarkdown></div></div>
             </div>
             <div className="space-y-4">
               <div className="bg-white/5 p-4 rounded-xl border border-[var(--border-glow)]">
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "النطاق التجريبي المستهدف" : "Target Pilot Scale"}</p>
+                <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "النطاق التجريبي المستهدف" : "Target Pilot Scale"}</p>
                 <p className="text-xl font-black text-[var(--text-primary)]">{data.ResearchInputs.DesiredPilotScale}</p>
               </div>
               <div className="bg-white/5 p-4 rounded-xl border border-[var(--border-glow)]">
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "كفاءة المختبر" : "Lab Efficiency"}</p>
+                <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "كفاءة المختبر" : "Lab Efficiency"}</p>
                 <p className="text-xl font-black text-[var(--accent-emerald)] dark:text-emerald-400">{data.ResearchInputs.ConversionEfficiency}%</p>
               </div>
               <div className="bg-white/5 p-4 rounded-xl border border-[var(--border-glow)]">
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الإنتاجية المخبرية" : "Lab Yield"}</p>
+                <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الإنتاجية المخبرية" : "Lab Yield"}</p>
                 <p className="text-sm font-black text-blue-700 dark:text-blue-400 uppercase">{data.ResearchInputs.LaboratoryYield}</p>
               </div>
             </div>
@@ -184,7 +218,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
               </div>
             ))}
             <div className="mt-6 p-4 bg-blue-50 rounded-2xl border border-blue-100">
-              <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "الطاقة والمرافق" : "Energy & Utilities"}</p>
+              <p className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "الطاقة والمرافق" : "Energy & Utilities"}</p>
               <p className="text-sm text-blue-900 leading-relaxed">{data.ImplementationEstimator?.EnergyUtilities}</p>
             </div>
           </div>
@@ -200,17 +234,17 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             <i className="fas fa-vial-circle-check mr-3 text-emerald-700 dark:text-emerald-400"></i>{language === 'Arabic' ? "مُقدِّر النطاق التجريبي" : "Pilot-Scale Estimator"}</h3>
           <div className="space-y-6">
             <div>
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "متطلبات المواد الخام" : "Feedstock Requirements"}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "متطلبات المواد الخام" : "Feedstock Requirements"}</p>
               <p className="text-sm text-[var(--text-secondary)]  font-bold leading-relaxed">{data.ImplementationEstimator?.FeedstockRequirements}</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "تعديلات الكفاءة" : "Efficiency Adjustments"}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "تعديلات الكفاءة" : "Efficiency Adjustments"}</p>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed italic border-l-4 border-[var(--border-glow)] pl-4">
                 {data.ImplementationEstimator?.EfficiencyAdjustments}
               </p>
             </div>
             <div className="bg-[var(--bg-main)] p-4 rounded-2xl border border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إدارة النفايات" : "Waste Management"}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إدارة النفايات" : "Waste Management"}</p>
               <p className="text-sm text-emerald-900 leading-relaxed">{data.ImplementationEstimator?.WasteManagement}</p>
             </div>
           </div>
@@ -228,19 +262,19 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
           <i className="fas fa-flask-vial mr-3 text-purple-600"></i>{language === 'Arabic' ? "تقدير الإنتاج" : "Production Output Estimation"}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-purple-50 p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إنتاج الوقود السنوي" : "Annual Fuel Output"}</p>
+            <p className="text-xs md:text-sm font-bold text-purple-700 dark:text-purple-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "إنتاج الوقود السنوي" : "Annual Fuel Output"}</p>
             <p className="text-lg font-black text-purple-900">{data.ProductionOutput?.AnnualFuelOutput}</p>
           </div>
           <div className="bg-blue-50 p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "المعادل من الطاقة" : "Energy Equivalent"}</p>
+            <p className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "المعادل من الطاقة" : "Energy Equivalent"}</p>
             <p className="text-lg font-black text-blue-900">{data.ProductionOutput?.EnergyOutput}</p>
           </div>
           <div className="bg-[var(--bg-main)] p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "إمكانية المنتجات الثانوية" : "By-Product Potential"}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "إمكانية المنتجات الثانوية" : "By-Product Potential"}</p>
             <p className="text-sm text-[var(--text-secondary)] font-bold">{data.ProductionOutput?.ByProductValueEstimation}</p>
           </div>
           <div className="bg-[var(--bg-main)] p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "الحد من الكربون" : "Carbon Reduction"}</p>
+            <p className="text-xs md:text-sm font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "الحد من الكربون" : "Carbon Reduction"}</p>
             <p className="text-sm text-emerald-700 dark:text-emerald-400 font-bold">{data.ProductionOutput?.CarbonReductionPotential}</p>
           </div>
         </div>
@@ -258,11 +292,11 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             <i className="fas fa-leaf mr-3 text-emerald-700 dark:text-emerald-400"></i>{language === 'Arabic' ? "متطلبات الموارد" : "Resource Requirements"}</h3>
           <div className="space-y-6">
             <div>
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "توازن الكتلة" : "Mass Balance"}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "توازن الكتلة" : "Mass Balance"}</p>
               <p className="text-sm text-[var(--text-secondary)]  font-bold leading-relaxed">{data.ResourceRequirements?.MassBalance}</p>
             </div>
             <div className="bg-[var(--bg-main)] p-4 rounded-2xl border border-[var(--border-glow)]">
-              <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "متطلبات المعالجة المسبقة" : "Pre-Treatment Required"}</p>
+              <p className="text-xs md:text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "متطلبات المعالجة المسبقة" : "Pre-Treatment Required"}</p>
               <p className="text-sm text-amber-900 leading-relaxed">{data.ResourceRequirements?.PreTreatmentRequired}</p>
             </div>
           </div>
@@ -278,11 +312,11 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             <i className="fas fa-chart-line mr-3 text-blue-700 dark:text-blue-400"></i>{language === 'Arabic' ? "تحليل الحساسية" : "Sensitivity Analysis"}</h3>
           <div className="space-y-6">
             <div>
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "السيناريو" : "Scenario"}</p>
+              <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "السيناريو" : "Scenario"}</p>
               <p className="text-sm text-[var(--text-secondary)]  font-bold leading-relaxed">{data.SensitivityAnalysis?.Scenario}</p>
             </div>
             <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-              <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "التأثير على سعر اللتر" : "Impact on Liter Price"}</p>
+              <p className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "التأثير على سعر اللتر" : "Impact on Liter Price"}</p>
               <p className="text-xl font-black text-blue-900 leading-relaxed">{data.SensitivityAnalysis?.ImpactOnLiterPrice}</p>
             </div>
           </div>
@@ -301,7 +335,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             <i className="fas fa-university mr-3 text-amber-700 dark:text-amber-400"></i> {language === 'Arabic' ? "التقريب المالي المعدل" : "Adjusted Financial Approximation"}
           </h3>
           {finance.OmanLogisticsMultiplierApplied && (
-            <span className="mt-2 md:mt-0 text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
+            <span className="mt-2 md:mt-0 text-xs md:text-sm font-black uppercase tracking-widest bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
               {language === 'Arabic' ? "تم تطبيق مضاعف اللوجستيات في عُمان (1.2x)" : "Oman Logistics Multiplier (1.2x) Applied"}
             </span>
           )}
@@ -319,7 +353,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                   <span className="text-[var(--text-secondary)] font-medium">{item.label}</span>
                   <div className="text-right">
                     <div className="text-[var(--text-primary)] font-bold">{item.val.USD}</div>
-                    <div className="text-[10px] text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
+                    <div className="text-xs md:text-sm text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
                   </div>
                 </div>
               ))}
@@ -335,7 +369,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                   <span className="text-[var(--text-secondary)] font-medium">{item.label}</span>
                   <div className="text-right">
                     <div className="text-[var(--text-primary)] font-bold">{item.val.USD}</div>
-                    <div className="text-[10px] text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
+                    <div className="text-xs md:text-sm text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
                   </div>
                 </div>
               ))}
@@ -346,17 +380,17 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             <div className="space-y-6">
               <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)] flex justify-between items-center">
                 <div>
-                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الاحتياطي للطوارئ (15%)" : "Contingency Buffer (15%)"}</p>
-                  <p className="text-xs text-[var(--text-secondary)]">{language === 'Arabic' ? "هامش أمان لتكاليف غير متوقعة" : "Safety margin for unforeseen expenses"}</p>
+                  <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الاحتياطي للطوارئ (15%)" : "Contingency Buffer (15%)"}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">{language === 'Arabic' ? "هامش أمان لتكاليف غير متوقعة" : "Safety margin for unforeseen expenses"}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-[var(--text-secondary)] font-black">{safeCost(finance.ContingencyBuffer).USD}</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] font-bold">{safeCost(finance.ContingencyBuffer).OMR}</div>
+                  <div className="text-xs md:text-sm text-[var(--text-secondary)] font-bold">{safeCost(finance.ContingencyBuffer).OMR}</div>
                 </div>
               </div>
               
               <div className="p-6 bg-amber-600 text-black rounded-2xl shadow-card dark:bg-amber-600 dark:text-white">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">{language === 'Arabic' ? "إجمالي الميزانية (مع الاحتياطي)" : "Total Budget (With Buffer)"}</p>
+                <p className="text-xs md:text-sm font-black uppercase tracking-widest opacity-80 mb-1">{language === 'Arabic' ? "إجمالي الميزانية (مع الاحتياطي)" : "Total Budget (With Buffer)"}</p>
                 <div className="flex flex-col">
                   <span className="text-3xl font-black">{safeCost(finance.TotalBudgetWithBuffer).USD}</span>
                   <span className="text-sm font-bold opacity-90">{safeCost(finance.TotalBudgetWithBuffer).OMR}</span>
@@ -378,7 +412,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
           <i className="fas fa-shield-halved mr-3 text-red-700 dark:text-red-400"></i>{language === 'Arabic' ? "تقييم المخاطر الفنية" : "Technical Risk Assessment"}</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <h4 className="text-[10px] font-bold text-red-700 dark:text-red-400 uppercase tracking-widest mb-4">{language === 'Arabic' ? "تحديات علمية" : "Scientific Challenges"}</h4>
+            <h4 className="text-xs md:text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-widest mb-4">{language === 'Arabic' ? "تحديات علمية" : "Scientific Challenges"}</h4>
             <ul className="space-y-3">
               {data.TechnicalRiskAssessment?.ScientificChallenges?.map((challenge, i) => (
                 <li key={i} className="flex items-start text-sm text-[var(--text-primary)] font-medium bg-[var(--bg-main)] p-3 rounded-xl border border-red-200 dark:bg-red-900/30 dark:border-red-500 dark:border-red-600/30/30 dark:text-red-200">
@@ -389,7 +423,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
             </ul>
           </div>
           <div>
-            <h4 className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-4">{language === 'Arabic' ? "استراتيجيات التخفيف" : "Mitigation Strategies"}</h4>
+            <h4 className="text-xs md:text-sm font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-4">{language === 'Arabic' ? "استراتيجيات التخفيف" : "Mitigation Strategies"}</h4>
             <ul className="space-y-3">
               {data.TechnicalRiskAssessment?.MitigationStrategies?.map((strategy, i) => (
                 <li key={i} className="flex items-start text-sm text-[var(--text-primary)] font-medium bg-[var(--bg-main)] p-3 rounded-xl border border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-500/30 dark:text-[var(--accent-emerald)]">
@@ -412,7 +446,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center">
             <i className="fas fa-map-signs mr-3 text-indigo-600"></i>{language === 'Arabic' ? "خارطة طريق متكيفة لمستوى الجاهزية التكنولوجية (TRL)" : "Adaptive TRL Roadmap"}</h3>
-          <span className="text-[10px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full border border-indigo-100">{language === 'Arabic' ? "مسار التطور الى TRL 9" : "Path to TRL 9"}</span>
+          <span className="text-xs md:text-sm font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full border border-indigo-100">{language === 'Arabic' ? "مسار التطور الى TRL 9" : "Path to TRL 9"}</span>
         </div>
 
         <div className="relative">
@@ -425,17 +459,17 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                 <div className="flex-1 w-full md:w-auto">
                   <div className={`p-6 rounded-2xl border ${data.ResearchInputs.TechnologyReadinessLevel >= step.trl ? 'bg-indigo-50 border-indigo-100' : 'bg-[var(--bg-main)] border-[var(--border-glow)] opacity-60'}`}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded ${data.ResearchInputs.TechnologyReadinessLevel >= step.trl ? 'bg-indigo-600 text-white' : 'bg-slate-400 text-white'}`}>
+                      <span className={`text-xs md:text-sm font-black px-2 py-0.5 rounded ${data.ResearchInputs.TechnologyReadinessLevel >= step.trl ? 'bg-indigo-600 text-white' : 'bg-slate-400 text-white'}`}>
                         TRL {step.trl}
                       </span>
-                      <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{step.estimatedDuration}</span>
+                      <span className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">{step.estimatedDuration}</span>
                     </div>
                     <h4 className="text-sm font-black text-[var(--text-primary)] mb-2">{step.title}</h4>
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">{step.description}</p>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">{step.description}</p>
                     <div className="space-y-2">
                       {step.keyMilestones?.map((m, mi) => (
-                        <div key={mi} className="flex items-center text-[10px] text-[var(--text-secondary)] font-bold">
-                          <i className="fas fa-check-circle mr-2 text-indigo-400"></i>
+                        <div key={mi} className="flex items-center text-xs md:text-sm text-[var(--text-secondary)] font-bold">
+                          <i className="fas fa-check-circle mr-2 text-indigo-700 dark:text-indigo-400"></i>
                           {m}
                         </div>
                       ))}
@@ -463,7 +497,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
         transition={{ delay: 0.7 }}
         className="bg-[var(--card-bg)] shadow-card  p-8 rounded-3xl  border border-[var(--border-glow)]"
       >
-        <h4 className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-6">{language === 'Arabic' ? "مقاييس الجاهزية لتنفيذ البحوث" : "Research Implementation Readiness Metrics"}</h4>
+        <h4 className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-6">{language === 'Arabic' ? "مقاييس الجاهزية لتنفيذ البحوث" : "Research Implementation Readiness Metrics"}</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             { label: 'Technical Scalability', score: data.ReadinessScore?.TechnicalScalability || 0 },
@@ -473,7 +507,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
           ].map((m, i) => (
             <div key={i} className="text-center">
               <div className={`text-3xl font-black mb-1 ${scoreColor(m.score)}`}>{m.score}%</div>
-              <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{m.label}</div>
+              <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">{m.label}</div>
               <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
                 <div className={`h-full ${m.score >= 80 ? 'bg-[var(--accent-emerald)]' : m.score >= 60 ? 'bg-blue-600 dark:bg-blue-600' : m.score >= 40 ? 'bg-amber-600 dark:bg-amber-600' : 'bg-red-600 dark:bg-red-600'}`} style={{ width: `${m.score}%` }}></div>
               </div>
@@ -492,7 +526,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center">
             <i className="fas fa-university mr-3 text-amber-700 dark:text-amber-400"></i>{language === 'Arabic' ? "تقدير تكلفة النطاق التجريبي الأكاديمي" : "Academic Pilot-Scale Cost Approximation"}</h3>
-          <span className="mt-2 md:mt-0 text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
+          <span className="mt-2 md:mt-0 text-xs md:text-sm font-black uppercase tracking-widest bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
             University-Based System
           </span>
         </div>
@@ -513,22 +547,22 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                   <span className="text-[var(--text-secondary)] font-medium">{item.label}</span>
                   <div className="text-right">
                     <div className="text-[var(--text-primary)] font-bold">{item.val.USD}</div>
-                    <div className="text-[10px] text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
+                    <div className="text-xs md:text-sm text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
                   </div>
                 </div>
               ))}
               <div className="flex justify-between items-center pt-4 border-t border-[var(--border-glow)]">
-                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-[10px]">{language === 'Arabic' ? "إجمالي تكلفة المعدات" : "Total Equipment Cost"}</span>
+                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-xs md:text-sm">{language === 'Arabic' ? "إجمالي تكلفة المعدات" : "Total Equipment Cost"}</span>
                 <div className="text-right">
                   <div className="text-blue-700 dark:text-blue-400 font-black">{safeCost(data.CostEstimation?.EquipmentCosts?.TotalEquipmentCost).USD}</div>
-                  <div className="text-[10px] text-blue-700 dark:text-blue-400 font-bold">{safeCost(data.CostEstimation?.EquipmentCosts?.TotalEquipmentCost).OMR}</div>
+                  <div className="text-xs md:text-sm text-blue-700 dark:text-blue-400 font-bold">{safeCost(data.CostEstimation?.EquipmentCosts?.TotalEquipmentCost).OMR}</div>
                 </div>
               </div>
               <div className="flex justify-between items-center pt-2">
-                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-[10px]">{language === 'Arabic' ? "التركيب والإعداد (20-30%)" : "Installation & Setup (20-30%)"}</span>
+                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-xs md:text-sm">{language === 'Arabic' ? "التركيب والإعداد (20-30%)" : "Installation & Setup (20-30%)"}</span>
                 <div className="text-right">
                   <div className="text-blue-700 dark:text-blue-400 font-black">{safeCost(data.CostEstimation?.InstallationSetupCost).USD}</div>
-                  <div className="text-[10px] text-blue-700 dark:text-blue-400 font-bold">{safeCost(data.CostEstimation?.InstallationSetupCost).OMR}</div>
+                  <div className="text-xs md:text-sm text-blue-700 dark:text-blue-400 font-bold">{safeCost(data.CostEstimation?.InstallationSetupCost).OMR}</div>
                 </div>
               </div>
             </div>
@@ -547,7 +581,7 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                   <span className="text-[var(--text-secondary)] font-medium">{item.label}</span>
                   <div className="text-right">
                     <div className="text-[var(--text-primary)] font-bold">{item.val.USD}</div>
-                    <div className="text-[10px] text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
+                    <div className="text-xs md:text-sm text-[var(--text-secondary)] font-medium">{item.val.OMR}</div>
                   </div>
                 </div>
               ))}
@@ -556,30 +590,30 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
                 <span className="text-[var(--text-primary)] font-bold">{data.CostEstimation?.AnnualOperatingCost?.LaboratoryStaff || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center pt-4">
-                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-[10px]">{language === 'Arabic' ? "إجمالي التشغيل السنوي" : "Total Annual Operating"}</span>
+                <span className="text-[var(--text-primary)] font-black uppercase tracking-widest text-xs md:text-sm">{language === 'Arabic' ? "إجمالي التشغيل السنوي" : "Total Annual Operating"}</span>
                 <div className="text-right">
                   <div className="text-emerald-700 dark:text-emerald-400 font-black">{safeCost(data.CostEstimation?.AnnualOperatingCost?.TotalAnnualOperatingCost).USD}</div>
-                  <div className="text-[10px] text-[var(--accent-emerald)] dark:text-emerald-400 font-bold">{safeCost(data.CostEstimation?.AnnualOperatingCost?.TotalAnnualOperatingCost).OMR}</div>
+                  <div className="text-xs md:text-sm text-[var(--accent-emerald)] dark:text-emerald-400 font-bold">{safeCost(data.CostEstimation?.AnnualOperatingCost?.TotalAnnualOperatingCost).OMR}</div>
                 </div>
               </div>
             </div>
             
             <div className="mt-8 p-6 bg-amber-600 text-black rounded-2xl shadow-card dark:bg-amber-600 dark:text-white">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">{language === 'Arabic' ? "إجمالي الميزانية الأولية المطلوبة" : "Total Initial Budget Required"}</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-widest opacity-80 mb-1">{language === 'Arabic' ? "إجمالي الميزانية الأولية المطلوبة" : "Total Initial Budget Required"}</p>
               <div className="flex flex-col">
                 <span className="text-2xl font-black">{safeCost(data.CostEstimation?.TotalInitialBudgetRange).USD}</span>
                 <span className="text-sm font-bold opacity-90">{safeCost(data.CostEstimation?.TotalInitialBudgetRange).OMR}</span>
               </div>
-              <p className="text-[10px] mt-2 italic opacity-70">{language === 'Arabic' ? "الميزانية التقديرية المطلوبة لتنفيذ هذا البحث على نطاق تجريبي" : "Estimated Budget Required to Implement This Research at Pilot Scale"}</p>
+              <p className="text-xs md:text-sm mt-2 italic opacity-70">{language === 'Arabic' ? "الميزانية التقديرية المطلوبة لتنفيذ هذا البحث على نطاق تجريبي" : "Estimated Budget Required to Implement This Research at Pilot Scale"}</p>
             </div>
           </div>
         </div>
 
         <div className="mt-8 pt-6 border-t border-[var(--border-glow)]">
-          <h4 className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-3">{language === 'Arabic' ? "افتراضات التكلفة" : "Cost Assumptions"}</h4>
+          <h4 className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-3">{language === 'Arabic' ? "افتراضات التكلفة" : "Cost Assumptions"}</h4>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
             {(data.CostEstimation?.CostAssumptions || []).map((assumption: string, i: number) => (
-              <li key={i} className="text-xs text-[var(--text-secondary)] flex items-start">
+              <li key={i} className="text-sm text-[var(--text-secondary)] flex items-start">
                 <i className="fas fa-info-circle text-amber-700 dark:text-amber-400 mr-2 mt-0.5"></i>
                 {assumption}
               </li>
@@ -628,5 +662,6 @@ export const ResearchDashboard: React.FC<ResearchDashboardProps> = ({ data, lang
       </div>
 
     </motion.div>
+    </div>
   );
 };

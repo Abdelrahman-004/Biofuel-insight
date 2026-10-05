@@ -104,25 +104,25 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div>
-                  <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "اسم المشروع" : "Project Name"}</p>
+                  <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "اسم المشروع" : "Project Name"}</p>
                   <p className="text-lg font-bold">{suggestion.ProjectName}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "استراتيجية المواد الخام" : "Feedstock Strategy"}</p>
+                  <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "استراتيجية المواد الخام" : "Feedstock Strategy"}</p>
                   <p className="text-sm">{suggestion.Feedstock}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "مبرر الامتثال" : "Compliance Justification"}</p>
-                  <p className="text-xs text-emerald-100 leading-relaxed italic">{suggestion.StrategicJustification}</p>
+                  <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{language === 'Arabic' ? "مبرر الامتثال" : "Compliance Justification"}</p>
+                  <p className="text-xs text-emerald-900 dark:text-emerald-100 leading-relaxed italic">{suggestion.StrategicJustification}</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-[var(--card-bg)] shadow-card  shadow-card border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-4 rounded-xl border border-[var(--border-glow)]">
-                  <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "التكنولوجيا القياسية" : "Standard Technology"}</p>
+                  <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "التكنولوجيا القياسية" : "Standard Technology"}</p>
                   <p className="text-sm">{suggestion.Technology}</p>
                 </div>
                 <div className="bg-[var(--card-bg)] shadow-card  shadow-card border-[var(--border-glow)] hover:border-var(--accent-emerald)/5 p-4 rounded-xl border border-[var(--border-glow)]">
-                  <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "النطاق الإرشادي" : "Indicative Scale"}</p>
+                  <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest mb-1">{language === 'Arabic' ? "النطاق الإرشادي" : "Indicative Scale"}</p>
                   <p className="text-sm">{suggestion.EstimatedScale}</p>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-emerald-700 dark:text-emerald-400 transition-colors">{s.title}</h3>
-                <p className="text-[10px] font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{s.subtitle}</p>
+                <p className="text-xs font-bold text-[var(--accent-emerald)] dark:text-emerald-400 uppercase tracking-widest">{s.subtitle}</p>
               </div>
               <div className="bg-[var(--bg-main)] p-2 rounded-lg text-[var(--text-secondary)] group-hover:text-[var(--accent-emerald)] dark:text-emerald-400 transition-colors">
                 <i className="fas fa-shield-check"></i>
@@ -152,11 +152,11 @@ export const GlobalStandards: React.FC<{ language?: string }> = ({ language = 'E
             <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">{s.desc}</p>
             <div className="space-y-4 pt-4 border-t border-slate-50">
               <div>
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الأهمية" : "Criticality"}</p>
+                <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "الأهمية" : "Criticality"}</p>
                 <p className="text-xs text-[var(--text-secondary)] font-medium">{s.why}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "القطاعات القابلة للتطبيق" : "Applicable Sectors"}</p>
+                <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{language === 'Arabic' ? "القطاعات القابلة للتطبيق" : "Applicable Sectors"}</p>
                 <p className="text-xs text-[var(--text-secondary)] font-medium">{s.applies}</p>
               </div>
             </div>

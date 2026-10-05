@@ -16,6 +16,9 @@ export interface EconomicFeasibility {
   Assessment: string;
   Justification: string;
   PaybackPeriodYears: number;
+  PaybackFormatted?: string;
+  isOperatingDeficit?: boolean;
+  breakEvenPrice?: number;
   RealisticRequiredCAPEX: number;
   FundingGapUSD: number;
   FundingGapPercentage: number;
@@ -24,7 +27,7 @@ export interface EconomicFeasibility {
   AnnualOPEX: number;
   GrossProfit: number;
   CapitalAdequacyRatio: number;
-  InvestmentVerdict: 'Not Bankable' | 'Conditionally Viable' | 'Investment Grade';
+  InvestmentVerdict: 'Not Bankable' | 'Not Bankable / High Commercial Risk' | 'Conditionally Viable' | 'Investment Grade';
   EstimatedInvestmentUSD: {
     Minimum: number;
     Maximum: number;
@@ -34,15 +37,27 @@ export interface EconomicFeasibility {
 
 export interface SensitivityDataPoint {
   label: string;
-  payback: number;
+  payback: number | null;
   irr: number;
+  ebitdaK?: number;
+}
+
+export interface SensitivityStressTest {
+  PaybackPeriod: number;
+  RiskLevel: string;
+  PaybackFormatted?: string;
+  EBITDA?: number;
+  EBITDADelta?: number;
 }
 
 export interface SensitivityAnalysis {
-  PriceDrop10: { PaybackPeriod: number; RiskLevel: string };
-  OPEXIncrease15: { PaybackPeriod: number; RiskLevel: string };
-  ProductionDrop10: { PaybackPeriod: number; RiskLevel: string };
+  PriceDrop10: SensitivityStressTest;
+  OPEXIncrease15: SensitivityStressTest;
+  ProductionDrop10: SensitivityStressTest;
   DataPoints: SensitivityDataPoint[];
+  BreakEvenSellingPriceUSD?: number;
+  BreakEvenUnit?: string;
+  IsOperatingDeficit?: boolean;
 }
 
 export interface EnvironmentalImpact {
@@ -59,10 +74,37 @@ export interface KeyRisk {
   Mitigation: string;
 }
 
+export interface ReconciliationAuditCheck {
+  id: string;
+  name: string;
+  category: 'INPUT_FIDELITY' | 'MATHEMATICAL_IDENTITY' | 'OMAN_BENCHMARK' | 'CROSS_MODULE_ALIGNMENT';
+  status: 'PASSED' | 'ADVISORY' | 'FLAGGED';
+  formula: string;
+  evaluatedValues: string;
+  message: string;
+}
+
 export interface AuditAIReview {
   ConsistencyCheck: string;
   DataWarnings: string[];
   SuggestedCorrections: string[];
+  VerificationStatus?: 'PASSED_ZERO_ERRORS' | 'PASSED_WITH_ADVISORY' | 'FLAGGED';
+  AuditScore?: number;
+  AuditTimestamp?: string;
+  AuditorEngine?: string;
+  ReconciliationChecks?: ReconciliationAuditCheck[];
+  EntriesEchoSummary?: {
+    projectName: string;
+    location: string;
+    category: string;
+    feedstock: string;
+    production: string;
+    capacity?: string;
+    budget: string;
+    sellingPrice: string;
+    electricityCost?: string;
+    laborCost?: string;
+  };
 }
 
 export interface InvestorPerspective {
@@ -339,7 +381,7 @@ export interface ChallengeHistoryEntry {
   id: string;
   topic: string;
   timestamp: string;
-  fullData: ChallengeSolverResult;
+  fullData: ChallengeSolverResult | MultiAgentChallengeResult;
 }
 
 export interface OptimizerResult {
@@ -632,3 +674,224 @@ export interface ProposalHistoryEntry {
   targetAudience: string;
   fullData: ProposalResult;
 }
+
+export interface ScientificParameter {
+  name: string;
+  optimalValue: string;
+  tolerance?: string;
+  scientificUnit: string;
+  impact: string;
+}
+
+export interface TroubleshootingStep {
+  symptom: string;
+  rootCause: string;
+  diagnosticAssay: string;
+  correctiveAction: string;
+  expectedBenchmark: string;
+}
+
+export interface AgentSolution {
+  agentRole: string;
+  agentIcon: string;
+  agentName: string;
+  specificMandate?: string;
+  proposedSolution: string;
+  keyEvidences: string[];
+  scientificParameters?: ScientificParameter[];
+  dataTables: {
+    title: string;
+    columns: string[];
+    rows: (string | number)[][];
+    chartType: "bar" | "line" | "pie";
+    xAxisLabel: string;
+    yAxisLabel: string;
+  }[];
+  timeline: {
+    phase: string;
+    duration: string;
+    description: string;
+  }[];
+}
+
+export interface LabProtocolStep {
+  stepNumber: number;
+  title: string;
+  instructions: string;
+  criticalNotice?: string;
+}
+
+export interface MultiAgentChallengeResult {
+  challengeTitle: string;
+  challengeSummary: string;
+  rootCauseAnalysis?: {
+    primaryFailureMechanism: string;
+    chemicalThermodynamicCause: string;
+    experimentalConfounder: string;
+  };
+  researcherTroubleshootingMatrix?: TroubleshootingStep[];
+  stepByStepLabProtocol?: LabProtocolStep[];
+  scientificConfidenceScore?: number;
+  trlCurrent?: number;
+  trlTarget?: number;
+  agents: AgentSolution[];
+  consensus: string;
+  consultingReportMarkdown?: string;
+}
+
+// ========================================================
+// OMAN EV MULTI-AGENT MOBILITY PLATFORM INTERFACES
+// ========================================================
+
+export interface OmanEvInput {
+  vehicleId: string;
+  vehicleModel?: string;
+  batteryCapacityKwh?: number;
+  currentSocPct: number; // 0 - 100
+  ambientTempC: number;
+  batteryTempC: number;
+  elevationChangeMeters: number; // e.g. +850m or -400m
+  originalEstimatedRangeKm: number;
+  requestedChargingPowerKw?: number;
+  stationName?: string;
+  stationGridCapacityKw?: number;
+  activePortsCount?: number;
+  totalStationPorts?: number;
+  stationThrottled?: boolean;
+  imageDataBase64?: string;
+  imageMimeType?: string;
+  language?: 'English' | 'Arabic';
+}
+
+export interface OmanEvAnalysisResult {
+  agent_telemetry_summary: {
+    vehicle_id: string;
+    normalized_temp_c: number;
+    normalized_soc_pct: number;
+    normalized_battery_temp_c?: number;
+    elevation_change_m?: number;
+    elevation_impact_desc?: string;
+  };
+  thermal_and_range_analysis: {
+    original_estimated_range_km: number;
+    adjusted_desert_range_km: number;
+    range_loss_percentage: number;
+    thermal_status: "NORMAL" | "WARNING" | "CRITICAL";
+    heat_coefficient_applied?: string;
+    cooling_power_penalty_pct?: number;
+    critical_warning_reason?: string;
+  };
+  grid_and_charging_optimization: {
+    allocated_power_kw: number;
+    applied_charging_tier: "TIER_1" | "TIER_2" | "TIER_3";
+    tariff_rate_omr_per_kwh: number;
+    tariff_rate_usd_per_kwh?: number;
+    cooling_power_draw_kw: number;
+    station_grid_load_pct?: number;
+    estimated_charge_time_mins?: number;
+    dynamic_load_allocation_note?: string;
+  };
+  vision_hardware_audit: {
+    has_image_input: boolean;
+    detected_faults: string[];
+    maintenance_priority: "NONE" | "LOW" | "MEDIUM" | "CRITICAL";
+    diagnostic_details?: string;
+    inspected_components?: {
+      connector_latch: "GOOD" | "WEAR_DETECTED" | "CRITICAL_DAMAGE";
+      screen_lcd: "CLEAR" | "GLARE_DETECTED" | "SUN_BURNED";
+      cooling_vents: "CLEAN" | "PARTIAL_SAND" | "HEAVY_BLOCKAGE";
+      charging_cable: "HEALTHY" | "SURFACE_WEAR" | "HAZARD_ABRASION";
+    };
+  };
+  driver_actionable_recommendation: string;
+  calculated_at?: string;
+  execution_mode?: "AI_AGENT_NETWORK" | "PRECISION_DETERMINISTIC_ENGINE";
+}
+
+// ========================================================
+// VOLTOMAN ENGINE - ENTERPRISE EV ROUTING & TELEMETRY
+// ========================================================
+
+export interface VoltOmanInput {
+  routeId?: string;
+  routeNameEn: string;
+  routeNameAr: string;
+  highwayCorridor: 'Batinah' | 'Nizwa Road' | 'Adam-Thumrait-Salalah' | 'Sharqiyah' | 'Duqm SEZ' | 'Custom';
+  distanceKm: number;
+  manufacturerRatingKwhPerKm: number; // e.g. 0.18 kWh/km
+  batteryCapacityKwh: number; // e.g. 78 kWh
+  initialSocPct: number; // e.g. 90%
+  minArrivalSocBufferPct?: number; // e.g. 15%
+  ambientTempC: number; // e.g. 44°C
+  timeOfDayHour: number; // 0 - 23 (e.g. 13 for 13:00 midday)
+  uphillGainMeters: number; // e.g. +1450m
+  downhillLossMeters: number; // e.g. -400m
+  vehicleMassKg: number; // e.g. 2100 kg
+  vehicleModelName?: string;
+  maxDcChargingSpeedKw?: number; // e.g. 150 kW or 250 kW
+  language?: 'English' | 'Arabic';
+}
+
+export interface VoltOmanChargingStop {
+  stopIndex: number;
+  stationNameEn: string;
+  stationNameAr: string;
+  highwayCorridor: string;
+  distanceFromStartKm: number;
+  segmentDistanceKm: number;
+  arrivalSocPct: number;
+  targetDepartureSocPct: number;
+  chargerRatedKw: number;
+  effectiveChargingPowerKw: number;
+  isMiddayDerated: boolean;
+  chargingTimeMins: number;
+  energyAddedKwh: number;
+  estimatedCostOmr: number;
+  coolingAdvice?: string;
+}
+
+export interface VoltOmanTelemetryMetrics {
+  distanceKm: number;
+  manufacturerRatingKwhPerKm: number;
+  baseEnergyConsumptionKwh: number; // E_base = Distance * Rating
+  ambientTempC: number;
+  timeOfDayHour: number;
+  isMidday: boolean; // 11:00 - 16:00
+  tempPenaltyFactor: number; // F_temp
+  tempFormulaExplanation: string;
+  tempAdjustedEnergyKwh: number; // E_base * F_temp
+  uphillGainMeters: number;
+  elevationUphillPenaltyKwh: number; // +2.5 kWh per 1000m gain
+  downhillLossMeters: number;
+  vehicleMassKg: number;
+  regenRecoveredKwh: number; // m * g * h * 0.60 converted to kWh
+  totalNetEnergyKwh: number; // (E_base * F_temp) + E_elev_uphill - E_regen
+  effectiveEfficiencyKwhPerKm: number; // Total / Distance
+  usableBatteryCapacityKwh: number;
+  initialSocPct: number;
+  arrivalSocPctWithoutCharging: number;
+  isDirectFeasible: boolean;
+  requiredChargingStopsCount: number;
+  isDeratingTriggered: boolean;
+  deratingFormulaExplanation: string;
+}
+
+export interface VoltOmanResult {
+  feasibilityVerdict: 'DIRECT_REACHABLE' | 'FEASIBLE_WITH_CHARGES' | 'CRITICAL_DEFICIT';
+  verdictTitleEn: string;
+  verdictTitleAr: string;
+  verdictSummaryEn: string;
+  verdictSummaryAr: string;
+  telemetry: VoltOmanTelemetryMetrics;
+  chargingItinerary: VoltOmanChargingStop[];
+  totalChargingTimeMins: number;
+  totalDriveTimeMins: number;
+  totalTripTimeMins: number;
+  totalTripCostOmr: number;
+  batteryThermalMitigationAdviceEn: string[];
+  batteryThermalMitigationAdviceAr: string[];
+  fullMarkdownReport: string;
+  calculatedAt: string;
+  executionEngine: 'VOLTOMAN_AI_COPILOT' | 'VOLTOMAN_PRECISION_ENGINE';
+}
+

@@ -109,9 +109,9 @@ export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'En
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h4 className="font-black text-[var(--text-primary)] group-hover:text-blue-700 dark:text-blue-400 transition">{entry.ResearchInputs.BiofuelType}</h4>
-                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{entry.ResearchInputs.FeedstockType}</p>
+                <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{entry.ResearchInputs.FeedstockType}</p>
               </div>
-              <div className="bg-blue-50 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black">
+              <div className="bg-blue-50 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-black">
                 Score: {entry.ReadinessScore.OverallScore}
               </div>
             </div>
@@ -127,7 +127,7 @@ export const ResearchHistory: React.FC<ResearchHistoryProps> = ({ language = 'En
               </div>
             </div>
 
-            <div className="flex justify-between items-center text-[10px] text-[var(--text-secondary)]">
+            <div className="flex justify-between items-center text-xs text-[var(--text-secondary)]">
               <span className="font-medium italic">{entry.timestamp}</span>
               <span className="text-blue-700 dark:text-blue-400 font-bold group-hover:translate-x-1 transition-transform">View Details <i className="fas fa-arrow-right ml-1"></i></span>
             </div>

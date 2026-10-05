@@ -132,7 +132,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ language }) => {
               {isArabic ? 'مرحباً، ' : 'Welcome, '}
               {authRole === 'GUEST' ? (isArabic ? 'زائر' : 'Guest') : (userAlias || (authRole === 'INVESTOR' ? (isArabic ? 'مستثمر' : 'Investor') : (isArabic ? 'دكتور' : 'Researcher')))}
             </h2>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+            <p className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider">
               {authRole === 'GUEST' ? (isArabic ? 'حساب زائر (للعرض فقط)' : 'Guest Account (View Only)') : currentUser?.email}
             </p>
           </div>
@@ -251,7 +251,7 @@ const AuthScreen = ({ language, onLoginSuccess }: { language: string, onLoginSuc
 
         <div className="mb-6 p-4 rounded-xl bg-[var(--card-bg)] border border-[var(--border-glow)] flex space-x-3 rtl:space-x-reverse">
           <i className="fas fa-info-circle text-blue-700 dark:text-blue-400 mt-0.5"></i>
-          <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
+          <p className="text-sm text-[var(--text-primary)] font-medium leading-relaxed">
             {isArabic 
               ? 'يرجى تسجيل الدخول باستخدام حساب جوجل للوصول إلى المنصة.'
               : 'Please sign in using your Google account to access the platform.'}
@@ -383,7 +383,7 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
             </p>
           </div>
           <div className="flex space-x-2 rtl:space-x-reverse">
-            <button className="px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-lg text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+            <button className="px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-lg text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
               <i className="fas fa-filter mr-2 rtl:ml-2 rtl:mr-0"></i> {isArabic ? 'تصفية' : 'Filter'}
             </button>
           </div>
@@ -403,7 +403,7 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
             <div className="h-48 relative overflow-hidden bg-[#F1F5F9] dark:bg-slate-800">
               <img src={project.image || 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1000&auto=format&fit=crop'} alt="Project" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
 
-              <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-black/60  border border-white/10 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full">
+              <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-black/60  border border-white/10 text-white text-xs md:text-sm font-black tracking-widest uppercase px-3 py-1.5 rounded-full">
                 {project.type}
               </div>
               <div className="absolute top-4 left-4 rtl:right-4 rtl:left-auto bg-emerald-400 text-emerald-950 text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center">
@@ -423,22 +423,22 @@ const InvestorDashboard = ({ language, user, isGuest }: { language: string, user
               
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-[var(--bg-main)] p-3 rounded-xl border border-[var(--border-glow)]">
-                  <p className="text-[10px] uppercase font-black tracking-wider text-[var(--text-secondary)] mb-1">{language === 'Arabic' ? "التمويل" : "Funding"}</p>
+                  <p className="text-xs md:text-sm uppercase font-black tracking-wider text-[var(--text-secondary)] mb-1">{language === 'Arabic' ? "التمويل" : "Funding"}</p>
                   <p className="font-black text-[var(--text-primary)]">${(project.fundingRequired / 1000000).toFixed(1)}M</p>
                 </div>
                 <div className="bg-[var(--bg-main)] p-3 rounded-xl border border-[var(--border-glow)]">
-                  <p className="text-[10px] uppercase font-black tracking-wider text-[var(--text-secondary)] mb-1">{language === 'Arabic' ? "معدل العائد" : "IRR"}</p>
-                  <p className="font-black text-emerald-500">{project.roi}%</p>
+                  <p className="text-xs md:text-sm uppercase font-black tracking-wider text-[var(--text-secondary)] mb-1">{language === 'Arabic' ? "معدل العائد" : "IRR"}</p>
+                  <p className="font-black text-emerald-600 dark:text-emerald-400">{project.roi}%</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-[var(--border-glow)]">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px]">
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs md:text-sm">
                     <i className="fas fa-user text-[var(--text-secondary)]"></i>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-[var(--text-primary)] line-clamp-1">{project.author}</p>
+                    <p className="text-xs md:text-sm font-bold text-[var(--text-primary)] line-clamp-1">{project.author}</p>
                     <p className="text-[9px] font-medium text-[var(--text-secondary)] line-clamp-1">{project.institution}</p>
                   </div>
                 </div>
@@ -597,7 +597,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
               </label>
               <input type="range" min="1" max="9" value={trl} onChange={e => setTrl(Number(e.target.value))} className="w-full" />
 
-              <div className="flex justify-between text-[10px] text-[var(--text-secondary)] font-bold">
+              <div className="flex justify-between text-xs md:text-sm text-[var(--text-secondary)] font-bold">
                 <span>TRL 1 (Idea)</span>
                 <span>TRL 5 (Lab Tested)</span>
                 <span>TRL 9 (Commercial)</span>
@@ -625,7 +625,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
               <div className="border-2 border-dashed border-[var(--border-glow)] rounded-xl p-8 text-center hover:bg-[var(--bg-main)] transition-colors cursor-pointer">
                 <i className="fas fa-cloud-upload-alt text-3xl text-blue-700 dark:text-blue-400 mb-3"></i>
                 <p className="text-sm font-medium text-[var(--text-primary)]">{isArabic ? 'اضغط لرفع الملفات' : 'Click to Upload Files'}</p>
-                <p className="text-xs text-[var(--text-secondary)] mt-1">{language === 'Arabic' ? "ملف PDF بحجم يصل إلى 20 ميغابايت" : "PDF up to 20MB"}</p>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">{language === 'Arabic' ? "ملف PDF بحجم يصل إلى 20 ميغابايت" : "PDF up to 20MB"}</p>
               </div>
             </div>
 
@@ -669,7 +669,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600 dark:bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600 dark:bg-blue-600/20 transition-all"></div>
           
           <div className="flex justify-between items-start mb-4">
-            <div className={`px-3 py-1 ${p.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'} text-[10px] font-black uppercase tracking-widest rounded-full`}>
+            <div className={`px-3 py-1 ${p.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'} text-xs md:text-sm font-black uppercase tracking-widest rounded-full`}>
               {isArabic ? (p.status === 'Pending' ? 'التحليل معلق' : 'نشط للمستثمرين') : (p.status === 'Pending' ? 'Pending Analysis' : 'Active Listing')}
             </div>
             <i className="fas fa-ellipsis-v text-[var(--text-secondary)] p-2 cursor-pointer hover:text-[var(--text-primary)]"></i>
@@ -678,7 +678,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
           <h3 className="text-lg font-bold text-[var(--text-primary)] leading-tight mb-2">
             {isArabic ? p.titleAr : p.titleEn}
           </h3>
-          <p className="text-xs text-[var(--text-secondary)] font-medium mb-6 line-clamp-2">
+          <p className="text-sm text-[var(--text-secondary)] font-medium mb-6 line-clamp-2">
             {p.description || "Scaling local biofuel operations in Oman using advanced technologies."}
           </p>
           
@@ -693,7 +693,7 @@ const ResearcherDashboard = ({ language, user, userAlias }: { language: string, 
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">{language === 'Arabic' ? "درجة الجدوى (الذكاء الاصطناعي)" : "AI Viability Score"}</span>
-              <span className="font-black text-emerald-500">{p.matchScore || 'N/A'}/100</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400">{p.matchScore || 'N/A'}/100</span>
             </div>
           </div>
           
@@ -727,10 +727,10 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
           <div className="absolute bottom-6 px-8 w-full flex justify-between items-end">
             <div>
               <div className="flex items-center space-x-3 rtl:space-x-reverse mb-3">
-                <span className="bg-emerald-400 text-emerald-950 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full shadow-lg">
+                <span className="bg-emerald-400 text-emerald-950 px-3 py-1 text-xs md:text-sm uppercase font-black tracking-widest rounded-full shadow-lg">
                   {project.matchScore}% {isArabic ? 'توافق' : 'Match'}
                 </span>
-                <span className="bg-white/20  text-white border border-white/20 px-3 py-1 text-[10px] uppercase font-black tracking-widest rounded-full">
+                <span className="bg-white/20  text-white border border-white/20 px-3 py-1 text-xs md:text-sm uppercase font-black tracking-widest rounded-full">
                   TRL {project.trl}
                 </span>
               </div>
@@ -764,7 +764,7 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
               <section>
                 <h3 className="text-sm font-black text-[var(--text-secondary)] uppercase tracking-wider mb-4 border-b border-[var(--border-glow)] pb-2 flex justify-between items-center">
                   <span>{isArabic ? 'نظرة عامة على المشروع' : 'Project Overview'}</span>
-                  <button className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1.5 rounded-lg flex items-center hover:bg-blue-100 transition-colors">
+                  <button className="text-xs md:text-sm bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1.5 rounded-lg flex items-center hover:bg-blue-100 transition-colors">
                     <i className="fas fa-download mr-2 rtl:ml-2 rtl:mr-0"></i> Pitch Deck
                   </button>
                 </h3>
@@ -777,21 +777,21 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
 
               <section>
                 <h3 className="text-sm font-black text-[var(--text-secondary)] uppercase tracking-wider mb-4 border-b border-[var(--border-glow)] pb-2 flex items-center">
-                  <i className="fas fa-robot text-emerald-500 mr-2 rtl:ml-2 rtl:mr-0"></i>
+                  <i className="fas fa-robot text-emerald-600 dark:text-emerald-400 mr-2 rtl:ml-2 rtl:mr-0"></i>
                   {isArabic ? 'تقرير محرك الجدوى الذكي' : 'AI Feasibility Engine Report'}
                 </h3>
                 
                 <div className="grid lg:grid-cols-3 gap-4">
                   <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-4 rounded-xl">
-                    <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">CAPEX (Est.)</p>
+                    <p className="text-xs md:text-sm text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">CAPEX (Est.)</p>
                     <p className="text-xl font-black text-[var(--text-primary)]">${(project.fundingRequired / 1000000).toFixed(1)}M</p>
                   </div>
                   <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-4 rounded-xl">
-                    <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">{language === 'Arabic' ? "معدل العائد الداخلي المتوقع" : "Expected IRR"}</p>
-                    <p className="text-xl font-black text-emerald-500">{project.roi}%</p>
+                    <p className="text-xs md:text-sm text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">{language === 'Arabic' ? "معدل العائد الداخلي المتوقع" : "Expected IRR"}</p>
+                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{project.roi}%</p>
                   </div>
                   <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-4 rounded-xl">
-                    <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">{language === 'Arabic' ? "فترة الاسترداد" : "Payback Period"}</p>
+                    <p className="text-xs md:text-sm text-[var(--text-secondary)] font-black uppercase tracking-wider mb-1">{language === 'Arabic' ? "فترة الاسترداد" : "Payback Period"}</p>
                     <p className="text-xl font-black text-amber-700 dark:text-amber-400">{project.payback} Yrs</p>
                   </div>
                 </div>
@@ -812,7 +812,7 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
                   </div>
                   <div>
                     <p className="font-bold text-[var(--text-primary)] line-clamp-1">{project.authorName || project.author}</p>
-                    <p className="text-[10px] font-bold text-[var(--text-secondary)]">{project.institution}</p>
+                    <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)]">{project.institution}</p>
                   </div>
                 </div>
                 {(project.contactEmail || project.contactPhone) && !isGuest && (
@@ -824,19 +824,19 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
                     )}
                     {project.contactPhone && (
                       <div className="flex items-center text-[var(--text-primary)] mt-2">
-                        <i className="fas fa-phone mr-2 rtl:ml-2 rtl:mr-0 w-4 text-center text-emerald-500"></i> <span dir="ltr">{project.contactPhone}</span>
+                        <i className="fas fa-phone mr-2 rtl:ml-2 rtl:mr-0 w-4 text-center text-emerald-600 dark:text-emerald-400"></i> <span dir="ltr">{project.contactPhone}</span>
                       </div>
                     )}
                   </div>
                 )}
                 {(project.contactEmail || project.contactPhone) && isGuest && (
-                  <div className="mb-4 text-center text-xs font-bold text-[var(--text-secondary)] bg-[var(--card-bg)] p-3 rounded-xl border border-[var(--border-glow)] border-dashed">
+                  <div className="mb-4 text-center text-sm font-bold text-[var(--text-secondary)] bg-[var(--card-bg)] p-3 rounded-xl border border-[var(--border-glow)] border-dashed">
                      <i className="fas fa-eye-slash mb-1.5 text-[var(--text-secondary)] text-lg block opacity-50"></i>
                      {isArabic ? 'سجل دخولك لرؤية بيانات التواصل' : 'Sign in to see contact info'}
                   </div>
                 )}
                 {project.status === 'Verified' && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-bold px-3 py-2 rounded-lg flex items-center justify-center">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-sm font-bold px-3 py-2 rounded-lg flex items-center justify-center">
                     <i className="fas fa-shield-check mr-2 rtl:ml-2 rtl:mr-0"></i> {isArabic ? 'هوية وبحث موثق' : 'Identity & Research Verified'}
                   </div>
                 )}
@@ -844,13 +844,13 @@ const ProjectDetails = ({ project, isArabic, onBack, viewer, isGuest, language =
 
               <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-6 rounded-2xl">
                 <h4 className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider mb-4">{isArabic ? 'المستشار الذكي للمستثمر' : 'Investor AI Advisor'}</h4>
-                <p className="text-xs text-[var(--text-primary)] font-medium mb-3">
+                <p className="text-sm text-[var(--text-primary)] font-medium mb-3">
                   {isArabic ? 'اسأل الذكاء الاصطناعي عن هذا المشروع' : 'Ask the AI about this project viability.'}
                 </p>
                 <div className="relative">
                   <input type="text" placeholder={isArabic ? "مثال: ما هي المخاطر التقنية؟" : "E.g. What are the policy risks?"} className="w-full bg-[var(--card-bg)] border border-[var(--border-glow)] rounded-xl py-2.5 px-4 text-xs focus:outline-none focus:border-emerald-500" />
                   <button className="absolute right-2 rtl:left-2 rtl:right-auto top-2 w-7 h-7 rounded-lg bg-emerald-600 text-[white] flex items-center justify-center">
-                    <i className="fas fa-magic text-[10px]"></i>
+                    <i className="fas fa-magic text-xs md:text-sm"></i>
                   </button>
                 </div>
               </div>

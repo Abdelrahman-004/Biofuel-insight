@@ -1,8 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-sans: "Inter", "Tajawal", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", "Tajawal", "Cairo", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --color-bg-main: var(--bg-main);
   --color-card-bg: var(--card-bg);
@@ -23,56 +25,69 @@
 
 @layer base {
   :root {
-    --bg-main: #F9FAFB; /* Tailwind gray-50 */
+    --bg-main: #F8FAFC;
     --card-bg: #FFFFFF;
-    --sidebar-bg: #FFFFFF;
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --text-primary: #111827; /* Tailwind gray-900 */
-    --text-secondary: #4B5563; /* Tailwind gray-600 */
-    --text-muted: #6B7280; /* Tailwind gray-500 (Accessible) */
-    --accent-emerald: #047857; /* Emerald-700 for WCAG AA */
-    --border-subtle: #F3F4F6; /* Gray-100 */
-    --border-glow: #E5E7EB; /* Gray-200, no neon */
-    --border-dark: #D1D5DB; 
-    --zebra-even: #F9FAFB;
-    --zebra-odd: #FFFFFF;
-    --color-up: #047857; /* Emerald-700 */
-    --color-down: #B91C1C;  /* Red-700 */
-    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    --sidebar-bg: #F8FAFC;
+    --nav-bg: rgba(248, 250, 252, 0.85);
+    --text-primary: #0F172A; 
+    --text-secondary: #475569; 
+    --text-muted: #94A3B8; 
+    --accent-emerald: #10B981; 
+    --border-subtle: rgba(0,0,0,0.03); 
+    --border-glow: rgba(0,0,0,0.05); 
+    --border-dark: rgba(0,0,0,0.1); 
+    --zebra-even: #F1F5F9;
+    --zebra-odd: #F8FAFC;
+    --color-up: #10B981;
+    --color-down: #EF4444;  
+    --card-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .dark {
-    --bg-main: #0B111A; /* Deep cybernetic space */
-    --card-bg: rgba(15, 23, 36, 0.6); /* Glassmorphic card */
-    --sidebar-bg: rgba(11, 17, 26, 0.85);
-    --nav-bg: rgba(11, 17, 26, 0.85);
+    --bg-main: #0B0F19; /* Rich, deep premium dark tone */
+    --card-bg: rgba(255, 255, 255, 0.03); /* Translucent glassmorphism */
+    --sidebar-bg: rgba(11, 15, 25, 0.6);
+    --nav-bg: rgba(11, 15, 25, 0.6);
     --text-primary: #F8FAFC; 
     --text-secondary: #94A3B8; 
     --text-muted: #64748B; 
     --accent-emerald: #10B981; 
-    --border-subtle: rgba(30, 41, 59, 0.6); 
-    --border-glow: rgba(16, 185, 129, 0.2); 
-    --border-dark: rgba(16, 185, 129, 0.4);
-    --zebra-even: rgba(30, 41, 59, 0.3);
+    --border-subtle: rgba(255, 255, 255, 0.04); 
+    --border-glow: rgba(255, 255, 255, 0.08); 
+    --border-dark: rgba(255, 255, 255, 0.12);
+    --zebra-even: rgba(255, 255, 255, 0.02);
     --zebra-odd: transparent;
-    --color-up: #34D399; 
-    --color-down: #F87171; 
-    --card-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.05), inset 0 1px 1px rgba(255,255,255,0.05);
+    --color-up: #10B981; 
+    --color-down: #EF4444; 
+    --card-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 20px 40px -10px rgba(0,0,0,0.5);
   }
 
+  .shadow-card {
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Orbs for background */
   body.dark {
     background-image: 
-      radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.03), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.03), transparent 25%);
+      radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.15), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15), transparent 40%);
     background-color: var(--bg-main);
     background-attachment: fixed;
   }
 
   body {
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08), transparent 40%);
     background-color: var(--bg-main);
+    background-attachment: fixed;
     color: var(--text-primary);
     @apply font-sans;
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 }
 
@@ -109,17 +124,24 @@
 
 @layer components {
   .markdown-body {
-    @apply text-[var(--text-secondary)] leading-relaxed;
+    @apply leading-relaxed;
+    color: inherit;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   .markdown-body h1 { @apply text-2xl font-bold mb-4 mt-6 text-[var(--text-primary)]; }
   .markdown-body h2 { @apply text-xl font-bold mb-3 mt-5 text-[var(--text-primary)]; }
   .markdown-body h3 { @apply text-lg font-bold mb-3 mt-4 text-[var(--text-primary)]; }
-  .markdown-body p { @apply mb-4; }
+  .markdown-body p { @apply mb-4; overflow-wrap: anywhere; }
   .markdown-body ul { @apply list-disc pl-6 mb-4 space-y-1; }
   .markdown-body ol { @apply list-decimal pl-6 mb-4 space-y-1; }
-  .markdown-body li { @apply text-[var(--text-secondary)]; }
+  .markdown-body li { color: inherit; overflow-wrap: anywhere; }
   .markdown-body strong { @apply font-bold text-[var(--text-primary)]; }
-  .markdown-body table { @apply w-full border-collapse mb-6 bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border-glow)]; }
+  .markdown-body blockquote { @apply border-l-4 border-[#10B981] pl-5 italic text-[var(--text-secondary)] my-6 bg-[#10B981]/5 py-3 rounded-r-xl; }
+  .markdown-body code { @apply bg-[var(--bg-main)] text-[var(--accent-emerald)] px-1.5 py-0.5 rounded font-mono text-sm border border-[var(--border-subtle)]; }
+  .markdown-body pre { @apply bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--border-glow)] overflow-x-auto my-4; }
+  .markdown-body pre code { @apply bg-transparent text-[var(--text-secondary)] p-0 border-none text-sm; }
+  .markdown-body table { @apply w-full border-collapse mb-6 bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border-glow)]; display: block; overflow-x: auto; white-space: nowrap; }
   .markdown-body th { @apply border-b border-[var(--border-glow)] p-4 text-start font-bold text-[var(--text-primary)] tracking-wide text-sm bg-[var(--bg-main)]; }
   .markdown-body td { @apply border-b border-[var(--border-subtle)] p-4 text-start text-[var(--text-secondary)] text-sm; }
 
@@ -131,6 +153,7 @@
   }
 }
 
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -139,3 +162,10 @@
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+

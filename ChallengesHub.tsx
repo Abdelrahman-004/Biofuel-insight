@@ -142,7 +142,7 @@ const CHALLENGES: Challenge[] = [
   {
     id: 'ren-dust-heat',
     category: 'Renewable',
-    icon: 'fa-temperature-sun',
+    icon: 'fa-temperature-high',
     titleEn: 'Extreme Summer Piques & Soiling Losses',
     titleAr: 'ذروة الحرارة العنيفة وخسائر الغبار الكوارتزي',
     severity: 'High',
@@ -207,7 +207,7 @@ const CHALLENGES: Challenge[] = [
   {
     id: 'gh2-water-impact',
     category: 'Hydrogen',
-    icon: 'fa-droplet-slash',
+    icon: 'fa-droplet',
     titleEn: 'Green H2: Desalination Strain & Extreme Cooling Loops',
     titleAr: 'مأزق الهيدروجين الأخضر: استنزاف المياه والتبريد المعقد',
     severity: 'Critical',
@@ -508,7 +508,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-block px-5 py-2 rounded-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-[10px] sm:text-xs font-black tracking-[0.3em] uppercase text-[var(--accent-emerald)] mb-6 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
+            <div className="inline-block px-5 py-2 rounded-full bg-[var(--bg-main)] border border-[var(--border-glow)] text-xs md:text-sm sm:text-xs font-black tracking-[0.3em] uppercase text-[var(--accent-emerald)] mb-6 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
               {isArabic ? 'التحليل الاستراتيجي لمنظومة الطاقة' : 'STRATEGIC ENERGY SYSTEM ANALYSIS'}
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] mb-6 tracking-tight leading-tight">
@@ -531,7 +531,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                 setActiveCategory(cat.id);
                 setSelectedChallenge(null);
               }}
-              className={`px-4 md:px-5 py-2.5 md:py-3 rounded-2xl text-[10px] md:text-xs font-bold transition-all duration-300 border flex items-center justify-center gap-2 md:gap-3 tracking-widest uppercase ${
+              className={`px-4 md:px-5 py-2.5 md:py-3 rounded-2xl text-xs md:text-sm md:text-sm font-bold transition-all duration-300 border flex items-center justify-center gap-2 md:gap-3 tracking-widest uppercase ${
                 activeCategory === cat.id 
                   ? 'bg-[var(--card-bg)] border-[var(--accent-emerald)] text-[var(--accent-emerald)] shadow-[0_0_20px_-5px_rgba(16,185,129,0.4)]' 
                   : 'bg-[var(--bg-main)] border-[var(--border-glow)] text-[var(--text-secondary)] hover:border-gray-400 hover:text-[var(--text-primary)]'
@@ -569,12 +569,12 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                     
                     <div className="flex items-start justify-between mb-5 relative z-10 w-full">
                       <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-2xl bg-[var(--bg-main)] border border-[var(--border-glow)] shadow-inner text-[var(--accent-emerald)] group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
-                         <i className={`fas ${challenge.icon}`}></i>
+                         <i className={`fas ${challenge.icon || 'fa-bolt'}`}></i>
                       </div>
-                      <span className={`text-[10px] font-black tracking-widest uppercase px-4 py-1.5 rounded-full border whitespace-nowrap shadow-sm backdrop-blur-md ${
-                        challenge.severity === 'Critical' ? 'border-rose-500/40 text-rose-500 bg-rose-500/10' : 
-                        challenge.severity === 'High' ? 'border-amber-500/40 text-amber-500 bg-amber-600/10' : 
-                        'border-emerald-500/40 text-emerald-500 bg-emerald-500/10'
+                      <span className={`text-xs md:text-sm font-black tracking-widest uppercase px-4 py-1.5 rounded-full border whitespace-nowrap shadow-sm backdrop-blur-md ${
+                        challenge.severity === 'Critical' ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 bg-rose-500/10' : 
+                        challenge.severity === 'High' ? 'border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-600/10' : 
+                        'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10'
                       }`}>
                         <i className={`fas ${challenge.severity === 'Critical' ? 'fa-triangle-exclamation' : 'fa-bolt'} mr-1.5`}></i>
                         {challenge.severity}
@@ -590,7 +590,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                     </p>
 
                     <div className="mt-auto pt-5 border-t border-[var(--border-glow)] flex justify-between items-center relative z-10 w-full">
-                       <span className={`text-[9px] md:text-[10px] font-bold text-[var(--accent-emerald)]/80 flex items-center gap-2 uppercase tracking-widest ${selectedChallenge && selectedChallenge.id !== challenge.id ? 'hidden xl:flex' : 'flex'}`}>
+                       <span className={`text-[9px] md:text-xs md:text-sm font-bold text-[var(--accent-emerald)]/80 flex items-center gap-2 uppercase tracking-widest ${selectedChallenge && selectedChallenge.id !== challenge.id ? 'hidden xl:flex' : 'flex'}`}>
                          <i className="fas fa-fingerprint"></i> {isArabic ? 'فتح التحليل المفصل' : 'Open Detailed Analysis'}
                        </span>
                        <div className={`w-8 h-8 rounded-full bg-[var(--bg-main)] border border-[var(--border-glow)] flex items-center justify-center text-[var(--text-secondary)] group-hover:bg-[var(--accent-emerald)] group-hover:text-[var(--bg-main)] group-hover:border-[var(--accent-emerald)] transition-all ${selectedChallenge && selectedChallenge.id !== challenge.id ? 'ml-auto' : ''}`}>
@@ -623,7 +623,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                           setSelectedChallenge(null);
                           listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="xl:hidden mb-10 text-xs font-bold w-full bg-[var(--bg-main)] border border-[var(--border-glow)] py-4 rounded-2xl flex items-center justify-center gap-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-emerald)] transition-all"
+                      className="xl:hidden mb-10 text-sm font-bold w-full bg-[var(--bg-main)] border border-[var(--border-glow)] py-4 rounded-2xl flex items-center justify-center gap-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-emerald)] transition-all"
                     >
                       <i className={`fas ${isArabic ? 'fa-arrow-right' : 'fa-arrow-left'}`}></i>
                       {isArabic ? 'العودة للخلف وإغلاق التقرير' : 'Close Details & Go Back'}
@@ -632,7 +632,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                     {/* Header Row */}
                     <div className="flex flex-col md:flex-row items-start justify-between flex-wrap gap-8 mb-12">
                        <div className="w-full xl:flex-1 xl:pr-6">
-                         <div className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-[#8B5CF6] mb-4 flex items-center gap-2">
+                         <div className="text-xs md:text-sm md:text-xs font-black uppercase tracking-[0.3em] text-[#8B5CF6] mb-4 flex items-center gap-2">
                            <i className="fas fa-radar animate-pulse text-[#8B5CF6] mr-2"></i> {isArabic ? 'تحليل وطني استراتيجي' : 'National Strategic Analysis'}
                          </div>
                          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-tight tracking-tight">
@@ -646,19 +646,19 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       {/* Section 1: Problem Diagnosis */}
                       <div className="bg-rose-500/5 border border-rose-500/20 p-6 lg:p-8 rounded-[2rem] relative overflow-hidden">
                         <i className="fas fa-biohazard absolute -right-4 top-10 text-[100px] lg:text-[150px] text-rose-500/5 pointer-events-none"></i>
-                        <h4 className="text-[11px] lg:text-xs font-black text-rose-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                        <h4 className="text-sm lg:text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
                           1 // {isArabic ? 'تشخيص المشكلة وتأثيرها' : 'Problem Diagnosis & Impact'}
                         </h4>
                         <p className="text-sm lg:text-base text-[var(--text-primary)] leading-loose font-medium mb-6 relative z-10 break-words">
                           {isArabic ? selectedChallenge.diagnosisAr : selectedChallenge.diagnosisEn}
                         </p>
                         <div className="flex items-start gap-4 bg-rose-500/10 backdrop-blur-md p-5 rounded-2xl border border-rose-500/30 relative z-10 w-full shadow-inner">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-500 flex-shrink-0 animate-pulse">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-700 dark:text-rose-400 flex-shrink-0 animate-pulse">
                              <i className="fas fa-exclamation-triangle"></i>
                           </div>
                           <div>
-                             <div className="text-[10px] uppercase tracking-widest text-rose-600 dark:text-rose-400 font-bold mb-1">{isArabic ? 'الأثر الكمي' : 'Quantified Impact'}</div>
-                             <span className="text-xs lg:text-sm text-rose-200 font-bold leading-relaxed">
+                             <div className="text-xs md:text-sm uppercase tracking-widest text-rose-700 dark:text-rose-400 font-bold mb-1">{isArabic ? 'الأثر الكمي' : 'Quantified Impact'}</div>
+                             <span className="text-xs lg:text-sm text-rose-950 dark:text-rose-100 font-bold leading-relaxed">
                                {isArabic ? selectedChallenge.impactAr : selectedChallenge.impactEn}
                              </span>
                           </div>
@@ -669,7 +669,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
                         {/* Section 2: Real-World Benchmark */}
                         <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] p-6 lg:p-8 rounded-[2rem] shadow-sm relative overflow-hidden">
-                          <h4 className="text-[11px] lg:text-xs font-black text-blue-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                          <h4 className="text-sm lg:text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
                             2 // {isArabic ? 'معايير الواقع العماني' : 'Real-World Oman Benchmarks'} <i className="fas fa-chart-bar ml-auto opacity-50"></i>
                           </h4>
                           <ul className="space-y-4">
@@ -683,15 +683,15 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                         </div>
 
                         {/* Section 4: AI Optimization */}
-                        <div className="bg-[#8B5CF6]/5 border border-[#8B5CF6]/30 p-6 lg:p-8 rounded-[2rem] shadow-[inset_0_0_30px_rgba(139,92,246,0.03)] relative overflow-hidden">
-                           <div className="absolute top-0 right-0 w-40 h-40 bg-[#8B5CF6]/10 blur-[40px] rounded-full pointer-events-none"></div>
-                           <h4 className="text-[11px] lg:text-xs font-black text-[#8B5CF6] uppercase tracking-[0.2em] mb-6 flex items-center gap-3 relative z-10">
+                        <div className="bg-purple-500/10 border border-purple-500/30 p-6 lg:p-8 rounded-[2rem] shadow-[inset_0_0_30px_rgba(139,92,246,0.05)] relative overflow-hidden">
+                           <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 blur-[40px] rounded-full pointer-events-none"></div>
+                           <h4 className="text-sm lg:text-xs font-black text-purple-700 dark:text-purple-300 uppercase tracking-[0.2em] mb-6 flex items-center gap-3 relative z-10">
                             4 // {isArabic ? 'طبقة التحسين الذكية (AI)' : 'AI Optimization Layer'} <i className="fas fa-microchip ml-auto opacity-50"></i>
                           </h4>
                           <div className="flex flex-col gap-3 relative z-10">
                             {(isArabic ? selectedChallenge.aiTechAr : selectedChallenge.aiTechEn).map((tech, i) => (
-                              <div key={i} className="px-4 py-3 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#eaddff] text-xs lg:text-sm font-bold tracking-wide shadow-sm flex items-center gap-3">
-                                <i className="fas fa-code-branch text-[#8B5CF6] text-opacity-70"></i> {tech}
+                              <div key={i} className="px-4 py-3 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-950 dark:text-purple-100 text-xs lg:text-sm font-bold tracking-wide shadow-sm flex items-center gap-3">
+                                <i className="fas fa-code-branch text-purple-600 dark:text-purple-400"></i> {tech}
                               </div>
                             ))}
                           </div>
@@ -701,7 +701,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       {/* Section 3: Technical Solutions Ranked */}
                       <div className="bg-[var(--accent-emerald)]/5 border border-[var(--accent-emerald)]/30 p-6 lg:p-10 rounded-[2rem] relative overflow-hidden shadow-[inset_0_0_50px_rgba(16,185,129,0.02)]">
                          <i className="fas fa-shield-check absolute -left-10 bottom-0 text-[180px] text-[var(--accent-emerald)]/5 pointer-events-none"></i>
-                         <h4 className="text-[11px] lg:text-xs font-black text-[var(--accent-emerald)] uppercase tracking-[0.2em] mb-8 flex items-center gap-3 relative z-10">
+                         <h4 className="text-sm lg:text-xs font-black text-[var(--accent-emerald)] uppercase tracking-[0.2em] mb-8 flex items-center gap-3 relative z-10">
                             3 // {isArabic ? 'الحلول الهندسية الموصى بها (مرتبة)' : 'Ranked Technical Solutions'} <i className="fas fa-layer-group ml-auto opacity-50"></i>
                          </h4>
                          <div className="space-y-4 relative z-10">
@@ -727,7 +727,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
                          {/* Section 5: Economics */}
                          <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-[2rem] p-6 lg:p-8 flex flex-col">
-                            <h4 className="text-[11px] lg:text-xs font-black text-amber-500 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+                            <h4 className="text-sm lg:text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
                               5 // {isArabic ? 'التحليل الاقتصادي' : 'Economic Analysis'} <i className="fas fa-coins ml-auto opacity-50"></i>
                             </h4>
                             <div className="grid grid-cols-2 gap-4 flex-grow">
@@ -752,7 +752,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
 
                          {/* Section 6: Deployment */}
                          <div className="bg-[var(--bg-main)] border border-[var(--border-glow)] rounded-[2rem] p-6 lg:p-8 flex flex-col">
-                            <h4 className="text-[11px] lg:text-xs font-black text-[var(--text-primary)] uppercase tracking-[0.2em] mb-8 flex items-center gap-3 opacity-90">
+                            <h4 className="text-sm lg:text-xs font-black text-[var(--text-primary)] uppercase tracking-[0.2em] mb-8 flex items-center gap-3 opacity-90">
                               6 // {isArabic ? 'استراتيجية النشر' : 'Deployment Strategy'} <i className="fas fa-map ml-auto opacity-50"></i>
                             </h4>
                             <div className="space-y-4 flex-grow flex flex-col justify-center">
@@ -770,13 +770,13 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       {/* Section 7: Final Output Format */}
                       <div className="p-1 rounded-[2.5rem] bg-gradient-to-br from-[#8B5CF6]/30 via-[var(--accent-emerald)]/30 to-blue-500/30">
                         <div className="bg-[var(--card-bg)] p-6 lg:p-10 rounded-[2.4rem] h-full">
-                           <h4 className="text-[11px] lg:text-xs font-black text-[var(--text-primary)] uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                           <h4 className="text-sm lg:text-xs font-black text-[var(--text-primary)] uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
                              7 // {isArabic ? 'الاستنتاج التنفيذي والفرص' : 'Executive Output & Opportunities'}
                            </h4>
                            
                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                              <div className="bg-[var(--bg-main)] p-5 rounded-2xl border border-[var(--border-glow)] text-center">
-                               <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest mb-3 font-bold">{isArabic ? 'مستوى المخاطرة' : 'Risk Level'}</div>
+                               <div className="text-xs md:text-sm text-[var(--text-secondary)] uppercase tracking-widest mb-3 font-bold">{isArabic ? 'مستوى المخاطرة' : 'Risk Level'}</div>
                                <div className={`text-base lg:text-lg font-black uppercase tracking-widest border-b-2 pb-2 inline-block ${
                                   selectedChallenge.riskLevelEn.includes('Low') ? 'text-[var(--accent-emerald)] dark:text-emerald-400 border-emerald-400/50' : 
                                   selectedChallenge.riskLevelEn.includes('High') || selectedChallenge.riskLevelEn.includes('Critical') ? 'text-rose-600 dark:text-rose-400 border-rose-400/50' : 'text-amber-700 dark:text-amber-400 border-amber-400/50'
@@ -784,7 +784,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                              </div>
                              
                              <div className="bg-[var(--bg-main)] p-5 rounded-2xl border border-[var(--border-glow)] text-center md:col-span-2 flex flex-col justify-center items-center">
-                               <div className="text-[10px] text-[var(--accent-emerald)] uppercase tracking-widest mb-3 font-bold"><i className="fas fa-arrow-trend-up mr-2"></i> {isArabic ? 'التأثير الكلي للشبكة' : 'Net Grid Improvement'}</div>
+                               <div className="text-xs md:text-sm text-[var(--accent-emerald)] uppercase tracking-widest mb-3 font-bold"><i className="fas fa-arrow-trend-up mr-2"></i> {isArabic ? 'التأثير الكلي للشبكة' : 'Net Grid Improvement'}</div>
                                <div className="text-sm lg:text-base font-black text-[var(--text-primary)] leading-relaxed max-w-md">{isArabic ? selectedChallenge.gridImprovementAr : selectedChallenge.gridImprovementEn}</div>
                              </div>
                            </div>
@@ -792,15 +792,15 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                            <div className="flex flex-col gap-5">
                               <div className="flex flex-col lg:flex-row gap-5">
                                 <div className="flex-1 bg-amber-600/5 border border-amber-500/20 p-5 rounded-2xl">
-                                  <div className="text-[10px] text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-4 font-black"><i className="fas fa-crown mr-2"></i>{isArabic ? 'التوصيات الحتمية' : 'Priority Actions'}</div>
+                                  <div className="text-xs md:text-sm text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-4 font-black"><i className="fas fa-crown mr-2"></i>{isArabic ? 'التوصيات الحتمية' : 'Priority Actions'}</div>
                                   <ul className="space-y-3">
                                     {(isArabic ? selectedChallenge.priorityAr : selectedChallenge.priorityEn).map((pri, i) => (
-                                      <li key={i} className="text-xs lg:text-sm text-[var(--text-primary)] dark:text-amber-100 font-medium flex items-start gap-3"><i className="fas fa-arrow-right text-amber-700/50 dark:text-amber-500/50 mt-1 text-[10px]"></i>{pri}</li>
+                                      <li key={i} className="text-xs lg:text-sm text-amber-950 dark:text-amber-100 font-bold flex items-start gap-3"><i className="fas fa-arrow-right text-amber-700 dark:text-amber-400 mt-1 text-xs md:text-sm"></i>{pri}</li>
                                     ))}
                                   </ul>
                                 </div>
                                 <div className="flex-1 bg-blue-600/5 border border-blue-500/20 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
-                                  <div className="text-[10px] text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-4 font-black">{isArabic ? 'فرصة الاستثمار الكبرى' : 'Mega Investment Op'}</div>
+                                  <div className="text-xs md:text-sm text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-4 font-black">{isArabic ? 'فرصة الاستثمار الكبرى' : 'Mega Investment Op'}</div>
                                   <div className="text-sm lg:text-lg text-[var(--text-primary)] font-black leading-snug">{isArabic ? selectedChallenge.investAr : selectedChallenge.investEn}</div>
                                 </div>
                               </div>
@@ -809,7 +809,7 @@ export const ChallengesHub: React.FC<Props> = ({ language, theme }) => {
                       </div>
 
                       {/* Footer sources */}
-                      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-[9px] md:text-[11px] text-[var(--text-secondary)] font-mono border-t border-[var(--border-glow)] pt-8 opacity-70">
+                      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-[9px] md:text-sm text-[var(--text-secondary)] font-mono border-t border-[var(--border-glow)] pt-8 opacity-70">
                         <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest w-full justify-center xl:w-auto xl:justify-start mb-2 xl:mb-0">
                           <i className="fas fa-link"></i> {isArabic ? 'مصادر التحليل:' : 'Analysis Sources:'} 
                         </span>
