@@ -5,7 +5,7 @@ import {
   VoltOmanResult, 
   VoltOmanChargingStop 
 } from './types';
-import { calculateVoltOmanEngine } from './server/omanEvEngine';
+import { calculateVoltOmanEngine } from './omanEvEngine';
 import { analyzeVoltOmanRoute } from './geminiService';
 import { CustomMarkdown } from './CustomMarkdown';
 import { GisMap } from './GisMap';
