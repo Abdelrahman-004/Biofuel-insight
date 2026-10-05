@@ -5,7 +5,7 @@ import {
   VoltOmanResult, 
   VoltOmanChargingStop,
   VoltOmanTelemetryMetrics 
-} from '../types';
+} from './types';
 
 /**
  * VoltOman Engine — Enterprise-Grade AI Co-Pilot for EV Routing & Battery Analytics
