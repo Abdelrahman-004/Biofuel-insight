@@ -1,4 +1,4 @@
-import { MultiAgentChallengeResult, AgentSolution, TroubleshootingStep, LabProtocolStep, ScientificParameter } from '../types';
+import { MultiAgentChallengeResult, AgentSolution, TroubleshootingStep, LabProtocolStep, ScientificParameter } from './types';
 
 interface ChallengeInputDetails {
   feedstock?: string;

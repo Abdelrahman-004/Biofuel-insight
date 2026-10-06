@@ -221,6 +221,7 @@ export const GisMap: React.FC<Props> = ({
 
   // EV Charging Layer State (All stations through 2027)
   const [showEvStations, setShowEvStations] = React.useState<boolean>(defaultEvStationsLayer);
+  const [showStrategicZones, setShowStrategicZones] = React.useState<boolean>(false); // Off by default: show only car stations with electrical charge
   const [evStatusFilter, setEvStatusFilter] = React.useState<'ALL' | 'OPERATIONAL' | 'CONSTRUCTION_2025_2026' | 'PIPELINE_2027' | 'FREE_ZONES_ONLY'>('ALL');
   const [selectedEvOperator, setSelectedEvOperator] = React.useState<string>('ALL');
 
@@ -307,10 +308,13 @@ export const GisMap: React.FC<Props> = ({
     };
   }, [feedstock, weight, destination, source, dieselPrice]);
 
-  // Filtered EV Charging Stations (Exclusive Oman Oil Network across Oman through 2027)
+  // Filtered EV Charging Stations (Exclusively Car Service Stations with Electrical Charge across Oman)
   const filteredEvStations = React.useMemo(() => {
     if (!showEvStations) return [];
     return baseStations.filter(st => {
+      // STRICT FILTER: Only show car stations that have electrical charge
+      if (st.hasElectricalCharge === false || !st.powerKw || st.powerKw <= 0) return false;
+
       // If user toggled to show only stops on the active VoltOman itinerary
       if (showOnlyVoltOmanStops) {
         const isMatched = matchStationWithItinerary(st, voltOmanResult?.chargingItinerary);
@@ -356,26 +360,26 @@ export const GisMap: React.FC<Props> = ({
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              {isArabic ? 'شبكة شركة النفط العمانية (OOMCO EV) الحصرية' : 'Exclusive Oman Oil Company (OOMCO EV) Network'}
+              {isArabic ? '⚡ محطات خدمة السيارات المزودة بنقاط شحن كهربائي حصراً (OOMCO EV)' : '⚡ Car Service Stations with Electrical Charge Only (OOMCO EV)'}
             </span>
-            <span className="text-xs font-mono text-slate-400">
-              {baseStations.length} {isArabic ? 'محطة شحن سريعة حتى 2027 في كافة أنحاء عُمان' : 'Fast-Charging Hubs across All Oman until 2027'}
+            <span className="text-xs font-mono text-emerald-400/90 font-bold px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-500/20">
+              {filteredEvStations.length} {isArabic ? 'محطة خدمة سيارات مزودة بشحن كهربائي حقيقي' : 'Verified EV Charging Car Stations'}
             </span>
           </div>
 
           <h2 className="text-2xl md:text-3xl font-black text-[var(--text-primary)] flex items-center gap-2.5">
-            <i className="fas fa-map-location-dot text-emerald-500"></i>
+            <i className="fas fa-charging-station text-emerald-500"></i>
             <span>
               {isArabic 
-                ? 'خريطة GIS لمحطات شحن شركة النفط العمانية (OOMCO EV) وربط برنامج VoltOman' 
-                : 'Oman Oil Company (OOMCO EV) GIS Map & VoltOman Results Link'}
+                ? 'خريطة GIS لمحطات خدمة سيارات نفط عُمان (OOMCO) المزودة بشواحن كهربائية' 
+                : 'OOMCO Car Service Stations with EV Charging Points — GIS Reality Map'}
             </span>
           </h2>
 
           <p className="text-[var(--text-secondary)] text-xs md:text-sm mt-1 max-w-3xl leading-relaxed">
             {isArabic 
-              ? 'تغطية جغرافية حصرية لكافة محطات شحن شركة النفط العمانية للتسويق (نفط عُمان / OOMCO) العاملة وقيد التجهيز وخطة 2027 في مسقط، الباطنة، الداخلية، الوسطى، ظفار، الشرقية، الظاهرة، البريمي ومسندم، مع ربط تفاعلي مباشر بحسابات ومحطات برنامج VoltOman.' 
-              : 'Comprehensive geographic coverage of all Oman Oil Marketing Company (OOMCO EV) charging stations across all governorates of Oman through 2027, dynamically linked to VoltOman calculation results and route feasibility.'}
+              ? 'تغطية جغرافية حصرية ودقيقة لمحطات خدمة السيارات التابعة لشركة النفط العمانية للتسويق (نفط عُمان / OOMCO) والمجهزة فعلياً بنقاط شحن كهربائي فائق السرعة، مع مواقع وإحداثيات مطابقة للواقع الميداني في كافة محافظات السلطنة.' 
+              : 'Dedicated ground-truth GIS mapping exclusively displaying Oman Oil Marketing Company (OOMCO) car service stations equipped with electric vehicle (EV) charging infrastructure across the Sultanate of Oman.'}
           </p>
         </div>
 
@@ -577,6 +581,19 @@ export const GisMap: React.FC<Props> = ({
                 )}
               </div>
 
+              {/* Optional Ports & Free Zones Layer (Disabled by default to keep focus strictly on car stations with EV charge) */}
+              <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-400 hover:text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={showStrategicZones}
+                    onChange={(e) => setShowStrategicZones(e.target.checked)}
+                    className="accent-amber-500 rounded cursor-pointer h-4 w-4"
+                  />
+                  <span>{isArabic ? 'إظهار الموانئ والمناطق الحرة (طبقة اختيارية)' : 'Show Ports & Free Zones (Optional Layer)'}</span>
+                </label>
+              </div>
+
               {/* Feedstocks / Materials Layer */}
               <div>
                 <label className="block text-[11px] font-bold text-slate-400 mb-1">
@@ -633,8 +650,8 @@ export const GisMap: React.FC<Props> = ({
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
             />
 
-            {/* Strategic Free Zones and Logistics Cities */}
-            {ZONES.map(z => (
+            {/* Strategic Free Zones and Logistics Cities (Disabled by default: only car stations with electrical charge shown) */}
+            {showStrategicZones && ZONES.map(z => (
               <Marker key={z.id} position={[z.lat, z.lng]} icon={createCustomIcon(z.color, z.isPort ? 'fa-anchor' : 'fa-industry')}>
                 <Popup className="custom-popup">
                   <div className="bg-slate-950 text-slate-100 p-3.5 rounded-xl border border-slate-800 shadow-2xl min-w-[220px]" dir={isArabic ? 'rtl' : 'ltr'}>
@@ -694,9 +711,28 @@ export const GisMap: React.FC<Props> = ({
                         {isArabic ? station.nameAr : station.nameEn}
                       </h4>
 
-                      <div className="text-xs text-emerald-400 font-bold mb-3 flex items-center gap-1.5">
+                      <div className="text-xs text-emerald-400 font-bold mb-2 flex items-center gap-1.5">
                         <i className="fa-solid fa-bolt-lightning text-amber-400 text-xs"></i>
                         <span>{isArabic ? station.operatorNameAr : station.operatorNameEn}</span>
+                      </div>
+
+                      {/* Verified Reality Address & Location */}
+                      <div className="text-[11px] text-slate-300 mb-2.5 flex items-start gap-1.5 bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                        <i className="fas fa-location-dot text-rose-400 mt-0.5 shrink-0 text-xs"></i>
+                        <span className="leading-snug">
+                          {isArabic 
+                            ? ((station as any).realAddressAr || station.nameAr) 
+                            : ((station as any).realAddressEn || station.nameEn)}
+                        </span>
+                      </div>
+
+                      {/* Verified Electrical Charge Indicator */}
+                      <div className="flex items-center justify-between gap-1 mb-2.5 text-[10px] font-mono px-2 py-1 rounded bg-emerald-950/60 text-emerald-300 border border-emerald-500/30">
+                        <span className="flex items-center gap-1">
+                          <i className="fas fa-charging-station text-emerald-400"></i>
+                          <span>{isArabic ? 'محطة سيارات مزودة بشحن كهربائي' : 'Car Station with EV Charging'}</span>
+                        </span>
+                        <span className="text-white font-bold">{station.powerKw} kW DC</span>
                       </div>
 
                       {/* Technical Specs Grid */}

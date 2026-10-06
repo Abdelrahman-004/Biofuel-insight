@@ -19,6 +19,7 @@ const autoDict: Record<string, string> = {
   "Investment Grade": "درجة استثمارية",
   "Conditionally Viable": "مجدي بشروط",
   "Not Bankable": "غير قابل للتمويل",
+  "Not Bankable / High Commercial Risk": "غير قابل للتمويل / مخاطر تجارية عالية",
   "High": "عالي",
   "Low": "منخفض",
   "Scientific & Technical AI Analysis": "تحليل الذكاء الاصطناعي العلمي والتقني",
@@ -314,12 +315,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                       <p className="text-sm font-black text-[var(--text-secondary)] ">{data?.TechnicalAI?.EnergyOutput || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Benchmark CAPEX", "النفقات الرأسمالية المعيارية")}</p>
-                      <p className="text-sm font-bold text-[var(--text-secondary)]">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Capacity Factor", "عامل السعة")}</p>
+                      <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.TechnicalAI?.CapacityFactor || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
-                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("TRL Level", "مستوى الجاهزية التكنولوجية")}</p>
-                      <p className="text-sm font-black text-blue-700 dark:text-blue-400">TRL {data?.TechnicalAI?.TRLEstimate || 'N/A'}</p>
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Benchmark CAPEX", "النفقات الرأسمالية المعيارية")}</p>
+                      <p className="text-sm font-bold text-[var(--text-secondary)]">{data?.TechnicalAI?.BenchmarkCAPEXRange || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -350,6 +351,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                       </p>
                     </div>
                     <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Annual Maintenance", "الصيانة الدورية السنوية")}</p>
+                      <p className="text-sm font-black text-amber-700 dark:text-amber-400">{formatCurrency(data?.FinancialAI?.MaintenanceCostUSD || 0)}</p>
+                    </div>
+                    <div className="p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("Annual Insurance", "التأمين السنوي")}</p>
+                      <p className="text-sm font-black text-blue-700 dark:text-blue-400">{formatCurrency(data?.FinancialAI?.InsuranceCostUSD || 0)}</p>
+                    </div>
+                    <div className="col-span-2 p-4 bg-[var(--bg-main)] rounded-xl border border-[var(--border-glow)]">
                       <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase mb-1">{t("IRR (Est.)", "معدل العائد الداخلي (تقديري)")}</p>
                       <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{data?.FinancialAI?.IRR_Simplified || 'N/A'}</p>
                     </div>
@@ -513,7 +522,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
 
 
       {/* Primary Investment Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -533,23 +542,50 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.25 }}
           className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Investment Verdict", "قرار الاستثمار")}</div>
-          <div className={`text-lg font-black leading-tight ${
-            data.DynamicScores?.overallViabilityRating === 'A' ? 'text-emerald-700 dark:text-emerald-400' : 
-            data.DynamicScores?.overallViabilityRating === 'B' ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'
-          }`}>
-            {t("Rating:", "التقييم:")} {data.DynamicScores?.overallViabilityRating || 'N/A'}
-          </div>
-          <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">{tt(data?.EconomicFeasibility?.InvestmentVerdict, language || 'Arabic')}</div>
+          {(() => {
+            const rating = data.DynamicScores?.overallViabilityRating || (data.FinalFeasibilityScore >= 78 ? 'A' : data.FinalFeasibilityScore >= 58 ? 'B' : 'C');
+            const verdict = data?.EconomicFeasibility?.InvestmentVerdict || (rating === 'A' ? 'Investment Grade' : rating === 'B' ? 'Conditionally Viable' : 'Not Bankable / High Commercial Risk');
+            return (
+              <>
+                <div className={`text-lg font-black leading-tight ${
+                  rating === 'A' ? 'text-emerald-700 dark:text-emerald-400' : 
+                  rating === 'B' ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'
+                }`}>
+                  {t("Rating:", "التقييم:")} {rating}
+                </div>
+                <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">
+                  {tt(verdict, language || 'Arabic')}
+                </div>
+              </>
+            );
+          })()}
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3 }}
+          className="bg-[var(--card-bg)] shadow-card p-6 rounded-2xl border border-[var(--border-glow)] flex flex-col justify-center"
+        >
+          <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Internal Rate of Return (IRR)", "معدل العائد الداخلي (IRR)")}</div>
+          <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
+            {data?.FinancialAI?.IRR_Simplified || 'N/A'}
+          </div>
+          <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">
+            {data?.FinancialAI?.ProjectLifespanYears 
+              ? (language === 'Arabic' ? `نمذجة تدفقات خصم لـ ${data.FinancialAI.ProjectLifespanYears} سنة` : `Discounted cash flows over ${data.FinancialAI.ProjectLifespanYears} yrs`)
+              : (language === 'Arabic' ? "تدفقات نقدية مخصومة (DCF)" : "Discounted Cash Flows (DCF)")}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.35 }}
           className="bg-[var(--card-bg)] shadow-card  p-6 rounded-2xl  border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Payback Period", "فترة الاسترداد")}</div>
@@ -563,14 +599,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
             </div>
           )}
           <div className="mt-2 text-xs md:text-sm font-bold text-[var(--text-secondary)] italic">
-            {data.EconomicFeasibility?.isOperatingDeficit ? (language === 'Arabic' ? "عجز تشغيلي سنوي" : "Operating Cash Deficit") : (language === 'Arabic' ? "عائد الاستثمار للمشروع" : "Project ROI")}
+            {data.EconomicFeasibility?.isOperatingDeficit 
+              ? (language === 'Arabic' ? "عجز تشغيلي سنوي" : "Operating Cash Deficit") 
+              : (data.FinancialAI?.EquityPaybackYears 
+                  ? (language === 'Arabic' ? "استرداد حقوق الملكية (Equity Payback)" : "Equity Capital Recovery (8–12 yrs)") 
+                  : (language === 'Arabic' ? "عائد الاستثمار لرأس المال" : "Project Capital Recovery"))}
           </div>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.4 }}
           className="bg-[var(--card-bg)] shadow-card p-6 rounded-2xl border border-[var(--border-glow)] flex flex-col justify-center"
         >
           <div className="text-xs md:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">{t("Corporate Tax (Oman)", "ضريبة الشركات (عُمان)")}</div>
@@ -775,6 +815,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                 <span className="text-sm text-[var(--text-secondary)]">{t("Annual OPEX", "النفقات التشغيلية السنوية")}</span>
                 <span className="text-sm font-black text-red-700 dark:text-red-400">{formatCurrency(data.EconomicFeasibility.AnnualOPEX)}</span>
               </div>
+              <div className="flex justify-between items-center border-b border-slate-50/50 pb-1.5 text-xs text-[var(--text-secondary)] pl-3 rtl:pr-3">
+                <span className="flex items-center gap-1.5">
+                  <i className="fas fa-wrench text-amber-500 text-[10px]"></i>
+                  {t("Annual Maintenance", "الصيانة السنوية")}
+                </span>
+                <span className="font-bold text-amber-700 dark:text-amber-400">{formatCurrency(data.FinancialAI?.MaintenanceCostUSD || 0)}</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-slate-50/50 pb-1.5 text-xs text-[var(--text-secondary)] pl-3 rtl:pr-3">
+                <span className="flex items-center gap-1.5">
+                  <i className="fas fa-shield-halved text-blue-500 text-[10px]"></i>
+                  {t("Annual Insurance", "التأمين السنوي")}
+                </span>
+                <span className="font-bold text-blue-700 dark:text-blue-400">{formatCurrency(data.FinancialAI?.InsuranceCostUSD || 0)}</span>
+              </div>
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-sm text-[var(--text-secondary)]">{t("Gross Profit", "إجمالي الربح")}</span>
                 <span className={`text-sm font-black ${data.EconomicFeasibility.GrossProfit > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
@@ -784,7 +838,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                 <span className="text-sm text-[var(--text-secondary)]">{t("Annual Production", "الإنتاج السنوي")}</span>
                 <span className="text-sm font-black text-[var(--text-secondary)] ">
-                  {data.ProjectAnalyzer.ExpectedProduction?.toLocaleString()} {data.ProjectAnalyzer.TechnologyCategory === 'Biofuel' ? 'Tons' : 'MWh'}
+                  {`${(data.ProjectAnalyzer.ExpectedProduction || 0).toLocaleString()} kWh/Year`}
                 </span>
               </div>
             </div>
@@ -796,31 +850,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-xs space-y-3">
                 <div className="flex items-center gap-2 text-[var(--accent-emerald)] font-bold text-sm">
                   <i className="fas fa-calculator text-base"></i>
-                  <span>{language === 'Arabic' ? "تفاصيل حساب وجدوى كميات الإنتاج واللقيم:" : "Production & Feedstock Feasibility Calculations Details:"}</span>
+                  <span>{language === 'Arabic' ? "تفاصيل حساب وجدوى كميات الإنتاج واللقيم (بالكيلوواط ساعة):" : "Production & Feedstock Feasibility Details (in kWh):"}</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 text-[var(--text-secondary)]">
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
-                    <span>{language === 'Arabic' ? "معدل الإنتاج اليومي المقدر:" : "Est. Daily Production Rate:"}</span>
+                    <span>{language === 'Arabic' ? "معدل الإنتاج اليومي المقدر:" : "Est. Daily Energy Rate:"}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 300).toFixed(2)} {language === 'Arabic' ? "طن/يوم تشغيلي" : "Tons/operating day"}
+                      {(((data.ProjectAnalyzer.ExpectedProduction || 0)) / 300).toFixed(0)} {language === 'Arabic' ? "ك.و.س/يوم تشغيلي" : "kWh/operating day"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
-                    <span>{language === 'Arabic' ? "معدل معالجة اللقيم الساعي:" : "Hourly Processing Rate:"}</span>
+                    <span>{language === 'Arabic' ? "معدل الطاقة الساعي المقدر:" : "Hourly Energy Rate:"}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 300 / 24).toFixed(3)} {language === 'Arabic' ? "طن/ساعة" : "Tons/hour"}
+                      {(((data.ProjectAnalyzer.ExpectedProduction || 0)) / 300 / 24).toFixed(0)} {language === 'Arabic' ? "ك.و.س/ساعة" : "kWh/hour"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
                     <span>{language === 'Arabic' ? `اللقيم المطلوب سنويًا (بكفاءة تحويل ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}٪):` : `Required Feedstock Input/yr (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}% conversion):`}</span>
                     <span className="font-bold text-[var(--accent-emerald)]">
-                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) / getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield).toLocaleString()} {language === 'Arabic' ? `طن/سنة من اللقيم` : `Tons/year Feedstock`}
+                      {Math.round(((data.ProjectAnalyzer.ExpectedProduction || 0) / 10500) / getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield).toLocaleString()} {language === 'Arabic' ? `طن/سنة من اللقيم` : `Tons/year Feedstock`}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
                     <span>{language === 'Arabic' ? `استعادة ${getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductAr} كمنتج ثانوي (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield) * 100)}٪):` : `Est. ${getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproduct} Byproduct Recovery (${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield) * 100)}%):`}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) * getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield).toLocaleString()} {language === 'Arabic' ? `طن/سنة` : `Tons/year`}
+                      {Math.round(((data.ProjectAnalyzer.ExpectedProduction || 0) / 10500) * getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').byproductYield).toLocaleString()} {language === 'Arabic' ? `طن/سنة` : `Tons/year`}
                     </span>
                   </div>
                 </div>
@@ -828,8 +882,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <i className="fas fa-info-circle text-xs mt-0.5 text-blue-500"></i>
                   <span>
                     {language === 'Arabic' 
-                      ? `تم احتساب هذه المقاييس بناءً على معايير تشغيلية لبيئة عُمان (300 يوم تشغيلي سنويًا، كفاءة تحويل قياسية ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}٪، ونسبة استرداد للمنتج الثانوي).`
-                      : `These details are modeled on regional industrial benchmarks (300 operating days, ${Math.round((getFeedstockMetrics(data.ProjectAnalyzer.Feedstock || '').yield) * 100)}% conversion yield, and specific byproduct recovery).`}
+                      ? `تم احتساب هذه المقاييس بناءً على معايير تشغيلية لبيئة عُمان (300 يوم تشغيلي سنويًا، محتوى طاقة 10,500 كيلوواط ساعة لكل طن وقود حيوي B100).`
+                      : `Modeled on regional benchmarks (300 operating days, 10,500 kWh/ton standard B100 biodiesel energy density).`}
                   </span>
                 </div>
               </div>
@@ -837,31 +891,54 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
               <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-glow)] text-xs space-y-3">
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-bold text-sm">
                   <i className="fas fa-charging-station text-base"></i>
-                  <span>{language === 'Arabic' ? "تفاصيل القدرة التشغيلية والتوليد السنوي:" : "Operational Capacity & Annual Generation Details:"}</span>
+                  <span>{language === 'Arabic' ? "تفاصيل القدرة التشغيلية والتوليد السنوي (بالكيلوواط ساعة):" : "Operational Capacity & Generation Details (in kWh):"}</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 text-[var(--text-secondary)]">
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
                     <span>{language === 'Arabic' ? "التوليد اليومي المقدر:" : "Est. Daily Generation:"}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {((data.ProjectAnalyzer.ExpectedProduction || 0) / 365).toFixed(2)} {language === 'Arabic' ? "ميجاوات/يوم" : "MWh/day"}
+                      {(((data.ProjectAnalyzer.ExpectedProduction || 0)) / 365).toFixed(0)} {language === 'Arabic' ? "ك.و.س/يوم" : "kWh/day"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
                     <span>{language === 'Arabic' ? "تجنب انبعاثات ثاني أكسيد الكربون سنويًا:" : "Est. CO2 Emissions Avoided/yr:"}</span>
                     <span className="font-bold text-[var(--accent-emerald)] dark:text-emerald-400">
-                      {Math.round((data.ProjectAnalyzer.ExpectedProduction || 0) * 0.72).toLocaleString()} {language === 'Arabic' ? "طن CO₂/سنة" : "Tons CO₂/year"}
+                      {Math.round(((data.ProjectAnalyzer.ExpectedProduction || 0) * 0.00068)).toLocaleString()} {language === 'Arabic' ? "طن CO₂/سنة" : "Tons CO₂/year"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
-                    <span>{language === 'Arabic' ? "ساعات الذروة الشمسية/الرياح المقدرة:" : "Average Equivalent Peak Hours/day:"}</span>
+                    <span>{language === 'Arabic' ? "ساعات الذروة التشغيلية المقدرة:" : "Average Equivalent Peak Hours/day:"}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {(((data.ProjectAnalyzer.ExpectedProduction || 0) * 1000) / ((parseFloat(data.TechnicalAI.InstalledCapacity.replace(/[^0-9.]/g, '')) || 1000) * 365)).toFixed(2)} hrs/day
+                      {data.TechnicalAI?.PeakSunHoursPerDay || (
+                        (() => {
+                          const capStr = data.TechnicalAI?.InstalledCapacity || '';
+                          const kwMatch = capStr.match(/([0-9.,]+)\s*kW/i);
+                          const mwMatch = capStr.match(/([0-9.,]+)\s*MW/i);
+                          let capKw = 1000;
+                          if (kwMatch) capKw = parseFloat(kwMatch[1].replace(/,/g, '')) || 1000;
+                          else if (mwMatch) capKw = (parseFloat(mwMatch[1].replace(/,/g, '')) || 1) * 1000;
+                          else capKw = parseFloat(capStr.replace(/[^0-9.]/g, '')) || 1000;
+                          return `${((data.ProjectAnalyzer?.ExpectedProduction || 0) / (capKw * 365)).toFixed(2)} hrs/day`;
+                        })()
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-[var(--border-glow)]/40 pb-1.5">
                     <span>{language === 'Arabic' ? "عامل السعة المقدر:" : "Est. System Capacity Factor:"}</span>
                     <span className="font-bold text-[var(--text-primary)]">
-                      {(((data.ProjectAnalyzer.ExpectedProduction || 0) * 1000) / ((parseFloat(data.TechnicalAI.InstalledCapacity.replace(/[^0-9.]/g, '')) || 1000) * 8760) * 100).toFixed(1)}%
+                      {data.TechnicalAI?.CapacityFactor || (
+                        (() => {
+                          const capStr = data.TechnicalAI?.InstalledCapacity || '';
+                          const kwMatch = capStr.match(/([0-9.,]+)\s*kW/i);
+                          const mwMatch = capStr.match(/([0-9.,]+)\s*MW/i);
+                          let capKw = 1000;
+                          if (kwMatch) capKw = parseFloat(kwMatch[1].replace(/,/g, '')) || 1000;
+                          else if (mwMatch) capKw = (parseFloat(mwMatch[1].replace(/,/g, '')) || 1) * 1000;
+                          else capKw = parseFloat(capStr.replace(/[^0-9.]/g, '')) || 1000;
+                          const cf = Math.min(100, Math.max(0, ((data.ProjectAnalyzer?.ExpectedProduction || 0) / (capKw * 8760)) * 100));
+                          return `${cf.toFixed(1)}%`;
+                        })()
+                      )}
                     </span>
                   </div>
                 </div>
@@ -898,7 +975,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   {t("Break-Even Offtake Price:", "سعر التعادل المطلوب للبيع:")}
                 </span>
                 <span className="font-black text-sm">
-                  ${data.SensitivityAnalysis.BreakEvenSellingPriceUSD.toFixed(0)}/{data.SensitivityAnalysis.BreakEvenUnit || 'unit'}
+                  ${data.SensitivityAnalysis.BreakEvenSellingPriceUSD < 1.0 ? data.SensitivityAnalysis.BreakEvenSellingPriceUSD.toFixed(4) : data.SensitivityAnalysis.BreakEvenSellingPriceUSD.toFixed(2)}/{data.SensitivityAnalysis.BreakEvenUnit || 'kWh'}
                 </span>
               </div>
             )}
@@ -1179,8 +1256,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <i className="fas fa-sun text-amber-500"></i>
                   <span>{language === 'Arabic' ? "الطاقة الشمسية (PPA)" : "Utility Solar PV"}</span>
                 </div>
-                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$15 – $30 / MWh</div>
-                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Oman PPA Industrial Tariff</div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$0.015 – $0.030 / kWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Oman PPA ($15–$30/MWh)</div>
               </div>
 
               <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
@@ -1188,8 +1265,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <i className="fas fa-wind text-blue-500"></i>
                   <span>{language === 'Arabic' ? "طاقة الرياح (PPA)" : "Onshore Wind"}</span>
                 </div>
-                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$20 – $35 / MWh</div>
-                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dhofar / Duqm Wind Profile</div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$0.020 – $0.035 / kWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dhofar / Duqm ($20–$35/MWh)</div>
               </div>
 
               <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
@@ -1198,7 +1275,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <span>{language === 'Arabic' ? "الوقود الحيوي / الديزل الحيوي" : "Biofuel / Biodiesel"}</span>
                 </div>
                 <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$700 – $1,300 / Ton</div>
-                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">GCC Wholesale Offtake</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">~0.105 USD/kWh equivalent</div>
               </div>
 
               <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">
@@ -1215,8 +1292,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, language = 'English'
                   <i className="fas fa-recycle text-teal-500"></i>
                   <span>{language === 'Arabic' ? "تحويل النفايات إلى طاقة" : "Waste-to-Energy"}</span>
                 </div>
-                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$50 – $100 / MWh</div>
-                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dual revenue (Power + Tipping)</div>
+                <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm mt-1">$0.050 – $0.100 / kWh</div>
+                <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">Dual ($50–$100/MWh + Tipping)</div>
               </div>
 
               <div className="p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border-glow)]">

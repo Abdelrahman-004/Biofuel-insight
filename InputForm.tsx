@@ -43,10 +43,10 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
   const [category, setCategory] = React.useState<'Biofuel' | 'Renewable Energy'>('Biofuel');
   const [feedstock, setFeedstock] = React.useState(BIOFUEL_FEEDSTOCKS.find(f => f.includes('Cooking') || f.includes('UCO')) || BIOFUEL_FEEDSTOCKS[0]);
   const [projectScale, setProjectScale] = React.useState<'Small' | 'Medium' | 'Large'>('Medium');
-  const [production, setProduction] = React.useState<string | number>(1500);
+  const [production, setProduction] = React.useState<string | number>(15000000);
   const [capacity, setCapacity] = React.useState<string | number>(1000);
   const [budget, setBudget] = React.useState<string | number>(1500000);
-  const [sellingPrice, setSellingPrice] = React.useState<string | number>(1200);
+  const [sellingPrice, setSellingPrice] = React.useState<string | number>(0.114);
   const [electricityCost, setElectricityCost] = React.useState<string | number>(0.05);
   const [laborCost, setLaborCost] = React.useState<string | number>(95000);
   const [co2Source, setCo2Source] = React.useState(CO2_SOURCES[0]);
@@ -59,13 +59,20 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
       if (initialInputs.location) setLocation(initialInputs.location);
       if (initialInputs.category) setCategory(initialInputs.category);
       if (initialInputs.feedstock) setFeedstock(initialInputs.feedstock);
-      if (initialInputs.production) setProduction(initialInputs.production);
+      if (initialInputs.production) {
+        const prod = Number(initialInputs.production);
+        setProduction(prod < 50000 ? prod * 10500 : prod);
+      }
       if (initialInputs.capacity) setCapacity(initialInputs.capacity);
       if (initialInputs.budget) setBudget(initialInputs.budget);
-      if (initialInputs.sellingPrice) setSellingPrice(initialInputs.sellingPrice);
+      if (initialInputs.sellingPrice) {
+        const p = Number(initialInputs.sellingPrice);
+        setSellingPrice(p > 1.0 ? +(p / 10500).toFixed(4) : p);
+      }
       if (initialInputs.electricityCost) setElectricityCost(initialInputs.electricityCost);
       if (initialInputs.laborCost) setLaborCost(initialInputs.laborCost);
       if (initialInputs.co2Source) setCo2Source(initialInputs.co2Source);
+      if (initialInputs.advancedParams) setAdvancedParams(initialInputs.advancedParams);
     }
   }, [initialInputs]);
 
@@ -80,13 +87,20 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
         if (draft.category) setCategory(draft.category);
         if (draft.feedstock) setFeedstock(draft.feedstock);
         if (draft.projectScale) setProjectScale(draft.projectScale);
-        if (draft.production) setProduction(draft.production);
+        if (draft.production) {
+          const p = Number(draft.production);
+          setProduction(p < 50000 ? p * 10500 : p);
+        }
         if (draft.capacity) setCapacity(draft.capacity);
         if (draft.budget) setBudget(draft.budget);
-        if (draft.sellingPrice) setSellingPrice(draft.sellingPrice);
+        if (draft.sellingPrice) {
+          const sp = Number(draft.sellingPrice);
+          setSellingPrice(sp > 1.0 ? +(sp / 10500).toFixed(4) : sp);
+        }
         if (draft.electricityCost) setElectricityCost(draft.electricityCost);
         if (draft.laborCost) setLaborCost(draft.laborCost);
         if (draft.co2Source) setCo2Source(draft.co2Source);
+        if (draft.advancedParams) setAdvancedParams(draft.advancedParams);
       } catch (e) { console.error("Failed to load form draft", e); }
     }
   }, []);
@@ -100,18 +114,28 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }, [projectName, location, category, feedstock, projectScale, production, capacity, budget, sellingPrice, electricityCost, laborCost, co2Source, advancedParams]);
 
-  // Update feedstock when category changes
+  const prevCategoryRef = React.useRef(category);
+  // Update feedstock and adjust default kWh parameters when category changes
   React.useEffect(() => {
-    if (category === 'Biofuel') {
-      if (!BIOFUEL_FEEDSTOCKS.includes(feedstock)) {
-        setFeedstock(BIOFUEL_FEEDSTOCKS[0]);
+    if (prevCategoryRef.current !== category) {
+      if (category === 'Biofuel') {
+        if (!BIOFUEL_FEEDSTOCKS.includes(feedstock)) {
+          setFeedstock(BIOFUEL_FEEDSTOCKS[0]);
+        }
+        if (Number(production) === 2000000) setProduction(15000000);
+        if (Number(sellingPrice) === 0.035) setSellingPrice(0.114);
+        if (Number(budget) === 800000) setBudget(1500000);
+      } else {
+        if (!RENEWABLE_ENERGY_TYPES.includes(feedstock)) {
+          setFeedstock(RENEWABLE_ENERGY_TYPES[0]);
+        }
+        if (Number(production) === 15000000) setProduction(2000000);
+        if (Number(sellingPrice) === 0.114) setSellingPrice(0.035);
+        if (Number(budget) === 1500000) setBudget(800000);
       }
-    } else {
-      if (!RENEWABLE_ENERGY_TYPES.includes(feedstock)) {
-        setFeedstock(RENEWABLE_ENERGY_TYPES[0]);
-      }
+      prevCategoryRef.current = category;
     }
-  }, [category, feedstock]);
+  }, [category, feedstock, production, sellingPrice, budget]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,14 +323,118 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             
             {/* Global Financial Parameters */}
             <div>
-              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الخصم / الفائدةالسنوية (%)' : 'Discount Rate / Cost of Capital (%)'}</label>
-              <input type="number" step="0.1" className={inputClasses} placeholder="8" 
-                onChange={e => setAdvancedParams({...advancedParams, 'Discount Rate (%)': e.target.value})} />
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'نسبة الخصم / الفائدة السنوية (%)' : 'Discount Rate / Cost of Capital (%)'}</label>
+              <input 
+                type="number" 
+                step="0.1" 
+                className={inputClasses} 
+                placeholder="8" 
+                value={advancedParams['Discount Rate (%)'] !== undefined ? String(advancedParams['Discount Rate (%)']) : ''}
+                onChange={e => setAdvancedParams({...advancedParams, 'Discount Rate (%)': e.target.value})} 
+              />
             </div>
             <div>
               <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'عمر المشروع (سنوات)' : 'Project Lifespan (Years)'}</label>
-              <input type="number" step="1" className={inputClasses} placeholder="20" 
-                onChange={e => setAdvancedParams({...advancedParams, 'Project Lifespan (Years)': e.target.value})} />
+              <input 
+                type="number" 
+                step="1" 
+                className={inputClasses} 
+                placeholder={category === 'Renewable Energy' ? "25" : "20"} 
+                value={advancedParams['Project Lifespan (Years)'] !== undefined ? String(advancedParams['Project Lifespan (Years)']) : ''}
+                onChange={e => setAdvancedParams({...advancedParams, 'Project Lifespan (Years)': e.target.value})} 
+              />
+            </div>
+
+            {/* Insurance Parameter Entries */}
+            <div className="p-3.5 rounded-xl bg-blue-500/5 border border-blue-500/20 col-span-1 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fas fa-shield-halved text-blue-400"></i>
+                  {isArabic ? 'معايير التأمين السنوي (Insurance)' : 'Annual Insurance Parameters'}
+                </span>
+                <span className="text-[10px] text-blue-400/80 font-mono font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                  {isArabic ? 'معيار عُمان: 0.50%' : 'Oman Benchmark: 0.50%'}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">
+                    {isArabic ? 'نسبة التأمين (% من CAPEX)' : 'Insurance (% of CAPEX)'}
+                  </label>
+                  <input 
+                    type="number" 
+                    step="0.05" 
+                    className={inputClasses} 
+                    placeholder="0.5" 
+                    value={advancedParams['Annual Insurance (% of CAPEX)'] !== undefined ? String(advancedParams['Annual Insurance (% of CAPEX)']) : ''}
+                    onChange={e => setAdvancedParams({...advancedParams, 'Annual Insurance (% of CAPEX)': e.target.value})} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">
+                    {isArabic ? 'أو مبلغ التأمين (دولار/سنة)' : 'Or Fixed Cost (USD/yr)'}
+                  </label>
+                  <input 
+                    type="number" 
+                    step="1000" 
+                    className={inputClasses} 
+                    placeholder="Optional USD/yr" 
+                    value={advancedParams['Annual Insurance Cost (USD/year)'] !== undefined ? String(advancedParams['Annual Insurance Cost (USD/year)']) : ''}
+                    onChange={e => setAdvancedParams({...advancedParams, 'Annual Insurance Cost (USD/year)': e.target.value})} 
+                  />
+                </div>
+              </div>
+              <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed italic">
+                {isArabic 
+                  ? 'يغطي التأمين الشامل للمنشآت والمعدات ضد الكوارث وانقطاع التشغيل وفق إرشادات الهيئة العامة لسوق المال بسلطنة عمان.' 
+                  : 'Comprehensive asset and business interruption insurance adhering to Capital Market Authority (CMA) guidelines.'}
+              </p>
+            </div>
+
+            {/* Maintenance Parameter Entries */}
+            <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 col-span-1 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fas fa-wrench text-amber-400"></i>
+                  {isArabic ? 'معايير الصيانة والتشغيل (Maintenance)' : 'Annual Maintenance Parameters'}
+                </span>
+                <span className="text-[10px] text-amber-400/80 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                  {isArabic ? 'المعيار: 2.0% - 3.5%' : 'Typical: 2.0% - 3.5%'}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">
+                    {isArabic ? 'نسبة الصيانة (% من CAPEX)' : 'Maintenance (% of CAPEX)'}
+                  </label>
+                  <input 
+                    type="number" 
+                    step="0.1" 
+                    className={inputClasses} 
+                    placeholder="2.5" 
+                    value={advancedParams['Annual Maintenance (% of CAPEX)'] !== undefined ? String(advancedParams['Annual Maintenance (% of CAPEX)']) : ''}
+                    onChange={e => setAdvancedParams({...advancedParams, 'Annual Maintenance (% of CAPEX)': e.target.value})} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">
+                    {isArabic ? 'أو مبلغ الصيانة (دولار/سنة)' : 'Or Fixed Cost (USD/yr)'}
+                  </label>
+                  <input 
+                    type="number" 
+                    step="1000" 
+                    className={inputClasses} 
+                    placeholder="Optional USD/yr" 
+                    value={advancedParams['Annual Maintenance Cost (USD/year)'] !== undefined ? String(advancedParams['Annual Maintenance Cost (USD/year)']) : ''}
+                    onChange={e => setAdvancedParams({...advancedParams, 'Annual Maintenance Cost (USD/year)': e.target.value})} 
+                  />
+                </div>
+              </div>
+              <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed italic">
+                {isArabic 
+                  ? 'يشمل الصيانة الوقائية والتصحيحية، قطع الغيار، عقود فحص الأجهزة وتنظيف الأسطح/المعدات الدورية.' 
+                  : 'Covers preventive O&M servicing, replacement components, SCADA maintenance, and periodic cleaning.'}
+              </p>
             </div>
 
             {/* Solar PV */}
@@ -333,8 +461,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
                     onChange={e => setAdvancedParams({...advancedParams, 'Daily Irradiance (kWh/m2/day)': e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة الصيانة السنوية (دولار/kW)' : 'O&M Cost (USD/kW/year)'}</label>
-                  <input type="number" step="0.1" className={inputClasses} placeholder="15" 
+                  <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1 tracking-widest">{isArabic ? 'تكلفة التشغيل والصيانة السنوية (دولار/kW)' : 'O&M Cost (USD/kW/year)'}</label>
+                  <input type="number" step="0.1" className={inputClasses} placeholder="7.5" 
                     onChange={e => setAdvancedParams({...advancedParams, 'O&M Cost (USD/kW/year)': e.target.value})} />
                 </div>
               </>
@@ -471,15 +599,18 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
               transition={{ delay: 0.45 }}
             >
               <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
-                {isArabic ? 'قدرة المحطة' : 'Installed Capacity'} (kW)
+                {isArabic ? 'قدرة / سعة المحطة' : 'Installed Capacity'} (kW)
               </label>
               <input 
                 type="number" 
                 value={capacity}
                 onChange={(e) => setCapacity(e.target.value)}
                 className={inputClasses}
-                placeholder={isArabic ? "مثال: 1000" : "e.g., 1000"}
+                placeholder={isArabic ? "مثال: 1000000 كيلوواط (1000 ميجاواط)" : "e.g., 1000000 kW (1000 MW)"}
               />
+              <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+                {isArabic ? 'القدرة التشغيلية بالكيلوواط (kW): 1000 kW = 1 MW (محطة منح: 1,000,000 kW)' : 'Capacity in kW: 1,000 kW = 1 MW (Manah Solar: 1,000,000 kW / 1,000 MW)'}
+              </p>
             </motion.div>
           )}
           <motion.div 
@@ -487,16 +618,26 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
-              {isArabic ? 'الإنتاج المستهدف' : 'Target Production'} ({category === 'Biofuel' ? (isArabic ? 'طن/سنة' : 'Tons/Year') : (isArabic ? 'ميجاوات/سنة' : 'MWh/Year')})
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">
+                {isArabic ? 'الإنتاج السنوي المستهدف' : 'Target Annual Production'} (kWh/Year)
+              </label>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                {isArabic ? 'كافة المقاييس بالكيلوواط ساعة' : 'All in kWh'}
+              </span>
+            </div>
             <input 
               type="number" 
               value={production}
               onChange={(e) => setProduction(e.target.value)}
               className={inputClasses}
-              placeholder={isArabic ? "0 (تقدير تلقائي)" : "0 (Automatic Estimate)"}
+              placeholder={category === 'Biofuel' ? "15000000 (15M kWh)" : "2000000 (2M kWh)"}
             />
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+              {category === 'Biofuel' 
+                ? (isArabic ? '15,000,000 كيلوواط ساعة تعادل ~1,428 طن وقود حيوي B100' : '15,000,000 kWh/yr equals ~1,428 Tons B100 energy equivalent')
+                : (isArabic ? 'مثال: 2,000,000 كيلوواط ساعة/سنة لمحطة 1 ميجاواط' : 'e.g. 2,000,000 kWh/yr for a 1 MW solar plant')}
+            </p>
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
@@ -520,28 +661,42 @@ export const InputForm: React.FC<InputFormProps> = ({ onAnalyze, isLoading, init
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">
-              {isArabic ? 'سعر البيع/التعريفة' : 'Selling Price / Tariff'} (USD/{category === 'Biofuel' ? (isArabic ? 'طن' : 'ton') : 'MWh'})
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">
+                {isArabic ? 'سعر البيع / التعرفة' : 'Selling Price / Tariff'} (USD/kWh)
+              </label>
+              <span className="text-[10px] text-[var(--text-secondary)]">
+                {category === 'Biofuel' ? '$0.071–$0.128' : '$0.015–$0.035'}
+              </span>
+            </div>
             <input 
-              type="number" step="0.01"
+              type="number" step="0.001"
               value={sellingPrice}
               onChange={(e) => setSellingPrice(e.target.value)}
               className={inputClasses}
+              placeholder={category === 'Biofuel' ? "0.114" : "0.035"}
             />
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+              {category === 'Biofuel'
+                ? (isArabic ? '0.114 $/ك.و.س يعادل ~1,200 $/طن وقود حيوي' : '$0.114/kWh equates to ~$1,200/ton B100 benchmark')
+                : (isArabic ? 'تعرفة شراء الطاقة المعتمدة في عُمان (0.020 - 0.035 $/ك.و.س)' : 'Oman utility PPA statutory benchmark ($0.015–$0.035/kWh)')}
+            </p>
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'الكهرباء' : 'Electricity'} (USD/kWh)</label>
+            <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-2 tracking-[0.2em]">{isArabic ? 'تعرفة الكهرباء' : 'Electricity Tariff'} (USD/kWh)</label>
             <input 
               type="number" step="0.01"
               value={electricityCost}
               onChange={(e) => setElectricityCost(e.target.value)}
               className={inputClasses}
             />
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+              {isArabic ? 'التعرفة الصناعية لهيئة APSR: 0.05 $/ك.و.س' : 'APSR industrial tariff: $0.05/kWh'}
+            </p>
           </motion.div>
           {category === 'Biofuel' ? (
             <motion.div 

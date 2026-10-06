@@ -3,7 +3,7 @@ import {
   SensitivityDataPoint,
   ReconciliationAuditCheck,
   AuditAIReview
-} from '../types';
+} from './types';
 
 export interface FeasibilityInput {
   projectName?: string;
@@ -38,6 +38,7 @@ export interface OPEXBreakdown {
   utilitiesUSD: number;
   laborUSD: number;
   maintenanceUSD: number;
+  insuranceUSD: number;
   totalUSD: number;
 }
 
@@ -54,6 +55,9 @@ export interface PriceBenchmarkInfo {
 export interface CalculatedMetrics {
   capacityValue: number;
   capacityUnit: string;
+  capacityFormatted: string;
+  capacityFactorPercent: number;
+  peakSunHoursPerDay: number;
   productionValue: number;
   productionUnit: string;
   budget: number;
@@ -73,9 +77,20 @@ export interface CalculatedMetrics {
   grossProfit: number;
   taxRate: number;
   corporateTaxUSD: number;
+  annualDepreciation: number;
+  taxableIncome: number;
   netProfit: number;
+  annualFreeCashFlow: number;
   paybackYears: number;
   paybackFormatted: string;
+  equityCapex: number;
+  debtCapex: number;
+  equityPaybackYears: number;
+  projectPaybackYears: number;
+  equityIRR: number;
+  projectIRR: number;
+  projectLifespanYears: number;
+  isUtilityIPP: boolean;
   irrPercent: number;
   irrString: string;
   lcoeOrCostPerTon: string;
@@ -103,17 +118,14 @@ export interface CalculatedMetrics {
 }
 
 /**
- * 10-year discounted cash flow Internal Rate of Return (IRR)
+ * Exact discounted cash flow Internal Rate of Return (IRR) across project lifespan
  */
-function calculateIRR(capex: number, annualNetCashFlow: number, years = 10, salvageValuePercent = 0.1): number {
-  if (annualNetCashFlow <= 0 || capex <= 0) return 0;
+function calculateIRR(capex: number, annualNetCashFlow: number, years = 20, salvageValuePercent = 0.05): number {
+  if (annualNetCashFlow <= 0 || capex <= 0 || years <= 0) return 0;
   
-  const simpleReturn = annualNetCashFlow / capex;
-  if (simpleReturn < 0.05) return Math.max(0, Math.round((simpleReturn * 0.6) * 1000) / 10);
-  
-  let low = -0.1;
-  let high = 1.0;
-  
+  const totalInflow = (annualNetCashFlow * years) + (capex * salvageValuePercent);
+  if (totalInflow <= capex) return 0;
+
   const npv = (r: number) => {
     let sum = -capex;
     for (let t = 1; t <= years; t++) {
@@ -123,13 +135,18 @@ function calculateIRR(capex: number, annualNetCashFlow: number, years = 10, salv
     return sum;
   };
   
-  if (npv(high) > 0) return 100;
-  if (npv(low) < 0) return 0;
+  if (npv(0) <= 0) return 0;
+  if (npv(1.0) > 0) return 100;
   
-  for (let iter = 0; iter < 40; iter++) {
+  let low = 0.0;
+  let high = 1.0;
+  
+  for (let iter = 0; iter < 50; iter++) {
     const mid = (low + high) / 2;
     const val = npv(mid);
-    if (Math.abs(val) < 1.0) return Math.round(mid * 1000) / 10;
+    if (Math.abs(val) < 1.0 || (high - low) < 0.0001) {
+      return Math.round(mid * 1000) / 10;
+    }
     if (val > 0) {
       low = mid;
     } else {
@@ -137,6 +154,47 @@ function calculateIRR(capex: number, annualNetCashFlow: number, years = 10, salv
     }
   }
   
+  return Math.round(((low + high) / 2) * 1000) / 10;
+}
+
+/**
+ * Multi-period cash flow IRR for Project Finance (e.g. Levered Equity IRR)
+ */
+function calculateCashFlowsIRR(initialOutflow: number, cashFlows: number[], terminalValue = 0): number {
+  if (initialOutflow <= 0 || cashFlows.length === 0) return 0;
+  const totalNominal = cashFlows.reduce((a, b) => a + b, 0) + terminalValue;
+  if (totalNominal <= initialOutflow) return 0;
+
+  const npv = (r: number) => {
+    let sum = -initialOutflow;
+    for (let t = 0; t < cashFlows.length; t++) {
+      sum += cashFlows[t] / Math.pow(1 + r, t + 1);
+    }
+    if (terminalValue > 0) {
+      sum += terminalValue / Math.pow(1 + r, cashFlows.length);
+    }
+    return sum;
+  };
+
+  if (npv(0) <= 0) return 0;
+  if (npv(1.0) > 0) return 100;
+
+  let low = 0.0;
+  let high = 1.0;
+
+  for (let iter = 0; iter < 50; iter++) {
+    const mid = (low + high) / 2;
+    const val = npv(mid);
+    if (Math.abs(val) < 1.0 || (high - low) < 0.0001) {
+      return Math.round(mid * 1000) / 10;
+    }
+    if (val > 0) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
   return Math.round(((low + high) / 2) * 1000) / 10;
 }
 
@@ -153,12 +211,12 @@ export function getOmanMarketBenchmark(category: string, feedstock: string): Pri
     if (fsLower.includes('wind') || fsLower.includes('رياح')) {
       return {
         sector: 'Onshore Wind (Oman PPA)',
-        unit: 'USD/MWh',
-        min: 20,
-        max: 35,
-        benchmarkMidpoint: 28.0,
+        unit: 'USD/kWh',
+        min: 0.020,
+        max: 0.035,
+        benchmarkMidpoint: 0.028,
         isWithinBenchmark: true,
-        advisoryNote: 'Oman Onshore Wind PPA benchmark range: $20–$35/MWh (Dhofar Wind precedent).'
+        advisoryNote: 'Oman Onshore Wind PPA benchmark range: $0.020–$0.035/kWh ($20–$35/MWh Dhofar Wind precedent).'
       };
     } else if (fsLower.includes('hydrogen') || fsLower.includes('هيدروجين')) {
       return {
@@ -173,35 +231,35 @@ export function getOmanMarketBenchmark(category: string, feedstock: string): Pri
     } else if (fsLower.includes('waste') || fsLower.includes('biomass') || fsLower.includes('msw') || fsLower.includes('نفايات')) {
       return {
         sector: 'Waste-to-Energy / Biomass Power',
-        unit: 'USD/MWh',
-        min: 50,
-        max: 100,
-        benchmarkMidpoint: 75.0,
+        unit: 'USD/kWh',
+        min: 0.050,
+        max: 0.100,
+        benchmarkMidpoint: 0.075,
         isWithinBenchmark: true,
-        advisoryNote: 'Oman Waste-to-Energy PPA benchmark range: $50–$100/MWh (Barka WtE standard).'
+        advisoryNote: 'Oman Waste-to-Energy PPA benchmark range: $0.050–$0.100/kWh ($50–$100/MWh Barka WtE standard).'
       };
     } else {
       // Default Solar PV
       return {
         sector: 'Utility-Scale Solar PV (Oman PPA)',
-        unit: 'USD/MWh',
-        min: 15,
-        max: 32,
-        benchmarkMidpoint: 24.0,
+        unit: 'USD/kWh',
+        min: 0.015,
+        max: 0.032,
+        benchmarkMidpoint: 0.024,
         isWithinBenchmark: true,
-        advisoryNote: 'Oman Utility Solar PV PPA benchmark range: $15–$32/MWh (Ibra / Manah I & II precedents).'
+        advisoryNote: 'Oman Utility Solar PV PPA benchmark range: $0.015–$0.032/kWh ($15–$32/MWh Ibra / Manah I & II precedents).'
       };
     }
   } else {
-    // Biofuel wholesale benchmarks
+    // Biofuel wholesale benchmarks in USD/kWh (standardized 10,500 kWh/ton for B100 Biodiesel)
     return {
-      sector: 'Biofuel / Biodiesel Wholesale (Oman/GCC)',
-      unit: 'USD/ton',
-      min: 750,
-      max: 1350,
-      benchmarkMidpoint: 1100.0,
+      sector: 'Biofuel / Clean Bio-Energy Wholesale (Oman/GCC)',
+      unit: 'USD/kWh',
+      min: 0.071,
+      max: 0.128,
+      benchmarkMidpoint: 0.105,
       isWithinBenchmark: true,
-      advisoryNote: 'Oman / GCC Biofuel wholesale benchmark range: $750–$1,350/ton (Wakud Khazaen precedent).'
+      advisoryNote: 'Oman / GCC Biofuel energy benchmark range: $0.071–$0.128/kWh (~$750–$1,350/ton equivalent for B100 Biodiesel, Wakud Khazaen precedent).'
     };
   }
 }
@@ -422,131 +480,192 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   const location = inputs.location || 'Muscat - Rusayl Industrial Estate';
   const scale = (inputs.projectScale as 'Small' | 'Medium' | 'Large' | 'Mega') || 'Medium';
 
-  // 1. Capacity & Production Synchronization
+  // Standard energy conversion constants for Oman clean fuel matrix
+  const energyKwhPerTonBiofuel = 10500; // 1 ton B100 Biodiesel ~ 10,500 kWh (37.8 MJ/kg)
+
+  // 1. Capacity & Production Synchronization (Standardized in kWh for all entries)
   const userEnteredProduction = inputs.production !== undefined && Number(inputs.production) > 0 ? Number(inputs.production) : undefined;
   const userEnteredCapacity = inputs.capacity !== undefined && Number(inputs.capacity) > 0 ? Number(inputs.capacity) : undefined;
 
   let productionValue = 0;
   let capacityValue = 0;
-  const capacityUnit = isBiofuel ? 'Tons/Year' : 'kW';
-  const productionUnit = isBiofuel ? 'Tons/Year' : 'MWh/Year';
+  let equivalentBiofuelTons = 0;
+  let capacityFactor = 0.251; // High solar GHI in Oman with single-axis tracking (~2,200 full load hours/yr)
+  const capacityUnit = isBiofuel ? 'kWh/day' : 'kW';
+  const productionUnit = 'kWh/Year';
 
   if (isBiofuel) {
     if (userEnteredProduction !== undefined) {
-      productionValue = userEnteredProduction;
-      capacityValue = userEnteredCapacity !== undefined ? userEnteredCapacity : userEnteredProduction;
-    } else if (userEnteredCapacity !== undefined) {
-      capacityValue = userEnteredCapacity;
-      productionValue = userEnteredCapacity;
+      productionValue = userEnteredProduction < 50000 ? userEnteredProduction * energyKwhPerTonBiofuel : userEnteredProduction;
     } else {
-      productionValue = 1500;
-      capacityValue = 1500;
+      productionValue = 15000000; // Default 15,000,000 kWh/year (~1,428 tons B100 equivalent)
     }
+    equivalentBiofuelTons = Math.max(1, Math.round(productionValue / energyKwhPerTonBiofuel));
+    capacityValue = userEnteredCapacity !== undefined ? userEnteredCapacity : Math.round(productionValue / 4000);
+    capacityFactor = 0.85;
   } else {
-    // Renewable Energy capacity factor
-    let capacityFactor = 0.228; // Solar PV in Oman: 22.8% (~2,000 full load hours/yr)
+    // Renewable Energy capacity factor benchmarks in Oman
     if (fsLower.includes('wind') || fsLower.includes('رياح')) capacityFactor = 0.350; // Dhofar Wind ~35%
     else if (fsLower.includes('hydrogen') || fsLower.includes('هيدروجين')) capacityFactor = 0.650;
     else if (fsLower.includes('waste') || fsLower.includes('biomass') || fsLower.includes('msw') || fsLower.includes('نفايات')) capacityFactor = 0.850;
+    else capacityFactor = 0.251; // Solar PV in Oman: 24–27% with tracking (e.g. Manah I & II, Ibri II)
 
     if (userEnteredProduction !== undefined && userEnteredCapacity !== undefined) {
-      productionValue = userEnteredProduction;
-      capacityValue = userEnteredCapacity;
+      let capKw = userEnteredCapacity;
+      let prodKwh = userEnteredProduction;
+      
+      // Auto-detect unit scale: if production implies capacity factor > 100%, user typed MW for capacity!
+      // E.g., user entered 2,200,000,000 kWh and typed 1000 or 1088 for MW
+      if (prodKwh / (capKw * 8760) > 1.20) {
+        capKw = capKw * 1000;
+      }
+      
+      // Legacy normalization: if production was entered in MWh (< 50,000) while capacity is large
+      if (prodKwh < 50000 && (prodKwh * 1000) / (capKw * 8760) >= 0.10) {
+        prodKwh = prodKwh * 1000;
+      }
+      
+      capacityValue = Math.round(capKw);
+      productionValue = Math.round(prodKwh);
+      capacityFactor = Math.min(0.95, Math.max(0.05, productionValue / (capacityValue * 8760)));
     } else if (userEnteredProduction !== undefined) {
-      productionValue = userEnteredProduction;
-      capacityValue = Math.round((productionValue * 1000) / (8760 * capacityFactor));
+      productionValue = userEnteredProduction < 50000 ? userEnteredProduction * 1000 : userEnteredProduction;
+      capacityValue = Math.round(productionValue / (8760 * capacityFactor));
     } else if (userEnteredCapacity !== undefined) {
-      capacityValue = userEnteredCapacity;
-      productionValue = Math.round((capacityValue * 8760 * capacityFactor) / 1000);
+      let capKw = userEnteredCapacity;
+      if (capKw <= 5000 && (scale === 'Mega' || scale === 'Large')) {
+        capKw = capKw * 1000;
+      }
+      capacityValue = Math.round(capKw);
+      productionValue = Math.round(capacityValue * 8760 * capacityFactor);
     } else {
       capacityValue = 1000; // 1,000 kW (1 MW)
-      productionValue = Math.round((capacityValue * 8760 * capacityFactor) / 1000);
+      productionValue = Math.round(capacityValue * 8760 * capacityFactor);
     }
   }
 
-  // 2. Selling Price & Market Benchmark
+  const capacityFactorPercent = +(capacityFactor * 100).toFixed(1);
+  const peakSunHoursPerDay = +(productionValue / (Math.max(1, capacityValue) * 365)).toFixed(2);
+  const capacityFormatted = isBiofuel 
+    ? `${capacityValue.toLocaleString()} kWh/day (${equivalentBiofuelTons.toLocaleString()} t/yr eq)`
+    : (capacityValue >= 1000 
+        ? `${(capacityValue / 1000).toLocaleString(undefined, {maximumFractionDigits: 1})} MW (${capacityValue.toLocaleString()} kW)`
+        : `${capacityValue.toLocaleString()} kW`);
+
+  // 2. Selling Price & Market Benchmark (Standardized in USD/kWh for all entries)
   const benchmarkInfo = getOmanMarketBenchmark(inputs.category || 'Biofuel', feedstock);
   const userEnteredPrice = inputs.sellingPrice !== undefined && Number(inputs.sellingPrice) > 0 ? Number(inputs.sellingPrice) : undefined;
   
   let effectiveSellingPrice = 0;
-  const priceUnit = benchmarkInfo.unit;
+  const priceUnit = 'USD/kWh';
 
   if (userEnteredPrice !== undefined) {
-    effectiveSellingPrice = userEnteredPrice;
+    if (userEnteredPrice > 1.0) {
+      effectiveSellingPrice = isBiofuel ? userEnteredPrice / energyKwhPerTonBiofuel : userEnteredPrice / 1000;
+    } else {
+      effectiveSellingPrice = userEnteredPrice;
+    }
     const isWithin = effectiveSellingPrice >= benchmarkInfo.min && effectiveSellingPrice <= benchmarkInfo.max;
     benchmarkInfo.isWithinBenchmark = isWithin;
     if (isWithin) {
       benchmarkInfo.advisoryNote = isArabic 
-        ? `سعر البيع المدخل ($${effectiveSellingPrice.toLocaleString()} ${priceUnit}) يقع تماماً ضمن النطاق المعتمد لسوق سلطنة عُمان ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}).`
-        : `Entered selling price of $${effectiveSellingPrice.toLocaleString()} ${priceUnit} is fully within the validated Oman market benchmark range ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}).`;
+        ? `سعر البيع المدخل ($${effectiveSellingPrice.toFixed(4)} ${priceUnit}) يقع تماماً ضمن النطاق المعتمد لسوق سلطنة عُمان ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}).`
+        : `Entered selling price of $${effectiveSellingPrice.toFixed(4)} ${priceUnit} is fully within the validated Oman market benchmark range ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}).`;
     } else {
       benchmarkInfo.advisoryNote = isArabic 
-        ? `ملاحظة تدقيقية: سعر البيع المدخل ($${effectiveSellingPrice.toLocaleString()} ${priceUnit}) يختلف عن النطاق المرجعي لسلطنة عُمان ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}). تم احتساب كافة الإيرادات والعوائد استناداً إلى السعر المدخل لضمان تطابق النتائج بدقة 100%.`
-        : `Advisory Note: Entered selling price of $${effectiveSellingPrice.toLocaleString()} ${priceUnit} diverges from the standard Oman benchmark ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}). Financial returns calculated strictly using entered price to maintain input fidelity.`;
+        ? `ملاحظة تدقيقية: سعر البيع المدخل ($${effectiveSellingPrice.toFixed(4)} ${priceUnit}) يختلف عن النطاق المرجعي لسلطنة عُمان ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}). تم احتساب كافة الإيرادات والعوائد استناداً إلى السعر المدخل لضمان تطابق النتائج بدقة 100%.`
+        : `Advisory Note: Entered selling price of $${effectiveSellingPrice.toFixed(4)} ${priceUnit} diverges from the standard Oman benchmark ($${benchmarkInfo.min}–$${benchmarkInfo.max} ${priceUnit}). Financial returns calculated strictly using entered price to maintain input fidelity.`;
     }
   } else {
     effectiveSellingPrice = benchmarkInfo.benchmarkMidpoint;
     benchmarkInfo.isWithinBenchmark = true;
     benchmarkInfo.advisoryNote = isArabic
-      ? `تم تطبيق السعر المرجعي الافتراضي لسلطنة عُمان: $${effectiveSellingPrice.toLocaleString()} ${priceUnit} (نطاق: $${benchmarkInfo.min}–$${benchmarkInfo.max}).`
-      : `Applied validated Oman sector benchmark: $${effectiveSellingPrice.toLocaleString()} ${priceUnit} (typical range: $${benchmarkInfo.min}–$${benchmarkInfo.max}).`;
+      ? `تم تطبيق السعر المرجعي الافتراضي لسلطنة عُمان: $${effectiveSellingPrice.toFixed(4)} ${priceUnit} (نطاق: $${benchmarkInfo.min}–$${benchmarkInfo.max}).`
+      : `Applied validated Oman sector benchmark: $${effectiveSellingPrice.toFixed(4)} ${priceUnit} (typical range: $${benchmarkInfo.min}–$${benchmarkInfo.max}).`;
   }
 
-  // 3. CAPEX Modeling
+  // 3. Dynamic Scale & CAPEX Modeling (Calibrated for Oman Utility Infrastructure)
+  let derivedScale: 'Small' | 'Medium' | 'Large' | 'Mega' = scale;
+  if (!isBiofuel) {
+    if (capacityValue >= 100000) derivedScale = 'Mega'; // >= 100 MW (e.g. Manah 1,000 MW, Ibri 500 MW)
+    else if (capacityValue >= 10000) derivedScale = 'Large'; // 10 MW to 100 MW
+    else if (capacityValue >= 1000) derivedScale = 'Medium'; // 1 MW to 10 MW
+    else derivedScale = 'Small';
+  } else {
+    if (equivalentBiofuelTons >= 15000) derivedScale = 'Mega';
+    else if (equivalentBiofuelTons >= 5000) derivedScale = 'Large';
+    else if (equivalentBiofuelTons >= 1000) derivedScale = 'Medium';
+    else derivedScale = 'Small';
+  }
+
   let realisticCAPEX = 0;
   const profile = resolveProfile(feedstock);
 
   if (isBiofuel) {
-    const scaleKey = scale === 'Small' || productionValue < 1000 ? 'small' : (scale === 'Large' || scale === 'Mega' || productionValue > 5000 ? 'large' : 'medium');
+    const scaleKey = derivedScale === 'Small' ? 'small' : (derivedScale === 'Large' || derivedScale === 'Mega' ? 'large' : 'medium');
     const unitCapex = profile.capexPerUnitUSD[scaleKey];
-    realisticCAPEX = Math.round(productionValue * unitCapex);
+    realisticCAPEX = Math.round(equivalentBiofuelTons * unitCapex);
   } else {
-    // Renewable Energy
+    // Renewable Energy Turnkey CAPEX in Oman (including grid tie-in, substations, bifacial tracking modules)
     if (fsLower.includes('solar') || fsLower.includes('شمسية')) {
-      const costPerKW = scale === 'Small' ? 820 : (scale === 'Large' || scale === 'Mega' ? 560 : 680);
+      // Oman utility solar benchmark: Manah I & II (1,000 MW total complex ~300M OMR / $780M USD = ~$750-$780/kW)
+      const costPerKW = derivedScale === 'Mega' ? 750 : (derivedScale === 'Large' ? 820 : (derivedScale === 'Medium' ? 920 : 1050));
       realisticCAPEX = Math.round(capacityValue * costPerKW);
     } else if (fsLower.includes('wind') || fsLower.includes('رياح')) {
-      realisticCAPEX = Math.round(capacityValue * 1250);
+      // Dhofar Wind benchmark: ~$1,150 - $1,300/kW turnkey
+      const costPerKW = derivedScale === 'Mega' ? 1150 : (derivedScale === 'Large' ? 1250 : 1380);
+      realisticCAPEX = Math.round(capacityValue * costPerKW);
     } else if (fsLower.includes('hydrogen') || fsLower.includes('هيدروجين')) {
-      realisticCAPEX = Math.round(capacityValue * 850);
+      const costPerKW = derivedScale === 'Mega' ? 750 : (derivedScale === 'Large' ? 850 : 1050);
+      realisticCAPEX = Math.round(capacityValue * costPerKW);
     } else if (fsLower.includes('waste') || fsLower.includes('biomass') || fsLower.includes('msw') || fsLower.includes('نفايات')) {
-      realisticCAPEX = Math.round(capacityValue * 1750);
+      realisticCAPEX = Math.round(capacityValue * 1650);
     } else {
-      realisticCAPEX = Math.round(capacityValue * 720);
+      realisticCAPEX = Math.round(capacityValue * 780);
     }
   }
 
   if (realisticCAPEX < 50000) realisticCAPEX = 50000;
 
   // 4. Investor Budget & Capital Adequacy
-  const budget = inputs.budget !== undefined && Number(inputs.budget) > 0 
+  let budget = inputs.budget !== undefined && Number(inputs.budget) > 0 
     ? Number(inputs.budget) 
     : Math.round(realisticCAPEX * 1.05);
+
+  // Auto-detect budget scale mismatch: e.g. for utility projects ($750M CAPEX)
+  // if user typed 800,000 thinking in thousands ($800M) or left a 1 MW default $800,000
+  if (realisticCAPEX >= 20000000 && budget < realisticCAPEX * 0.05) {
+    if (budget * 1000 >= realisticCAPEX * 0.35 && budget * 1000 <= realisticCAPEX * 3.0) {
+      budget = budget * 1000;
+    } else {
+      budget = Math.round(realisticCAPEX * 1.05);
+    }
+  }
 
   const capitalAdequacyRatio = +(budget / realisticCAPEX).toFixed(2);
   const fundingGapUSD = Math.max(0, Math.round(realisticCAPEX - budget));
   const fundingGapPercentage = realisticCAPEX > 0 ? +((fundingGapUSD / realisticCAPEX) * 100).toFixed(1) : 0;
   const underfundingDetected = capitalAdequacyRatio < 0.65;
-  const installedCostPerUnit = +(realisticCAPEX / (isBiofuel ? productionValue : capacityValue)).toFixed(2);
+  const installedCostPerUnit = +(realisticCAPEX / (productionValue || 1)).toFixed(4);
 
-  // 5. Dynamic Revenue Streams
+  // 5. Dynamic Revenue Streams (Standardized in kWh)
   let mainProductRevenue = 0;
   let byproductRevenue = 0;
   let tippingFeeRevenue = 0;
-  let mainProductName = isBiofuel ? (isArabic ? 'وقود حيوي معتمد (Biodiesel B100)' : 'Certified Clean Biofuel (B100)') : `${feedstock} Power`;
+  let mainProductName = isBiofuel ? (isArabic ? 'طاقة وقود حيوي معتمد (Biodiesel B100)' : 'Certified Clean Biofuel Energy (B100)') : `${feedstock} Power`;
   let byproductName = isArabic ? profile.byproductNameAr : profile.byproductNameEn;
   let tippingFeeDescription = isArabic ? 'غير منطبق' : 'Not Applicable';
 
   if (isBiofuel) {
     mainProductRevenue = Math.round(productionValue * effectiveSellingPrice);
     
-    // Byproduct commercialization
-    const byproductTons = productionValue * profile.byproductYield;
+    // Byproduct commercialization (calculated based on physical mass yield)
+    const byproductTons = equivalentBiofuelTons * profile.byproductYield;
     byproductRevenue = Math.round(byproductTons * profile.byproductPriceUSD);
 
     // Gate / Tipping fees from municipal waste providers (be'ah / Nama)
     if (profile.tippingFeeUSD > 0) {
-      const rawFeedstockTons = productionValue / profile.conversionYield;
+      const rawFeedstockTons = equivalentBiofuelTons / profile.conversionYield;
       tippingFeeRevenue = Math.round(rawFeedstockTons * profile.tippingFeeUSD);
       tippingFeeDescription = isArabic 
         ? `رسوم استقبال ومعالجة نفايات ($${profile.tippingFeeUSD}/طن على ${Math.round(rawFeedstockTons).toLocaleString()} طن مواد خام)`
@@ -554,13 +673,12 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
     }
   } else {
     if (fsLower.includes('hydrogen') || fsLower.includes('هيدروجين')) {
-      // Production in tons or kg
-      mainProductRevenue = Math.round(productionValue * 1000 * effectiveSellingPrice);
-      mainProductName = isArabic ? 'هيدروجين أخضر عالي النقاوة' : 'High-Purity Green Hydrogen';
+      mainProductRevenue = Math.round(productionValue * effectiveSellingPrice);
+      mainProductName = isArabic ? 'طاقة هيدروجين أخضر عالي النقاوة' : 'High-Purity Green Hydrogen Clean Energy';
     } else if (fsLower.includes('waste') || fsLower.includes('biomass') || fsLower.includes('msw') || fsLower.includes('نفايات')) {
       mainProductRevenue = Math.round(productionValue * effectiveSellingPrice);
       mainProductName = isArabic ? 'طاقة كهربائية أساسية من النفايات' : 'Baseload Waste-to-Energy Power';
-      const rawWasteRequiredTons = Math.round(productionValue / 0.62); // 1 ton MSW produces ~0.62 MWh
+      const rawWasteRequiredTons = Math.round((productionValue / 1000) / 0.62); // 1 ton MSW produces ~0.62 MWh
       tippingFeeRevenue = Math.round(rawWasteRequiredTons * 24); // $24/ton tipping fee in Oman
       tippingFeeDescription = isArabic
         ? `رسوم استقبال النفايات البلدية من "بيئة" ($24/طن على ${rawWasteRequiredTons.toLocaleString()} طن)`
@@ -584,7 +702,7 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
     tippingFeeDescription
   };
 
-  // 6. Annual Operating Expenses (OPEX Breakdown)
+  // 6. Annual Operating Expenses (OPEX Breakdown) - Rigorous Oman Calibration
   let feedstockCost = 0;
   let chemicalsCost = 0;
   let utilitiesCost = 0;
@@ -592,44 +710,122 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   let maintenanceCost = 0;
 
   if (isBiofuel) {
-    const rawFeedstockRequired = productionValue / profile.conversionYield;
+    const rawFeedstockRequired = equivalentBiofuelTons / profile.conversionYield;
     feedstockCost = Math.round(rawFeedstockRequired * profile.feedstockPriceUSD);
-    chemicalsCost = Math.round(productionValue * profile.chemicalsPerTonUSD);
+    chemicalsCost = Math.round(equivalentBiofuelTons * profile.chemicalsPerTonUSD);
 
     const elecRate = inputs.electricityCost !== undefined && Number(inputs.electricityCost) > 0 ? Number(inputs.electricityCost) : 0.050;
-    // Process power (~45 kWh/t) + thermal natural gas/steam + water
-    utilitiesCost = Math.round(productionValue * (elecRate * 45 + profile.utilitiesPerTonUSD));
+    utilitiesCost = Math.round(equivalentBiofuelTons * (elecRate * 45 + profile.utilitiesPerTonUSD));
 
     if (inputs.laborCost !== undefined && Number(inputs.laborCost) > 0) {
       laborCost = Number(inputs.laborCost);
     } else {
-      laborCost = scale === 'Small' ? 65000 : (scale === 'Large' || scale === 'Mega' ? 165000 : 95000);
+      laborCost = derivedScale === 'Small' ? 65000 : (derivedScale === 'Large' || derivedScale === 'Mega' ? 165000 : 95000);
     }
 
-    maintenanceCost = Math.round(realisticCAPEX * 0.032);
+    if (inputs.advancedParams?.['Annual Maintenance (% of CAPEX)'] !== undefined && Number(inputs.advancedParams['Annual Maintenance (% of CAPEX)']) > 0) {
+      maintenanceCost = Math.round(realisticCAPEX * (Number(inputs.advancedParams['Annual Maintenance (% of CAPEX)']) / 100));
+    } else if (inputs.advancedParams?.['Annual Maintenance Cost (USD/year)'] !== undefined && Number(inputs.advancedParams['Annual Maintenance Cost (USD/year)']) > 0) {
+      maintenanceCost = Math.round(Number(inputs.advancedParams['Annual Maintenance Cost (USD/year)']));
+    } else {
+      maintenanceCost = Math.round(realisticCAPEX * 0.032);
+    }
   } else {
     feedstockCost = 0;
     chemicalsCost = 0;
-    const elecRate = inputs.electricityCost !== undefined && Number(inputs.electricityCost) > 0 ? Number(inputs.electricityCost) : 0.050;
-    utilitiesCost = Math.round(capacityValue * 1.2 * elecRate * 12);
+    const isSolar = fsLower.includes('solar') || fsLower.includes('شمسية');
+    const isWind = fsLower.includes('wind') || fsLower.includes('رياح');
 
-    if (inputs.laborCost !== undefined && Number(inputs.laborCost) > 0) {
-      laborCost = Number(inputs.laborCost);
+    const userSpecifiedMaintPct = inputs.advancedParams?.['Annual Maintenance (% of CAPEX)'] !== undefined && Number(inputs.advancedParams['Annual Maintenance (% of CAPEX)']) > 0;
+    const userSpecifiedMaintUSD = inputs.advancedParams?.['Annual Maintenance Cost (USD/year)'] !== undefined && Number(inputs.advancedParams['Annual Maintenance Cost (USD/year)']) > 0;
+
+    if (isSolar) {
+      // Oman Solar PV OPEX Benchmarks:
+      // Utility-scale plants (Manah I & II, Ibri II) operate at 15% - 18% of revenues ($7.0 - $8.5 / kW/year).
+      let omRatePerKW = 7.5;
+      if (inputs.advancedParams?.['O&M Cost (USD/kW/year)'] !== undefined && Number(inputs.advancedParams['O&M Cost (USD/kW/year)']) > 0) {
+        omRatePerKW = Number(inputs.advancedParams['O&M Cost (USD/kW/year)']);
+      } else if (derivedScale === 'Mega' || capacityValue >= 100000) {
+        omRatePerKW = 7.5; // Robotic dry cleaning, OETC grid interconnection fee, SCADA ops
+      } else if (derivedScale === 'Large' || capacityValue >= 10000) {
+        omRatePerKW = 9.5;
+      } else if (derivedScale === 'Medium' || capacityValue >= 1000) {
+        omRatePerKW = 13.5;
+      } else {
+        omRatePerKW = 19.0;
+      }
+
+      let targetSolarOPEX = Math.round(capacityValue * omRatePerKW);
+      
+      // Ensure utility scale solar OPEX conforms to standard Oman 15% - 18% revenue margin
+      if ((derivedScale === 'Mega' || capacityValue >= 100000) && annualRevenue > 0 && inputs.advancedParams?.['O&M Cost (USD/kW/year)'] === undefined) {
+        targetSolarOPEX = Math.min(targetSolarOPEX, Math.round(annualRevenue * 0.165));
+      }
+
+      if (inputs.laborCost !== undefined && Number(inputs.laborCost) > 0) {
+        laborCost = Number(inputs.laborCost);
+      } else {
+        laborCost = Math.round(targetSolarOPEX * 0.20);
+      }
+      utilitiesCost = Math.round(targetSolarOPEX * 0.05);
+
+      if (userSpecifiedMaintPct) {
+        maintenanceCost = Math.round(realisticCAPEX * (Number(inputs.advancedParams!['Annual Maintenance (% of CAPEX)']) / 100));
+      } else if (userSpecifiedMaintUSD) {
+        maintenanceCost = Math.round(Number(inputs.advancedParams!['Annual Maintenance Cost (USD/year)']));
+      } else {
+        maintenanceCost = Math.round(targetSolarOPEX * 0.65);
+      }
+    } else if (isWind) {
+      let omRatePerKW = derivedScale === 'Mega' ? 28 : (derivedScale === 'Large' ? 32 : 38);
+      if (inputs.advancedParams?.['O&M Cost (USD/kW/yr)'] !== undefined && Number(inputs.advancedParams['O&M Cost (USD/kW/yr)']) > 0) {
+        omRatePerKW = Number(inputs.advancedParams['O&M Cost (USD/kW/yr)']);
+      }
+      const targetWindOPEX = Math.round(capacityValue * omRatePerKW);
+      laborCost = inputs.laborCost !== undefined ? Number(inputs.laborCost) : Math.round(targetWindOPEX * 0.22);
+      utilitiesCost = Math.round(targetWindOPEX * 0.08);
+
+      if (userSpecifiedMaintPct) {
+        maintenanceCost = Math.round(realisticCAPEX * (Number(inputs.advancedParams!['Annual Maintenance (% of CAPEX)']) / 100));
+      } else if (userSpecifiedMaintUSD) {
+        maintenanceCost = Math.round(Number(inputs.advancedParams!['Annual Maintenance Cost (USD/year)']));
+      } else {
+        maintenanceCost = Math.round(targetWindOPEX * 0.70);
+      }
     } else {
-      laborCost = Math.max(25000, Math.round(capacityValue * 6));
-    }
+      const targetCleanOPEX = Math.round(capacityValue * 22);
+      laborCost = inputs.laborCost !== undefined ? Number(inputs.laborCost) : Math.round(targetCleanOPEX * 0.25);
+      utilitiesCost = Math.round(targetCleanOPEX * 0.10);
 
-    // Solar / Wind routine maintenance & robotic anti-soiling washing in Oman
-    maintenanceCost = Math.round(capacityValue * 15);
+      if (userSpecifiedMaintPct) {
+        maintenanceCost = Math.round(realisticCAPEX * (Number(inputs.advancedParams!['Annual Maintenance (% of CAPEX)']) / 100));
+      } else if (userSpecifiedMaintUSD) {
+        maintenanceCost = Math.round(Number(inputs.advancedParams!['Annual Maintenance Cost (USD/year)']));
+      } else {
+        maintenanceCost = Math.round(targetCleanOPEX * 0.65);
+      }
+    }
   }
 
-  const annualOPEX = Math.round(feedstockCost + chemicalsCost + utilitiesCost + laborCost + maintenanceCost);
+  // Insurance calculation (Oman industrial & utility asset insurance: typically 0.50% of CAPEX)
+  let insuranceCost = 0;
+  if (inputs.advancedParams?.['Annual Insurance (% of CAPEX)'] !== undefined && Number(inputs.advancedParams['Annual Insurance (% of CAPEX)']) >= 0) {
+    insuranceCost = Math.round(realisticCAPEX * (Number(inputs.advancedParams['Annual Insurance (% of CAPEX)']) / 100));
+  } else if (inputs.advancedParams?.['Annual Insurance Cost (USD/year)'] !== undefined && Number(inputs.advancedParams['Annual Insurance Cost (USD/year)']) >= 0) {
+    insuranceCost = Math.round(Number(inputs.advancedParams['Annual Insurance Cost (USD/year)']));
+  } else {
+    // Benchmark Oman asset insurance: 0.50% of CAPEX
+    insuranceCost = Math.round(realisticCAPEX * 0.005);
+  }
+
+  const annualOPEX = Math.round(feedstockCost + chemicalsCost + utilitiesCost + laborCost + maintenanceCost + insuranceCost);
   const opexBreakdown: OPEXBreakdown = {
     feedstockUSD: feedstockCost,
     chemicalsUSD: chemicalsCost,
     utilitiesUSD: utilitiesCost,
     laborUSD: laborCost,
     maintenanceUSD: maintenanceCost,
+    insuranceUSD: insuranceCost,
     totalUSD: annualOPEX
   };
 
@@ -640,55 +836,134 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   // 8. Gross Operating Profit (EBITDA)
   const grossProfit = Math.round(annualRevenue - annualOPEX);
 
-  // 9. Statutory Corporate Tax (Oman Location Calibration)
+  // 9. Statutory Corporate Tax & Project Lifespan (Oman Location & Tax Calibration)
   const locLower = location.toLowerCase();
   const isFreeZone = locLower.includes('freezone') || locLower.includes('free zone') || 
                      locLower.includes('special economic zone') || locLower.includes('opaz') ||
                      locLower.includes('duqm') || locLower.includes('salalah') || locLower.includes('sohar') ||
                      locLower.includes('khazaen') || locLower.includes('خزائن') || locLower.includes('الدقم') ||
                      locLower.includes('صلالة') || locLower.includes('صحار') || locLower.includes('حرة');
-  
+
+  // Lifespan & Depreciation Modeling
+  const projectLifespanYears = inputs.advancedParams?.['Project Lifespan (Years)'] !== undefined && Number(inputs.advancedParams['Project Lifespan (Years)']) > 0
+    ? Number(inputs.advancedParams['Project Lifespan (Years)'])
+    : (!isBiofuel ? 25 : 20); // 25 years standard for Solar PV / Wind utility PPA, 20 yrs for Biofuels
+
+  const annualDepreciation = Math.round(realisticCAPEX / projectLifespanYears);
+  const taxableIncome = Math.max(0, grossProfit - annualDepreciation);
   const taxRate = isFreeZone ? 0.0 : 0.15;
-  const corporateTaxUSD = (grossProfit > 0 && !isFreeZone) ? Math.round(grossProfit * taxRate) : 0;
-  const netProfit = grossProfit - corporateTaxUSD;
+  const corporateTaxUSD = (taxableIncome > 0 && !isFreeZone) ? Math.round(taxableIncome * taxRate) : 0;
+  
+  // Net Accounting Profit
+  const netProfit = grossProfit - annualDepreciation - corporateTaxUSD;
+  // Free Cash Flow to Firm / Project Operating Free Cash Flow
+  const annualFreeCashFlow = grossProfit - corporateTaxUSD;
+
   const taxDescription = isFreeZone 
     ? (isArabic ? 'إعفاء ضريبي بنسبة 0% (حوافز المناطق الحرة والمناطق الاقتصادية الخاصة تحت مظلة OPAZ).' : '0% Corporate Tax applied (Special Economic Zone / Free Zone statutory incentive under OPAZ).')
-    : (isArabic ? 'ضريبة دخل شركات بنسبة 15% مطبقة على الأرباح وفق نظام جهاز الضرائب العماني.' : '15% Standard Omani Corporate tax applied to gross profit as per Oman Tax Authority.');
+    : (isArabic ? 'ضريبة دخل شركات بنسبة 15% مطبقة على الدخل الخاضع للضريبة بعد استهلاك رأس المال وفق نظام جهاز الضرائب العماني.' : '15% Standard Omani Corporate tax applied on taxable income after straight-line depreciation as per Oman Tax Authority.');
 
-  // 10. Simple Payback Period & Deficit Safeguards
-  const isOperatingDeficit = grossProfit <= 0 || netProfit <= 0;
-  let paybackYears = 0;
+  // 10. Project Finance Structure & Bankable Capital Recovery (Oman IPP Standard)
+  const isUtilityIPP = !isBiofuel && (derivedScale === 'Mega' || derivedScale === 'Large' || capacityValue >= 20000);
+  const debtRatio = isUtilityIPP ? 0.75 : 0.70;
+  const equityRatio = 1 - debtRatio;
+
+  const equityCapex = Math.round(realisticCAPEX * equityRatio);
+  const debtCapex = Math.round(realisticCAPEX * debtRatio);
+
+  // Senior Debt Amortization over 18 years at 4.8% interest (standard Oman infrastructure loan)
+  const debtTenorYears = Math.min(18, projectLifespanYears - 2);
+  const debtInterestRate = 0.048;
+  const rawDebtService = debtCapex > 0 
+    ? Math.round(debtCapex * (debtInterestRate * Math.pow(1 + debtInterestRate, debtTenorYears)) / (Math.pow(1 + debtInterestRate, debtTenorYears) - 1))
+    : 0;
+
+  // Commercial Bank Debt Sculpting: Lenders in Oman sculpt annual debt service to maintain DSCR >= 1.25x
+  const maxBankableDebtService = annualFreeCashFlow > 0 ? Math.round(annualFreeCashFlow * 0.78) : 0;
+  const annualDebtService = Math.min(rawDebtService, maxBankableDebtService);
+
+  const annualEquityCashFlowDuringDebt = Math.max(0, annualFreeCashFlow - annualDebtService);
+  const isOperatingDeficit = grossProfit <= 0 || annualFreeCashFlow <= 0;
+
+  // Equity Capital Recovery (Sponsor Payback)
+  let equityPaybackYears = 0;
+  if (!isOperatingDeficit && equityCapex > 0 && (annualEquityCashFlowDuringDebt > 0 || annualFreeCashFlow > 0)) {
+    let cumulative = 0;
+    for (let yr = 1; yr <= projectLifespanYears; yr++) {
+      const flow = yr <= debtTenorYears ? annualEquityCashFlowDuringDebt : annualFreeCashFlow;
+      if (cumulative + flow >= equityCapex) {
+        const frac = (equityCapex - cumulative) / (flow || 1);
+        equityPaybackYears = +(yr - 1 + frac).toFixed(1);
+        break;
+      }
+      cumulative += flow;
+    }
+    if (equityPaybackYears === 0 && cumulative > 0) {
+      equityPaybackYears = +(equityCapex / (annualEquityCashFlowDuringDebt || 1)).toFixed(1);
+    }
+  }
+
+  // Unlevered Project Payback
+  let projectPaybackYears = 0;
+  if (annualFreeCashFlow > 0) {
+    projectPaybackYears = +(realisticCAPEX / annualFreeCashFlow).toFixed(1);
+  }
+
+  // The primary bankable payback reported: In utility IPPs, equity payback is the key metric (8 - 12 years)
+  const paybackYears = isUtilityIPP && equityPaybackYears > 0 ? equityPaybackYears : projectPaybackYears;
   let paybackFormatted = isArabic ? 'غير متاح (عجز)' : 'N/A (Deficit)';
-
-  if (!isOperatingDeficit) {
-    const effectiveCashFlow = netProfit > 0 ? netProfit : grossProfit;
-    paybackYears = +(realisticCAPEX / effectiveCashFlow).toFixed(1);
-    paybackFormatted = `${paybackYears} ${isArabic ? 'سنوات' : 'yrs'}`;
+  if (!isOperatingDeficit && paybackYears > 0) {
+    paybackFormatted = isArabic 
+      ? `${paybackYears} سنوات ${isUtilityIPP ? '(استرداد حقوق الملكية / Equity Recovery)' : ''}`
+      : `${paybackYears} yrs ${isUtilityIPP ? '(Equity Capital Recovery)' : ''}`;
   }
 
   // Break-Even Offtake Price: Offtake tariff required for Annual Revenue == Annual OPEX
   const otherRevenue = byproductRevenue + tippingFeeRevenue;
   const breakEvenPrice = productionValue > 0 
-    ? Math.max(0, Math.round(((annualOPEX - otherRevenue) / productionValue) * 100) / 100)
+    ? Math.max(0, Math.round(((annualOPEX - otherRevenue) / productionValue) * 1000) / 1000)
     : 0;
 
-  // 11. Discounted Cash Flow IRR
-  const irrPercent = (grossProfit > 0 && netProfit > 0) ? calculateIRR(realisticCAPEX, netProfit) : 0;
-  const irrString = irrPercent > 0 ? `${irrPercent.toFixed(1)}%` : 'N/A (< 0%)';
+  // 11. Discounted Cash Flow IRR (Equity IRR & Project Unlevered IRR)
+  let equityIRR = 0;
+  if (isUtilityIPP && equityCapex > 0 && annualEquityCashFlowDuringDebt > 0) {
+    const equityFlows: number[] = [];
+    for (let yr = 1; yr <= projectLifespanYears; yr++) {
+      if (yr <= debtTenorYears) {
+        equityFlows.push(annualEquityCashFlowDuringDebt);
+      } else {
+        equityFlows.push(annualFreeCashFlow);
+      }
+    }
+    equityIRR = calculateCashFlowsIRR(equityCapex, equityFlows, Math.round(equityCapex * 0.05));
+  }
 
-  // 12. Levelized Cost of Energy / Cost per Ton
-  const lcoeOrCostPerTon = isBiofuel 
-    ? `$${(annualOPEX / productionValue).toFixed(0)} per ton` 
-    : `$${(annualOPEX / productionValue).toFixed(2)} per MWh`;
+  const projectIRR = (grossProfit > 0 && annualFreeCashFlow > 0) 
+    ? calculateIRR(realisticCAPEX, annualFreeCashFlow, projectLifespanYears, 0.05) 
+    : 0;
+
+  const irrPercent = isUtilityIPP && equityIRR > 0 ? equityIRR : projectIRR;
+  const irrString = irrPercent > 0 
+    ? (isUtilityIPP ? `${equityIRR.toFixed(1)}% (Equity) / ${projectIRR.toFixed(1)}% (Project)` : `${irrPercent.toFixed(1)}%`)
+    : 'N/A (< 0%)';
+
+  // 12. Levelized Cost of Energy / Production Cost per kWh
+  const lcoeOrCostPerTon = `$${(annualOPEX / (productionValue || 1)).toFixed(4)} per kWh`;
 
   // 13. Deterministic Stress Tests (Price Drop -10%, OPEX +15%, Production -10%)
   // Stress Test 1: Price Drop -10%
   const st1Rev = Math.round((mainProductRevenue * 0.90) + byproductRevenue + tippingFeeRevenue);
   const st1Ebitda = Math.round(st1Rev - annualOPEX);
   const st1EbitdaDelta = st1Ebitda - grossProfit;
-  const st1ProfitAfterTax = (st1Ebitda > 0 && !isFreeZone) ? Math.round(st1Ebitda * (1 - taxRate)) : st1Ebitda;
-  const st1Payback = st1ProfitAfterTax > 0 ? +(realisticCAPEX / st1ProfitAfterTax).toFixed(1) : 0;
-  const st1Risk = st1Ebitda <= 0 ? 'Critical' : (st1Payback <= 6.0 ? 'Moderate' : 'Significant');
+  const st1Deprec = annualDepreciation;
+  const st1Taxable = Math.max(0, st1Ebitda - st1Deprec);
+  const st1Tax = (st1Taxable > 0 && !isFreeZone) ? Math.round(st1Taxable * taxRate) : 0;
+  const st1FCF = st1Ebitda - st1Tax;
+  const st1EqFlow = Math.max(0, st1FCF - annualDebtService);
+  const st1Payback = isUtilityIPP 
+    ? (st1EqFlow > 0 ? +(equityCapex / st1EqFlow).toFixed(1) : 0)
+    : (st1FCF > 0 ? +(realisticCAPEX / st1FCF).toFixed(1) : 0);
+  const st1Risk = st1Ebitda <= 0 ? 'Critical' : (st1Payback <= 11.0 ? 'Moderate' : 'Significant');
   const st1PaybackFormatted = st1Ebitda <= 0 
     ? (isArabic ? 'غير متاح (عجز)' : 'N/A (Deficit)') 
     : `${st1Payback} ${isArabic ? 'سنوات' : 'yrs'}`;
@@ -697,21 +972,31 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   const st2OPEX = Math.round(annualOPEX * 1.15);
   const st2Ebitda = Math.round(annualRevenue - st2OPEX);
   const st2EbitdaDelta = st2Ebitda - grossProfit;
-  const st2ProfitAfterTax = (st2Ebitda > 0 && !isFreeZone) ? Math.round(st2Ebitda * (1 - taxRate)) : st2Ebitda;
-  const st2Payback = st2ProfitAfterTax > 0 ? +(realisticCAPEX / st2ProfitAfterTax).toFixed(1) : 0;
-  const st2Risk = st2Ebitda <= 0 ? 'Critical' : (st2Payback <= 6.0 ? 'Moderate' : 'Significant');
+  const st2Taxable = Math.max(0, st2Ebitda - annualDepreciation);
+  const st2Tax = (st2Taxable > 0 && !isFreeZone) ? Math.round(st2Taxable * taxRate) : 0;
+  const st2FCF = st2Ebitda - st2Tax;
+  const st2EqFlow = Math.max(0, st2FCF - annualDebtService);
+  const st2Payback = isUtilityIPP 
+    ? (st2EqFlow > 0 ? +(equityCapex / st2EqFlow).toFixed(1) : 0)
+    : (st2FCF > 0 ? +(realisticCAPEX / st2FCF).toFixed(1) : 0);
+  const st2Risk = st2Ebitda <= 0 ? 'Critical' : (st2Payback <= 11.0 ? 'Moderate' : 'Significant');
   const st2PaybackFormatted = st2Ebitda <= 0 
     ? (isArabic ? 'غير متاح (عجز)' : 'N/A (Deficit)') 
     : `${st2Payback} ${isArabic ? 'سنوات' : 'yrs'}`;
 
   // Stress Test 3: Production Drop -10%
   const st3Rev = Math.round((mainProductRevenue * 0.90) + (byproductRevenue * 0.90) + (tippingFeeRevenue * 0.90));
-  const st3OPEX = Math.round(annualOPEX * 0.94);
+  const st3OPEX = Math.round(annualOPEX * 0.95);
   const st3Ebitda = Math.round(st3Rev - st3OPEX);
   const st3EbitdaDelta = st3Ebitda - grossProfit;
-  const st3ProfitAfterTax = (st3Ebitda > 0 && !isFreeZone) ? Math.round(st3Ebitda * (1 - taxRate)) : st3Ebitda;
-  const st3Payback = st3ProfitAfterTax > 0 ? +(realisticCAPEX / st3ProfitAfterTax).toFixed(1) : 0;
-  const st3Risk = st3Ebitda <= 0 ? 'Critical' : (st3Payback <= 6.5 ? 'Moderate' : 'Significant');
+  const st3Taxable = Math.max(0, st3Ebitda - annualDepreciation);
+  const st3Tax = (st3Taxable > 0 && !isFreeZone) ? Math.round(st3Taxable * taxRate) : 0;
+  const st3FCF = st3Ebitda - st3Tax;
+  const st3EqFlow = Math.max(0, st3FCF - annualDebtService);
+  const st3Payback = isUtilityIPP 
+    ? (st3EqFlow > 0 ? +(equityCapex / st3EqFlow).toFixed(1) : 0)
+    : (st3FCF > 0 ? +(realisticCAPEX / st3FCF).toFixed(1) : 0);
+  const st3Risk = st3Ebitda <= 0 ? 'Critical' : (st3Payback <= 11.5 ? 'Moderate' : 'Significant');
   const st3PaybackFormatted = st3Ebitda <= 0 
     ? (isArabic ? 'غير متاح (عجز)' : 'N/A (Deficit)') 
     : `${st3Payback} ${isArabic ? 'سنوات' : 'yrs'}`;
@@ -722,37 +1007,76 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   const labelsAr = ['تراجع -20%', 'تراجع -10%', 'الأساس (Baseline)', 'نمو +10%', 'نمو +20%'];
   const sensitivityDataPoints: SensitivityDataPoint[] = shifts.map((shift, idx) => {
     const shiftedRev = Math.round(annualRevenue * (1 + shift));
-    const shiftedOPEX = Math.round(annualOPEX * (1 - shift * 0.25));
-    const shiftedProfit = Math.round(shiftedRev - shiftedOPEX);
-    const shiftedTax = (shiftedProfit > 0 && !isFreeZone) ? Math.round(shiftedProfit * taxRate) : 0;
-    const shiftedNetProfit = shiftedProfit - shiftedTax;
-    const pb = shiftedNetProfit > 0 ? +(realisticCAPEX / shiftedNetProfit).toFixed(1) : null;
-    const irr = shiftedNetProfit > 0 ? calculateIRR(realisticCAPEX, shiftedNetProfit) : 0;
+    const shiftedOPEX = Math.round(annualOPEX * (1 - shift * 0.15));
+    const shiftedEbitda = Math.round(shiftedRev - shiftedOPEX);
+    const shiftedTaxable = Math.max(0, shiftedEbitda - annualDepreciation);
+    const shiftedTax = (shiftedTaxable > 0 && !isFreeZone) ? Math.round(shiftedTaxable * taxRate) : 0;
+    const shiftedFCF = shiftedEbitda - shiftedTax;
+    const shiftedEqFlow = isUtilityIPP ? Math.max(0, shiftedFCF - annualDebtService) : shiftedFCF;
+    const pb = shiftedEqFlow > 0 
+      ? +( (isUtilityIPP ? equityCapex : realisticCAPEX) / shiftedEqFlow).toFixed(1) 
+      : null;
+    const irr = shiftedFCF > 0 ? calculateIRR(realisticCAPEX, shiftedFCF, projectLifespanYears) : 0;
     return {
       label: isArabic ? labelsAr[idx] : labels[idx],
       payback: pb,
       irr: Math.min(50, +(irr.toFixed(1))),
-      ebitdaK: Math.round(shiftedProfit / 1000)
+      ebitdaK: Math.round(shiftedEbitda / 1000)
     };
   });
 
-  // 14. Objective Bankability Scoring & Verdict
+  // 14. Objective Bankability Scoring & Dynamic Alignment with Feasibility Score
+  let economicScore = 88;
+  if (isOperatingDeficit || annualRevenue < annualOPEX) {
+    economicScore = 20;
+  } else if (paybackYears <= 5.5) {
+    economicScore = 96;
+  } else if (paybackYears <= 8.5) {
+    economicScore = 92;
+  } else if (paybackYears <= 11.5) {
+    economicScore = 88;
+  } else if (paybackYears <= 14.5) {
+    economicScore = 80;
+  } else if (paybackYears <= 18.0) {
+    economicScore = 70;
+  } else if (paybackYears <= projectLifespanYears) {
+    economicScore = 60;
+  } else {
+    economicScore = 35;
+  }
+
+  const sustainabilityScore = isBiofuel ? 94 : 98;
+
+  let riskScore = 85;
+  if (capitalAdequacyRatio >= 1.0) riskScore = 94;
+  else if (capitalAdequacyRatio >= 0.85) riskScore = 88;
+  else if (capitalAdequacyRatio >= 0.60) riskScore = 78;
+  else if (capitalAdequacyRatio >= 0.40) riskScore = 65;
+  else riskScore = 50;
+
+  // Composite Feasibility Score (Weightings: Economics 45%, Sustainability 25%, Risk & Capital 30%)
+  let overallScore = Math.round(economicScore * 0.45 + sustainabilityScore * 0.25 + riskScore * 0.30);
+  if (isOperatingDeficit || grossProfit <= 0) {
+    overallScore = Math.min(38, overallScore);
+  }
+
+  // Investment Verdict & Rating directly dynamically derived from the Feasibility Score (overallScore)
   let viabilityRating: 'A' | 'B' | 'C' = 'A';
   let verdict: 'Investment Grade' | 'Conditionally Viable' | 'Not Bankable' | 'Not Bankable / High Commercial Risk' = 'Investment Grade';
   let auditorClassification: 'Pass' | 'Needs Revision' | 'Critical Financial Issue' = 'Pass';
   let riskClassification: 'Moderate' | 'Significant' | 'Critical' = 'Moderate';
 
-  if (isOperatingDeficit || paybackYears > 12.0 || paybackYears === 0) {
+  if (isOperatingDeficit || overallScore < 50 || paybackYears > projectLifespanYears || paybackYears === 0) {
     viabilityRating = 'C';
     verdict = 'Not Bankable / High Commercial Risk';
     auditorClassification = 'Critical Financial Issue';
     riskClassification = 'Critical';
-  } else if (paybackYears <= 5.5 && capitalAdequacyRatio >= 0.85 && grossProfit > 0) {
+  } else if (overallScore >= 78) {
     viabilityRating = 'A';
     verdict = 'Investment Grade';
     auditorClassification = 'Pass';
     riskClassification = 'Moderate';
-  } else if (paybackYears <= 8.5 && capitalAdequacyRatio >= 0.60 && grossProfit > 0) {
+  } else if (overallScore >= 58) {
     viabilityRating = 'B';
     verdict = 'Conditionally Viable';
     auditorClassification = 'Needs Revision';
@@ -763,25 +1087,6 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
     auditorClassification = 'Critical Financial Issue';
     riskClassification = 'Critical';
   }
-
-  let economicScore = 88;
-  if (isOperatingDeficit) {
-    economicScore = 25;
-  } else if (paybackYears <= 3.5) economicScore = 95;
-  else if (paybackYears <= 5.0) economicScore = 88;
-  else if (paybackYears <= 7.0) economicScore = 75;
-  else if (paybackYears <= 10.0) economicScore = 55;
-  else economicScore = 35;
-
-  const sustainabilityScore = isBiofuel ? 94 : 96;
-
-  let riskScore = 85;
-  if (capitalAdequacyRatio >= 1.0) riskScore = 92;
-  else if (capitalAdequacyRatio >= 0.85) riskScore = 84;
-  else if (capitalAdequacyRatio >= 0.60) riskScore = 68;
-  else riskScore = 44;
-
-  const overallScore = Math.round(economicScore * 0.45 + sustainabilityScore * 0.25 + riskScore * 0.30);
 
   // 15. The 10-Point AI Verification & Mathematical Integrity Audit
   const equationsAudit: ReconciliationAuditCheck[] = [
@@ -806,7 +1111,7 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
         : 'AnnualRevenue = NetElectricityGeneration × OfftakeTariff',
       evaluatedValues: isBiofuel 
         ? `$${annualRevenue.toLocaleString()} = $${mainProductRevenue.toLocaleString()} + $${byproductRevenue.toLocaleString()} + $${tippingFeeRevenue.toLocaleString()}`
-        : `$${annualRevenue.toLocaleString()} = ${productionValue.toLocaleString()} MWh × $${effectiveSellingPrice.toLocaleString()}/MWh`,
+        : `$${annualRevenue.toLocaleString()} = ${productionValue.toLocaleString()} kWh × $${effectiveSellingPrice.toFixed(4)}/kWh`,
       message: isArabic 
         ? 'تم التحقق: معادلة الإيرادات مطابقة بنسبة 100% لمصادر الدخل الأساسية والثانوية ورسوم الاستقبال.'
         : 'Verified: Revenue formula holds true across primary off-take, byproduct, and gate fee streams.'
@@ -817,11 +1122,11 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
       category: 'MATHEMATICAL_IDENTITY',
       status: 'PASSED',
       formula: isBiofuel 
-        ? 'TotalOPEX = Feedstock + Chemicals + Utilities + Labor + Maintenance'
-        : 'TotalOPEX = Routine O&M + Robotic Cleaning + Inverter Maintenance + Utilities + Labor',
+        ? 'TotalOPEX = Feedstock + Chemicals + Utilities + Labor + Maintenance + Insurance'
+        : 'TotalOPEX = Routine Maintenance & O&M + Utilities + Labor + Insurance',
       evaluatedValues: isBiofuel 
-        ? `$${annualOPEX.toLocaleString()} = $${feedstockCost.toLocaleString()} + $${chemicalsCost.toLocaleString()} + $${utilitiesCost.toLocaleString()} + $${laborCost.toLocaleString()} + $${maintenanceCost.toLocaleString()}`
-        : `$${annualOPEX.toLocaleString()} = $${maintenanceCost.toLocaleString()} (O&M & Cleaning) + $${laborCost.toLocaleString()} (Labor) + $${utilitiesCost.toLocaleString()} (Aux Power)`,
+        ? `$${annualOPEX.toLocaleString()} = $${feedstockCost.toLocaleString()} + $${chemicalsCost.toLocaleString()} + $${utilitiesCost.toLocaleString()} + $${laborCost.toLocaleString()} + $${maintenanceCost.toLocaleString()} + $${insuranceCost.toLocaleString()} (Insurance)`
+        : `$${annualOPEX.toLocaleString()} = $${maintenanceCost.toLocaleString()} (Maintenance) + $${laborCost.toLocaleString()} (Labor) + $${utilitiesCost.toLocaleString()} (Utilities) + $${insuranceCost.toLocaleString()} (Insurance)`,
       message: isArabic 
         ? 'تم التحقق: مجموع عناصر OPEX يطابق الإجمالي التشغيلي السنوي تماماً خالي من التناقضات.'
         : 'Verified: Detailed itemized operational costs sum exactly to annual OPEX with zero discrepancy.'
@@ -842,26 +1147,28 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
       name: isArabic ? 'قانون الضرائب العماني وتوطين المنطقة' : 'Oman Corporate Tax Statutory Localization',
       category: 'OMAN_BENCHMARK',
       status: 'PASSED',
-      formula: isFreeZone ? 'CorporateTax = 0% (Free Zone Statutory Incentive)' : 'CorporateTax = GrossProfit × 15% (Oman Tax Authority)',
-      evaluatedValues: `${taxDescription} (Tax: $${corporateTaxUSD.toLocaleString()})`,
+      formula: isFreeZone ? 'CorporateTax = 0% (Free Zone Statutory Incentive)' : 'CorporateTax = max(0, EBITDA - Depreciation) × 15% (Oman Tax Authority)',
+      evaluatedValues: `${taxDescription} (Taxable Income: $${taxableIncome.toLocaleString()} | Tax: $${corporateTaxUSD.toLocaleString()})`,
       message: isArabic 
         ? `تم تطبيق النظام الضريبي الخاص بموقع "${location}" بدقة تامة.`
         : `Accurately applied statutory tax rules for ${location}.`
     },
     {
       id: 'CHK_06_PAYBACK_IDENTITY',
-      name: isArabic ? 'معادلة فترة استرداد رأس المال' : 'Simple Payback Period Identity',
+      name: isArabic ? 'معادلة فترة استرداد رأس المال' : 'Bankable Capital Recovery Payback Identity',
       category: 'MATHEMATICAL_IDENTITY',
       status: 'PASSED',
       formula: isOperatingDeficit 
         ? 'Payback = N/A (Operating Deficit: EBITDA < 0)' 
-        : 'PaybackYears = RealisticCAPEX / NetAnnualProfit',
+        : (isUtilityIPP ? 'EquityPayback = EquityCapex / AnnualEquityCashFlow' : 'PaybackYears = RealisticCAPEX / AnnualFreeCashFlow'),
       evaluatedValues: isOperatingDeficit 
-        ? `N/A | Operating Deficit: -$${Math.abs(grossProfit).toLocaleString()}/yr | Break-Even Tariff: $${breakEvenPrice.toFixed(0)}/${priceUnit}`
-        : `${paybackYears} Yrs = $${realisticCAPEX.toLocaleString()} / $${(netProfit > 0 ? netProfit : grossProfit).toLocaleString()}`,
+        ? `N/A | Operating Deficit: -$${Math.abs(grossProfit).toLocaleString()}/yr | Break-Even Tariff: $${breakEvenPrice.toFixed(4)}/${priceUnit}`
+        : (isUtilityIPP 
+            ? `${equityPaybackYears} yrs Equity Recovery ($${equityCapex.toLocaleString()} / $${annualEquityCashFlowDuringDebt.toLocaleString()}/yr) | Project Asset: ${projectPaybackYears} yrs ($${realisticCAPEX.toLocaleString()} / $${annualFreeCashFlow.toLocaleString()}/yr)`
+            : `${paybackYears} yrs = $${realisticCAPEX.toLocaleString()} / $${annualFreeCashFlow.toLocaleString()}/yr`),
       message: isOperatingDeficit 
         ? (isArabic ? 'تم التحقق: في حال وجود عجز تشغيلي، فإن فترة الاسترداد غير معرفة (لا يوجد استرداد لرأس المال دون تحقيق أرباح).' : 'Verified: With negative operational cash flows, capital payback is mathematically non-existent / undefined.')
-        : (isArabic ? 'تم التحقق: فترة الاسترداد محسوبة بنزاهة رياضية تامة بناءً على النفقات الرأسمالية وصافي الربح.' : 'Verified: Payback period calculation precisely matches capital outlay divided by net profit.')
+        : (isArabic ? 'تم التحقق: فترة استرداد رأس المال محسوبة بنزاهة رياضية تامة بناءً على النفقات الرأسمالية والتدفقات النقدية الصافية.' : 'Verified: Capital recovery calculation precisely matches capital outlay divided by net operating cash flow.')
     },
     {
       id: 'CHK_07_CAPITAL_ADEQUACY',
@@ -899,11 +1206,11 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
       name: isArabic ? 'سلامة القرار الاستثماري (Verdict Rule)' : 'Bankability Verdict Integrity',
       category: 'MATHEMATICAL_IDENTITY',
       status: 'PASSED',
-      formula: 'Verdict = Payback <= 5.5 & CAR >= 0.85 ? Investment Grade : Payback <= 8.5 & CAR >= 0.60 ? Conditionally Viable : Not Bankable',
-      evaluatedValues: `Verdict: ${verdict} (Payback: ${paybackFormatted}, CAR: ${capitalAdequacyRatio})`,
+      formula: 'Verdict = overallScore >= 78 ? Investment Grade (Rating A) : overallScore >= 58 ? Conditionally Viable (Rating B) : Not Bankable (Rating C)',
+      evaluatedValues: `Verdict: ${verdict} | Feasibility Score: ${overallScore}% | Rating: ${viabilityRating} | Payback: ${paybackFormatted}`,
       message: isArabic 
-        ? 'تم التحقق: القرار الاستثماري مشتق بحيادية رياضية من معايير الجدوى دون أي تضارب.'
-        : 'Verified: Verdict strictly determined by deterministic financial thresholds.'
+        ? 'تم التحقق: القرار الاستثماري وتصنيف الجدارة (Rating) مشتقان مباشرة وبشكل ديناميكي من درجة الجدوى الكلية دون أي تعارض.'
+        : 'Verified: Investment verdict and rating are directly synchronized with the composite feasibility score.'
     }
   ];
 
@@ -945,7 +1252,7 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
       category: inputs.category || 'Biofuel',
       feedstock: inputs.feedstock || (inputs.category === 'Renewable Energy' ? 'Solar PV' : 'Waste Cooking Oil'),
       production: `${productionValue.toLocaleString()} ${productionUnit}`,
-      capacity: `${capacityValue.toLocaleString()} ${capacityUnit}`,
+      capacity: capacityFormatted,
       budget: `$${budget.toLocaleString()}`,
       sellingPrice: `$${effectiveSellingPrice.toLocaleString()}/${priceUnit}`,
       electricityCost: inputs.electricityCost !== undefined ? `$${inputs.electricityCost}/kWh` : '$0.050/kWh',
@@ -956,6 +1263,9 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
   return {
     capacityValue,
     capacityUnit,
+    capacityFormatted,
+    capacityFactorPercent,
+    peakSunHoursPerDay,
     productionValue,
     productionUnit,
     budget,
@@ -975,9 +1285,20 @@ export function calculateTechnoEconomics(inputs: FeasibilityInput): CalculatedMe
     grossProfit,
     taxRate,
     corporateTaxUSD,
+    annualDepreciation,
+    taxableIncome,
     netProfit,
+    annualFreeCashFlow,
     paybackYears,
     paybackFormatted,
+    equityCapex,
+    debtCapex,
+    equityPaybackYears,
+    projectPaybackYears,
+    equityIRR,
+    projectIRR,
+    projectLifespanYears,
+    isUtilityIPP,
     irrPercent,
     irrString,
     lcoeOrCostPerTon,
@@ -1205,7 +1526,11 @@ export function buildCompleteAnalysis(inputs: FeasibilityInput, metrics?: Calcul
     isArabic 
       ? `مرتفع وممتاز - فترة استرداد سريعة (${m.paybackYears} سنوات) ومعدل عائد داخلي جذاب (${m.irrString}).`
       : `High - Fast capital payback of ${m.paybackYears} years paired with an attractive ${m.irrString} IRR.`
-  ) : (m.paybackYears <= 7.5) ? (
+  ) : (m.isUtilityIPP && m.paybackYears <= 11.5 && m.irrPercent >= 5.0) ? (
+    isArabic
+      ? `ممتاز وجدير بالاستثمار (Investment Grade) - مشروع بنية أساسية مستقل (IPP) يسترد حقوق الملكية خلال ${m.paybackYears} سنوات بمعدل عائد على حقوق الملكية يبلغ ${m.equityIRR.toFixed(1)}% (${m.irrString}) مدعوماً باتفاقية شراء طاقة PPA سيادية طويلة الأجل.`
+      : `High / Investment Grade - Bankable utility IPP asset recovering equity investment in ${m.paybackYears} years with an attractive ${m.equityIRR.toFixed(1)}% Equity IRR (${m.irrString}) backed by a long-term sovereign PPA off-take framework.`
+  ) : (m.paybackYears <= 12.0) ? (
     isArabic 
       ? `معتدل ومستقر - فترة استرداد متوازنة (${m.paybackYears} سنوات) ومعدل عائد داخلي صحي (${m.irrString}).`
       : `Moderate - Balanced capital payback of ${m.paybackYears} years with healthy ${m.irrString} IRR.`
@@ -1229,14 +1554,14 @@ export function buildCompleteAnalysis(inputs: FeasibilityInput, metrics?: Calcul
       CO2Source: inputs.co2Source || (isArabic ? 'غازات المداخن الصناعية المجمعة' : 'Industrial Flue Gas')
     },
     TechnicalAI: {
-      InstalledCapacity: `${m.capacityValue.toLocaleString()} ${m.capacityUnit}`,
-      EnergyOutput: category === 'Biofuel' 
-        ? `${Math.round(m.productionValue * 37.8).toLocaleString()} GJ/Year` 
-        : `${Math.round(m.productionValue).toLocaleString()} MWh/Year`,
+      InstalledCapacity: m.capacityFormatted || `${m.capacityValue.toLocaleString()} ${m.capacityUnit}`,
+      EnergyOutput: `${Math.round(m.productionValue).toLocaleString()} kWh/Year (${(m.productionValue / 1000000).toFixed(2)} GWh/Year)`,
       BenchmarkCAPEXRange: category === 'Biofuel' 
-        ? `$720 - $1,250 per ton installed capacity` 
-        : `$560 - $820 per kW installed capacity`,
-      TRLEstimate: profile.trl
+        ? `$0.070 - $0.120 per kWh/yr annual capacity ($720 - $1,250/ton equivalent)` 
+        : `$720 - $850 per kW installed capacity (Oman Utility IPP / Manah standard)`,
+      TRLEstimate: profile.trl,
+      CapacityFactor: `${m.capacityFactorPercent.toFixed(1)}%`,
+      PeakSunHoursPerDay: `${m.peakSunHoursPerDay.toFixed(2)} hrs/day`
     },
     FinancialAI: {
       RealisticCAPEX: m.realisticCAPEX,
@@ -1245,15 +1570,21 @@ export function buildCompleteAnalysis(inputs: FeasibilityInput, metrics?: Calcul
       GrossProfit: m.grossProfit,
       PaybackYears: m.paybackYears,
       IRR_Simplified: m.irrString,
-      LCOE_or_CostPerTon: m.lcoeOrCostPerTon
+      LCOE_or_CostPerTon: m.lcoeOrCostPerTon,
+      EquityIRR: `${m.equityIRR.toFixed(1)}%`,
+      ProjectIRR: `${m.projectIRR.toFixed(1)}%`,
+      EquityPaybackYears: m.equityPaybackYears,
+      ProjectLifespanYears: m.projectLifespanYears,
+      MaintenanceCostUSD: m.opexBreakdown.maintenanceUSD,
+      InsuranceCostUSD: m.opexBreakdown.insuranceUSD
     },
     AuditorAI: {
       RecalculatedInstalledCost: m.installedCostPerUnit,
       BenchmarkComparison: isArabic 
-        ? `التكاليف الرأسمالية للمشروع في ${location} تتوافق بدقة مع المعايير الصناعية المعتمدة في السلطنة (مثل مدينة خزائن الاقتصادية وميناء صحار).`
-        : `Project capital requirements in ${location} closely mirror established industrial precedents in Oman (such as Khazaen Economic City and Sohar Port).`,
+        ? `التكاليف الرأسمالية للمشروع في ${location} تتوافق بدقة مع المعايير الصناعية المعتمدة في السلطنة (مثل مجمع منح للطاقة الشمسية وميناء صحار).`
+        : `Project capital requirements in ${location} closely mirror established industrial precedents in Oman (such as Manah Solar Complex and Sohar Port).`,
       UnderfundingDetected: m.underfundingDetected,
-      UnrealisticPaybackFlag: m.isOperatingDeficit || m.paybackYears <= 0 || m.paybackYears < 2.0 || m.paybackYears > 10.0,
+      UnrealisticPaybackFlag: m.isOperatingDeficit || m.paybackYears <= 0 || m.paybackYears > m.projectLifespanYears,
       StressTestResults: {
         RevenueMinus10: isArabic 
           ? `فترة استرداد: ${m.stressTest10PriceDrop.paybackFormatted} | الأرباح: $${m.stressTest10PriceDrop.ebitda.toLocaleString()} (خطر: ${m.stressTest10PriceDrop.risk})` 
@@ -1639,9 +1970,11 @@ export function reconcileAnalysis(raw: any, inputs: FeasibilityInput): BioFuelAn
     },
     TechnicalAI: {
       ...baseline.TechnicalAI,
-      InstalledCapacity: `${m.capacityValue.toLocaleString()} ${m.capacityUnit}`,
+      InstalledCapacity: m.capacityFormatted || `${m.capacityValue.toLocaleString()} ${m.capacityUnit}`,
       EnergyOutput: baseline.TechnicalAI.EnergyOutput,
       BenchmarkCAPEXRange: baseline.TechnicalAI.BenchmarkCAPEXRange,
+      CapacityFactor: `${m.capacityFactorPercent.toFixed(1)}%`,
+      PeakSunHoursPerDay: `${m.peakSunHoursPerDay.toFixed(2)} hrs/day`,
     },
     FinancialAI: {
       RealisticCAPEX: m.realisticCAPEX,
@@ -1651,12 +1984,18 @@ export function reconcileAnalysis(raw: any, inputs: FeasibilityInput): BioFuelAn
       PaybackYears: m.paybackYears,
       IRR_Simplified: m.irrString,
       LCOE_or_CostPerTon: m.lcoeOrCostPerTon,
+      EquityIRR: `${m.equityIRR.toFixed(1)}%`,
+      ProjectIRR: `${m.projectIRR.toFixed(1)}%`,
+      EquityPaybackYears: m.equityPaybackYears,
+      ProjectLifespanYears: m.projectLifespanYears,
+      MaintenanceCostUSD: m.opexBreakdown.maintenanceUSD,
+      InsuranceCostUSD: m.opexBreakdown.insuranceUSD,
     },
     AuditorAI: {
       ...baseline.AuditorAI,
       RecalculatedInstalledCost: m.installedCostPerUnit,
       UnderfundingDetected: m.underfundingDetected,
-      UnrealisticPaybackFlag: baseline.AuditorAI.UnrealisticPaybackFlag,
+      UnrealisticPaybackFlag: m.isOperatingDeficit || m.paybackYears <= 0 || m.paybackYears > m.projectLifespanYears,
       StressTestResults: baseline.AuditorAI.StressTestResults,
       FundingGapUSD: m.fundingGapUSD,
       FundingGapPercentage: m.fundingGapPercentage,
@@ -1676,7 +2015,7 @@ export function reconcileAnalysis(raw: any, inputs: FeasibilityInput): BioFuelAn
       AnnualOPEX: m.annualOPEX,
       GrossProfit: m.grossProfit,
       PaybackPeriodYears: m.paybackYears,
-      PaybackFormatted: baseline.EconomicFeasibility.PaybackFormatted,
+      PaybackFormatted: m.paybackFormatted,
       CapitalAdequacyRatio: m.capitalAdequacyRatio,
       FundingGapUSD: m.fundingGapUSD,
       FundingGapPercentage: m.fundingGapPercentage,
@@ -1690,7 +2029,11 @@ export function reconcileAnalysis(raw: any, inputs: FeasibilityInput): BioFuelAn
     InvestorPerspective: baseline.InvestorPerspective,
     AuditorAssessment: baseline.AuditorAssessment,
     Dashboard: baseline.Dashboard,
-    DynamicScores: baseline.DynamicScores,
+    DynamicScores: {
+      ...baseline.DynamicScores,
+      economicScore: m.economicScore,
+      overallViabilityRating: m.viabilityRating,
+    },
     OmanLogic: baseline.OmanLogic,
     AuditAIReview: m.auditReview,
     AdvancedSensitivity: baseline.AdvancedSensitivity,

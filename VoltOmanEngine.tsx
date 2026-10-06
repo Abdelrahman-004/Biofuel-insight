@@ -248,9 +248,28 @@ export const VoltOmanEngine: React.FC<VoltOmanEngineProps> = ({
     setSelectedZoneForDossier(zoneData);
   };
 
-  // Run calculation immediately on load with default scenario
+  // Run local calculation immediately on load with default scenario
   useEffect(() => {
-    executeVoltOmanAnalysis();
+    const inputData: VoltOmanInput = {
+      routeNameEn,
+      routeNameAr,
+      highwayCorridor,
+      distanceKm: Number(distanceKm),
+      manufacturerRatingKwhPerKm: Number(manufacturerRatingKwhPerKm),
+      batteryCapacityKwh: Number(batteryCapacityKwh),
+      initialSocPct: Number(initialSocPct),
+      minArrivalSocBufferPct: Number(minArrivalSocBufferPct),
+      ambientTempC: Number(ambientTempC),
+      timeOfDayHour: Number(timeOfDayHour),
+      uphillGainMeters: Number(uphillGainMeters),
+      downhillLossMeters: Number(downhillLossMeters),
+      vehicleMassKg: Number(vehicleMassKg),
+      vehicleModelName,
+      maxDcChargingSpeedKw: Number(maxDcChargingSpeedKw),
+      language
+    };
+    const localResult = calculateVoltOmanEngine(inputData);
+    setResult(localResult);
   }, []);
 
   const handleSelectPreset = (preset: typeof PRESET_ROUTES[0]) => {

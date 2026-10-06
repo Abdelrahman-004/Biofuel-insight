@@ -570,20 +570,27 @@ export default function App() {
     analysisFunction: () => Promise<T>,
     toolName?: string,
   ): Promise<T | undefined> => {
-    if (!user) {
-      console.warn(
-        "User is not authenticated (auth failed). Bypassing usage limits to fail open.",
-      );
+    try {
+      if (!user) {
+        return await analysisFunction();
+      }
+      const usage = await checkUsageLimit(user.uid, toolName).catch((err) => {
+        console.warn("Usage limit check bypassed due to network error:", err);
+        return { allowed: true, remaining: 999, planType: 'free' as const, limit: 999 };
+      });
+      if (!usage.allowed) {
+        setShowPricing(true);
+        return undefined;
+      }
+      await incrementUsage(user.uid, toolName).catch((err) => {
+        console.warn("Usage increment non-blocking error:", err);
+      });
+      setUsageRefresh((r) => r + 1);
+      return await analysisFunction();
+    } catch (err) {
+      console.warn("Analysis request failed-open to ensure completion:", err);
       return await analysisFunction();
     }
-    const usage = await checkUsageLimit(user.uid, toolName);
-    if (!usage.allowed) {
-      setShowPricing(true);
-      return undefined;
-    }
-    await incrementUsage(user.uid, toolName);
-    setUsageRefresh((r) => r + 1);
-    return await analysisFunction();
   };
 
   React.useEffect(() => {
@@ -783,7 +790,7 @@ export default function App() {
           energyDomain: result.EnergyDomain,
           production:
             (result.ProjectAnalyzer.ExpectedProduction || 0) > 0
-              ? `${result.ProjectAnalyzer.ExpectedProduction!.toLocaleString()} ${result.ProjectAnalyzer.TechnologyCategory === "Biofuel" ? "Tons" : "MWh"}`
+              ? `${result.ProjectAnalyzer.ExpectedProduction!.toLocaleString()} kWh/Year`
               : "Not Provided",
           budget:
             (result.ProjectAnalyzer.PreliminaryBudgetUSD || 0) > 0

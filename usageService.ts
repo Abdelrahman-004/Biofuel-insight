@@ -11,9 +11,9 @@ export interface UsageData {
 }
 
 const PLAN_LIMITS: Record<PlanType, number> = {
-  free: 3,
-  researcher: 30,
-  investor: 100,
+  free: 50,
+  researcher: 150,
+  investor: 500,
   enterprise: 999999,
 };
 

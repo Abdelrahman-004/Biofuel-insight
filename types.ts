@@ -269,6 +269,8 @@ export interface TechnicalEngineeringAI {
   EnergyOutput: string;
   BenchmarkCAPEXRange: string;
   TRLEstimate: number;
+  CapacityFactor?: string;
+  PeakSunHoursPerDay?: string;
 }
 
 export interface FinancialModelingAI {
@@ -279,6 +281,12 @@ export interface FinancialModelingAI {
   PaybackYears: number;
   IRR_Simplified: string;
   LCOE_or_CostPerTon: string;
+  EquityIRR?: string;
+  ProjectIRR?: string;
+  EquityPaybackYears?: number;
+  ProjectLifespanYears?: number;
+  MaintenanceCostUSD?: number;
+  InsuranceCostUSD?: number;
 }
 
 export interface InvestmentCommitteeAuditor {
